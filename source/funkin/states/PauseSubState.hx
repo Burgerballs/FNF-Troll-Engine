@@ -196,7 +196,7 @@ class PauseSubState extends MusicBeatSubstate
 		var addedItems = [for (text in menuItems){
 			var textStringKey = 'pauseoption_${Paths.formatToSongPath(text)}';
 			text => menu.addTextOption(
-				Paths.hasString(textStringKey) ? Paths.getString(textStringKey) : text,
+				Paths.hasString(textStringKey) ? Paths.getString(textStringKey, true) : text,
 				toAdd.get(text)	
 			);
 		}];

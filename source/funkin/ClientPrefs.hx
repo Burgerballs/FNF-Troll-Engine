@@ -38,6 +38,12 @@ class ClientPrefs
 	public static final epicWindow:Float = -1;
 	#end
 
+	/* TODO: Maybe add a define to embed the strings file
+	#if !MULTILANGUAGE
+    public static var locale:String = 'en';
+	#end
+	*/
+
 	/*	
 		* You can force the value of an option by declaring it outside of the option definitions
 		* This will also remove it from the options menu.
@@ -47,9 +53,7 @@ class ClientPrefs
 		// public static final ghostTapping = false;
 	*/
 
-	static var defaultOptionDefinitions = getOptionDefinitions();
-	inline public static function getOptionDefinitions():Map<String, OptionData>
-	{
+	inline public static function getOptionDefinitions():Map<String, OptionData>{
 		return [
 			// gameplay
 			"controllerMode" => {
@@ -85,7 +89,7 @@ class ClientPrefs
 				desc: "Preset for the judgement windows.",
 				type: Dropdown,
 				value: "Standard",
-                // V-Slice could be named PBOT1??
+				// V-Slice could be named PBOT1??
 				data: ["options" => ["Psych", "V-Slice", "Week 7", "Standard", "ITG", "Custom"]]
 			},
 			"judgeDiff" => {
@@ -102,7 +106,12 @@ class ClientPrefs
 				desc: "How much to offset notes, song events, etc.",
 				type: Number,
 				value: 0,
-				data: ["suffix" => "ms", "min" => -1000, "max" => 1000, "step" => 1,]
+				data: [
+					"min" => -1000, 
+					"max" => 1000, 
+					"step" => 1,
+					"suffix" => "ms"
+				]
 			},
 			"ratingOffset" => {
 				display: "Judgements Offset",
@@ -176,7 +185,7 @@ class ClientPrefs
 					"type" => "percent" // saved value is value / 100
 				]
 			},
-
+	
 			"flashing" => {
 				display: "Flashing Lights",
 				desc: "When toggled, flashing lights will be shown ingame.",
@@ -434,7 +443,7 @@ class ClientPrefs
 					"options" => ["Default", "Advanced", "Kade"]
 				]
 			},
-
+	
 			"judgeCounter" => {
 				display: "Judgement Counter",
 				desc: "How to display the judgement counters.",
@@ -494,7 +503,7 @@ class ClientPrefs
 				value: 180,
 				data: ["suffix" => "ms", "min" => 0, "max" => 200, "step" => 0.1]
 			},
-
+	
 			////
 			"drawDistanceModifier" => {
 				display: "Draw Distance Multiplier",
@@ -574,7 +583,7 @@ class ClientPrefs
 				type: Button,
 				data: []
 			},
-
+	
 			//
 			"discordRPC" => {
 				display: "Discord Rich Presence",
@@ -582,6 +591,15 @@ class ClientPrefs
 				type: Toggle,
 				value: true,
 				data: []
+			},
+	
+			//
+			"locale" => {
+				display: "Language",
+				desc: "Language",
+				type: Dropdown,
+				value: "System default",
+				data: ["options" => ["System Default"]]
 			},
 			
 			// updating
@@ -602,6 +620,8 @@ class ClientPrefs
 			
 		];
 	}
+
+	static var defaultOptionDefinitions:Map<String, OptionData>;
 
 	#if !macro
 	public static var gameplaySettings:Map<String, Dynamic> = [
@@ -659,8 +679,6 @@ class ClientPrefs
 		 0, 0
 	];
 
-    public static var locale:String = 'en';
-
 	// I'd like to rewrite the whole Controls.hx thing tbh
 	// I think its shitty and can stand a rewrite but w/e
 	// later
@@ -697,12 +715,17 @@ class ClientPrefs
 
 	static var manualLoads = ["gameplaySettings", "quantHSV", "arrowHSV", "comboOffset"];
 
-	public static function initialize(){
-		defaultOptionDefinitions.get("framerate").value = FlxG.stage.application.window.displayMode.refreshRate;
-		#if MULTILANGUAGE
-		locale = openfl.system.Capabilities.language;
+	public static function initialize()
+	{	
+		_optionDefinitions["framerate"].value = FlxG.stage.application.window.displayMode.refreshRate;
+		
+		#if (true || MULTILANGUAGE)
+		var localeOptions = _optionDefinitions["locale"].data["options"];
+		for (lang in Paths.getAvailableStringFiles())
+			localeOptions.push(lang.split(".")[0]);
 		#end
 
+		defaultOptionDefinitions = getOptionDefinitions();
 		optionSave.bind("options_v2");
 		loadDefaultKeys();
     }
@@ -724,7 +747,9 @@ class ClientPrefs
 			for (name in options)
 				Reflect.setField(optionSave.data, name, Reflect.field(ClientPrefs, name));
 
-		
+		if (Paths.locale != locale)
+			Paths.locale = locale;
+				
 		// some dumb hardcoded saves
 		for (name in manualLoads)
 			Reflect.setField(optionSave.data, name, Reflect.field(ClientPrefs, name));
@@ -789,7 +814,10 @@ class ClientPrefs
 
 		FlxSprite.defaultAntialiasing = ClientPrefs.globalAntialiasing;
 		FlxG.stage.quality = ClientPrefs.globalAntialiasing ? openfl.display.StageQuality.BEST : openfl.display.StageQuality.LOW; // does nothing!!!!
-
+		
+		if (Paths.locale != locale)
+			Paths.locale = locale;
+		
 		#if discord_rpc
 		discordRPC ? DiscordClient.start() : DiscordClient.shutdown();	
 		#end

@@ -414,18 +414,10 @@ class Paths
 
 		for (filePath in Paths.getFolders("data"))
 		{
-            var checkFiles = ["lang/" + locale + ".txt", "lang/en.txt", "strings.txt"];
-			var file = filePath + checkFiles.shift();
-			while (checkFiles.length > 0 && !exists(file))
-                file = filePath + checkFiles.shift();
-			
-			if (!exists(file))continue;
+			var stringsText = getUpperStringFile(filePath);
+			if (stringsText == null) continue;
 
-
-			var stringsText = getContent(file);
-			var daLines = stringsText.trim().split("\n");
-
-			for(shit in daLines){
+			for(shit in stringsText.trim().split("\n")){
 				var splitted = shit.split("=");
 				var thisKey = splitted.shift();
 
@@ -435,24 +427,42 @@ class Paths
 		}
 	}
 
+	public inline static function getAvailableStringFiles()
+	{
+		var m = new Map<String, Bool>();
+
+		for (folderPath in Paths.getFolders("data/lang")){
+			trace("folder",folderPath);
+			iterateDirectory(folderPath, (fileName)->{
+				trace("found",fileName); 
+				m.set(fileName, true);
+			});
+		}
+
+		return [for (name in m.keys()) name];
+	}
+
 	public inline static function hasString(key:String)
 		return getString(key) != key;
+
+	inline static function getUpperStringFile(folderPath:String):Null<String>
+	{
+		var checkFiles = ["strings.txt", "lang/en.txt", 'lang/$locale.txt'];
+		var stringsText:Null<String> = null;
+		while (checkFiles.length > 0 && stringsText == null)
+			stringsText = getContent(folderPath + checkFiles.pop());
+
+		return stringsText;
+	}
 
 	public static function getString(key:String, force:Bool = false):String
 	{
 		if (!force && currentStrings.exists(key))
 			return currentStrings.get(key);
-	
 
 		for (filePath in Paths.getFolders("data"))
 		{
-			var checkFiles = ["lang/" + locale + ".txt", "lang/en.txt", "strings.txt"];
-			var file = filePath + checkFiles.shift();
-			while (checkFiles.length > 0 && !exists(file))
-				file = filePath + checkFiles.shift();
-
-			//trace(filePath);
-			var stringsText = getContent(file);
+			var stringsText = getUpperStringFile(filePath);
 			if (stringsText == null) continue;
 
 			for (line in stringsText.trim().split("\n")){

@@ -418,6 +418,7 @@ class OptionsSubstate extends MusicBeatSubstate
 			//["audio", ["masterVolume", "songVolume", "hitsoundVolume", "missVolume"]],
 			#if discord_rpc
 			["discord", ["discordRPC"]],
+			["language", ["locale"]],
 			#end
 			#if DO_AUTO_UPDATE
 			["updating", ["checkForUpdates", "downloadBetas"]]
@@ -590,7 +591,8 @@ class OptionsSubstate extends MusicBeatSubstate
 		{
 			var tabName = optionOrder[idx];
 
-			var text = new FlxText(0, 0, 0, Paths.getString('opt_tabName_$tabName').toUpperCase(), 16);
+			var tabNameStringKey = 'opt_tabName_$tabName';
+			var text = new FlxText(0, 0, 0, (Paths.hasString(tabNameStringKey) ? Paths.getString(tabNameStringKey) : tabName).toUpperCase(), 16);
 			#if tgt
 			text.setFormat(Paths.font("calibrib.ttf"), 32, 0xFFFFFFFF, CENTER);
 			#else
