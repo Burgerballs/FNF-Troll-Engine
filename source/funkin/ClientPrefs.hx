@@ -38,11 +38,10 @@ class ClientPrefs
 	public static final epicWindow:Float = -1;
 	#end
 
-	/* TODO: Maybe add a define to embed the strings file
 	#if !MULTILANGUAGE
-    public static var locale:String = 'en';
+	// TODO: Add a define to embed the strings file, maybe even find a way to inline its values somehow
+	public static var locale:String = 'en';
 	#end
-	*/
 
 	/*	
 		* You can force the value of an option by declaring it outside of the option definitions
@@ -719,7 +718,7 @@ class ClientPrefs
 	{	
 		_optionDefinitions["framerate"].value = FlxG.stage.application.window.displayMode.refreshRate;
 		
-		#if (true || MULTILANGUAGE)
+		#if MULTILANGUAGE
 		var localeOptions = _optionDefinitions["locale"].data["options"];
 		for (lang in Paths.getAvailableStringFiles())
 			localeOptions.push(lang.split(".")[0]);
@@ -749,7 +748,7 @@ class ClientPrefs
 
 		if (Paths.locale != locale)
 			Paths.locale = locale;
-				
+
 		// some dumb hardcoded saves
 		for (name in manualLoads)
 			Reflect.setField(optionSave.data, name, Reflect.field(ClientPrefs, name));
