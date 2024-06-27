@@ -6,6 +6,8 @@ import funkin.ClientPrefs;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 
+using funkin.macros.Sowy;
+
 class OptionMacro
 {
 	public static macro function build():Array<Field>
@@ -16,14 +18,6 @@ class OptionMacro
 		var optionNames:Array<String> = [];
 		var definitions:Map<String, OptionData> = ClientPrefs.getOptionDefinitions(); // gets all the option definitions
 
-		function getField(name:String):Null<Field>{
-			for (field in fields){
-				if (field.name == name)
-					return field;
-			}
-			return null;
-		}
-
 		// defining this here cause it'd start type checking the options map for some reason
 		fields.push({
 			name: "_optionDefinitions",
@@ -31,14 +25,14 @@ class OptionMacro
 			kind: FVar(macro : Map<String, OptionData>, macro $v{definitions}),
 			pos: pos
 		});
-		getField("getOptionDefinitions").kind = FFun({
+		fields.findByName("getOptionDefinitions").kind = FFun({
 			args: [],
 			expr: macro { return ClientPrefs._optionDefinitions.copy(); },
 			ret: macro : Map<String, OptionData>
 		});
 
 		for(option => key in definitions){
-			var optionField:Null<Field> = getField(option);
+			var optionField:Null<Field> = fields.findByName(option);
 			if (optionField != null){
 				// if (optionField.access.contains(AStatic))
 					continue;
