@@ -3,11 +3,10 @@ package funkin.objects;
 import funkin.states.PlayState;
 import funkin.scripts.Globals;
 import flixel.FlxG;
-import funkin.objects.shaders.ColorSwap;
+import funkin.objects.shaders.NoteColorSwap;
 
 class NoteSplash extends NoteObject
 {
-	public var colorSwap:ColorSwap = null;
 	private var idleAnim:String;
 	private var textureLoaded:String = null;
 
@@ -15,34 +14,34 @@ class NoteSplash extends NoteObject
 		super(x, y);
 		objType = SPLASH;
 		
-		colorSwap = new ColorSwap();
-		shader = colorSwap.shader;
+		colorSwap = new NoteColorSwap();
+		shader = NoteColorSwap.shader;
 
 		loadAnims(PlayState.splashSkin);
 		setupNoteSplash(x, y, note);
-        visible = false;
+		visible = false;
 	}
 
 	function callOnHScripts(event:String, ?args:Array<Dynamic>, ?vars:Map<String, Dynamic>, ignoreStops = false, ?exclusions:Array<String>):Dynamic{
 		if(FlxG.state == PlayState.instance)
-            return PlayState.instance.callOnScripts(event, args, ignoreStops, exclusions, PlayState.instance.hscriptArray, vars);
-        else
-            return Globals.Function_Continue;
+			return PlayState.instance.callOnScripts(event, args, ignoreStops, exclusions, PlayState.instance.hscriptArray, vars);
+		else
+			return Globals.Function_Continue;
 
-    }
-    
+	}
+	
 	public var animationAmount:Int = 2;
 	public function setupNoteSplash(x:Float, y:Float, column:Int = 0, texture:String = null, hueColor:Float = 0, satColor:Float = 0, brtColor:Float = 0, ?note:Note) 
 	{
 		visible = true;
-        var doR:Bool = false;
+		var doR:Bool = false;
 		if (note != null && note.genScript != null){
-            var ret:Dynamic = note.genScript.call("preSetupNoteSplash", [x, y, column, texture, hueColor, satColor, brtColor, note], ["this" => this, "noteData" => noteData, "column" => column]);
-            if(ret == Globals.Function_Stop) doR = true;
-        }
-        
+			var ret:Dynamic = note.genScript.call("preSetupNoteSplash", [x, y, column, texture, hueColor, satColor, brtColor, note], ["this" => this, "noteData" => noteData, "column" => column]);
+			if(ret == Globals.Function_Stop) doR = true;
+		}
+		
 		if (callOnHScripts("preSetupNoteSplash", [x, y, column, texture, hueColor, satColor, brtColor, note], ["this" => this, "noteData" => noteData, "column" => column]) == Globals.Function_Stop)
-            return;
+			return;
 
 		if (doR)return;
 		
@@ -56,16 +55,16 @@ class NoteSplash extends NoteObject
 		this.column = column;
 		if (texture == null) texture = PlayState.splashSkin;
 
-        if(note != null && note.genScript != null){
+		if(note != null && note.genScript != null){
 			if (note.genScript.exists("texturePrefix")) texture = note.genScript.get("texturePrefix") + texture;
 
-            if (note.genScript.exists("textureSuffix")) texture += note.genScript.get("textureSuffix");
-        }
+			if (note.genScript.exists("textureSuffix")) texture += note.genScript.get("textureSuffix");
+		}
 
 		if (textureLoaded != texture) {
 			var ret = Globals.Function_Continue;
 
-            if (note != null && note.genScript != null)
+			if (note != null && note.genScript != null)
 				ret = note.genScript.call("loadSplashAnims", [texture], ["this" => this, "noteData" => noteData, "column" => column]);
 
 			ret = callOnHScripts("loadSplashAnims", [texture], ["this" => this, "noteData" => noteData, "column" => column]);

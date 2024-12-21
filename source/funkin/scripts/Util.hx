@@ -1,5 +1,7 @@
 package funkin.scripts;
 
+import flixel.system.FlxAssets.FlxGraphicAsset;
+import flixel.util.FlxColor;
 import funkin.scripts.Globals.*;
 import funkin.states.PlayState;
 import funkin.states.GameOverSubstate;
@@ -13,19 +15,20 @@ import flixel.math.FlxMath;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxEase;
 
+using SpriteTools;
 using StringTools;
 
 class Util
 {
 	inline public static function pussyPath(luaFile:String):Null<String>
 	{
-        var hasLuaExtension = false;
-        for(ext in Paths.LUA_EXTENSIONS){
+		var hasLuaExtension = false;
+		for(ext in Paths.LUA_EXTENSIONS){
 			if (luaFile.endsWith('.$ext')){
 				hasLuaExtension = true;
-                break;
-            }
-        }
+				break;
+			}
+		}
 
 		var cervix = hasLuaExtension ? luaFile : luaFile + ".lua";
 		var doPush = false;
@@ -486,11 +489,59 @@ class ModchartSprite extends FlxSprite
 	//public var isInFront:Bool = false;
 	public var animOffsets:Map<String, Array<Float>> = new Map<String, Array<Float>>();
 
-	public function new(?x:Float = 0, ?y:Float = 0)
+	public function new(?x:Float = 0, ?y:Float = 0, ?Graphic:FlxGraphicAsset)
 	{
-		super(x, y);
+		super(x, y, Graphic);
 		//antialiasing = ClientPrefs.globalAntialiasing;
 	}
+
+	// NightmareVision backwards compat
+	#if NMV_MOD_COMPATIBILITY
+	@:noCompletion
+	public function loadImage(Graphic:String, Animated:Bool = false, FrameWidth:Int = 0, FrameHeight:Int = 0, Unique:Bool = false, ?Key:String)
+		return loadGraphic(Graphic, Animated, FrameWidth, FrameHeight, Unique, Key);
+
+	@:noCompletion
+	public function loadFrames(Frames:String) {
+		this.frames = funkin.Paths.getSparrowAtlas(Frames);
+		return this;
+	}
+
+	@:noCompletion
+	public function setScale(ScaleX:Float, ?ScaleY:Float) {
+		scale.set(ScaleX, ScaleY == null ? ScaleX : ScaleY);
+		updateHitbox();
+		return this;
+	}
+
+	@:noCompletion
+	public function centerOnSprite(spr:FlxSprite, axes:flixel.util.FlxAxes = XY)
+		return this.objectCenter(spr, axes);
+
+	@:noCompletion
+	public function addAndPlay(name:String, prefix:String, fps:Float = 24, looped:Bool = true){
+		animation.addByPrefix(name, prefix, fps, looped);
+		animation.play(name);
+		return this;
+	}
+
+	@:noCompletion
+	public function makeScaledGraphic(w:Float = 0, h:Float = 0, color:Int = FlxColor.WHITE, unique:Bool = false, ?key:String = null) {
+		makeGraphic(1, 1, color, unique, key);
+		scale.set(w, h);
+		updateHitbox();
+		return this;
+	}
+	
+	@:noCompletion
+	public function updateGraphicSize(?a:Float, ?b:Float, _:Bool){
+		setGraphicSize(a, b);
+		updateHitbox();
+		return this;
+	}
+	
+	#end
+
 }
 
 class ModchartText extends FlxText

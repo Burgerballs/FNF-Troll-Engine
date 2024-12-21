@@ -9,36 +9,36 @@ import funkin.objects.playfields.NoteField;
 import funkin.states.PlayState;
 
 /* 
-    I'm gonna have to do some changes to NoteField to allow this to happen, but
-    The idea is that ProxyField would be more optimized to use en masse compared to NoteFields, as this'd just copy what the field draws, rather than getting every pos etc itself
-    Just need to figure out how I'm gonna write it tho
-    chances are what i'd have to do is have some sorta "NotefieldManager" which'd handle drawing notefields in specific
-    and it'd be put into 2 phases
-    pre-draw and draw
-    pre-draw grabs all the notes from the playfield its linked to, gets the position they'd be drawn at, etc. This'd store all the drawing info into an array in the notefield
-    draw goes through the list of every NoteField and ProxyField and draws them. for ProxyFields, it just grabs the info from its linked NoteField, and for NoteFields it just uses its own info
-    this shouldnt be too bad? esp. since PlayFields/NoteFields should only be used in PlayState
+	I'm gonna have to do some changes to NoteField to allow this to happen, but
+	The idea is that ProxyField would be more optimized to use en masse compared to NoteFields, as this'd just copy what the field draws, rather than getting every pos etc itself
+	Just need to figure out how I'm gonna write it tho
+	chances are what i'd have to do is have some sorta "NotefieldManager" which'd handle drawing notefields in specific
+	and it'd be put into 2 phases
+	pre-draw and draw
+	pre-draw grabs all the notes from the playfield its linked to, gets the position they'd be drawn at, etc. This'd store all the drawing info into an array in the notefield
+	draw goes through the list of every NoteField and ProxyField and draws them. for ProxyFields, it just grabs the info from its linked NoteField, and for NoteFields it just uses its own info
+	this shouldnt be too bad? esp. since PlayFields/NoteFields should only be used in PlayState
 */
 
 class ProxyField extends FieldBase {
-    var proxiedField:NoteField;
+	var proxiedField:NoteField;
 	var transfarm:ColorTransform = new ColorTransform();
 
 	public function new(field:NoteField){
-        super(0,0);
+		super(0,0);
 		proxiedField = field;
-    }
+	}
 
-    override function preDraw(){
-        // does nothing, since this uses info from its linked notefield
-    }
+	override function preDraw(){
+		// does nothing, since this uses info from its linked notefield
+	}
 	
 	override function update(elapsed:Float){
 		field = proxiedField.field;
 		super.update(elapsed);
 	}
 	var point = FlxPoint.get(0, 0);
-    override function draw(){
+	override function draw(){
 		if (!active || !exists || !visible || !proxiedField.exists || !proxiedField.active)
 			return; // dont draw if visible = false
 
@@ -67,6 +67,7 @@ class ProxyField extends FieldBase {
 				var vertices = object.vertices;
 				var uvData = object.uvData;
 				var indices = object.indices;
+				var colorSwap = object.colorSwap;
 				var transforms:Array<ColorTransform> = [];
 				for (n in 0...Std.int(vertices.length / 2))
 				{
@@ -95,7 +96,7 @@ class ProxyField extends FieldBase {
 						var drawItem = camera.startTrianglesBatch(graphic, shader.bitmap.filter == 4, true, null, true, shader);
 						@:privateAccess
 						{
-							drawItem.addTrianglesColorArray(vertices, indices, uvData, null, point, camera._bounds, transforms);
+							drawItem.addTrianglesColorArray(vertices, indices, uvData, null, point, camera._bounds, transforms, colorSwap);
 						}
 						for (n in 0...transforms.length)
 							transforms[n].alphaMultiplier = alphas[n];
@@ -103,5 +104,5 @@ class ProxyField extends FieldBase {
 				}
 			}
 		}
-    }
+	}
 }

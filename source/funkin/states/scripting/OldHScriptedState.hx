@@ -62,14 +62,14 @@ class OldHScriptedState extends MusicBeatState
 	{
 		var scriptPath:Null<String> = null;
 
-        var hasExtension = false;
-        for(ext in Paths.HSCRIPT_EXTENSIONS){
-            if(fileName.endsWith('.$ext')){
-                hasExtension = true;
-                break;
-            }
-        }
-        
+		var hasExtension = false;
+		for(ext in Paths.HSCRIPT_EXTENSIONS){
+			if(fileName.endsWith('.$ext')){
+				hasExtension = true;
+				break;
+			}
+		}
+		
 		if (!hasExtension)
 			fileName += ".hscript";
 
@@ -206,7 +206,7 @@ class OldHScriptedState extends MusicBeatState
 
 	static var switchToDeprecation = false;
 
-    #if ALLOW_DEPRECATION
+	#if ALLOW_DEPRECATION
 	override function switchTo(s:FlxState)
 	{
 		if (!stateScript.exists("onSwitchTo"))
@@ -225,15 +225,15 @@ class OldHScriptedState extends MusicBeatState
 		stateScript.call("onSwitchToPost", [s]);
 		return true;
 	}
-    #end
-	override function transitionIn()
+	#end
+	override function transitionIn(?onEnter:() -> Void)
 	{
-		if (stateScript.call("onTransitionIn") == Globals.Function_Stop)
+		if (stateScript.call("onTransitionIn", [onEnter]) == Globals.Function_Stop)
 			return;
 
-		super.transitionIn();
+		super.transitionIn(onEnter);
 
-		stateScript.call("onTransitionInPost");
+		stateScript.call("onTransitionInPost", [onEnter]);
 	}
 
 	override function transitionOut(?onExit:() -> Void)

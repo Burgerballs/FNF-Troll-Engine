@@ -1,6 +1,5 @@
 package funkin.data;
 
-import funkin.scripts.FunkinHScript;
 import funkin.objects.Note;
 
 /**
@@ -8,32 +7,33 @@ import funkin.objects.Note;
  */
 enum abstract ComboBehaviour(Int) from Int to Int
 {
-    /** doesnt increment or break your combo */
-    var IGNORE = 0;
-    /** increments your combo by 1 */
-    var INCREMENT = 1;
-    /** breaks your combo */
-    var BREAK = -1;
+	/** doesnt increment or break your combo */
+	var IGNORE = 0;
+	/** increments your combo by 1 */
+	var INCREMENT = 1;
+	/** breaks your combo */
+	var BREAK = -1;
 }
 
 /**
  * Defines how a judgment behaves (hit window, score, etc)
  */
 typedef JudgmentData = {
-    internalName:String, // internal name of the judge
-    displayName:String, // how this judge is displayed in UI, etc
-    window:Float, // hit window to hit this judge
-    score:Int, // score you gain when hitting this judge
-    accuracy:Float, // how much accuracy is added by this judge. unused by wife3
-    health:Float, // % of health to add/remove
+	internalName:String, // internal name of the judge
+	displayName:String, // how this judge is displayed in UI, etc
+	window:Float, // hit window to hit this judge
+	score:Int, // score you gain when hitting this judge
+	accuracy:Float, // how much accuracy is added by this judge. unused by wife3
+	health:Float, // % of health to add/remove
 	noteSplash:Bool, // whether this judge should cause a note splash
-    // var frame:Int; // where in the judgment sheet this judgment lies
+	// var frame:Int; // where in the judgment sheet this judgment lies
 
 	?wifePoints:Float, // if this isn't null, then Wife3 wont do any calculations and will instead just add these to the wife score/accuracy
 	?pbotPoints:Float, // if this isn't null, then PBOT wont do any calculations and will instead just add these to the pbot score/accuracy
 	?hideJudge:Bool, // if this is true then this judge wont show a judgment image
-    ?comboBehaviour:ComboBehaviour, // how this judge affects your combo (IGNORE, INCREMENT or BREAK). Defaults to INCREMENT
-    ?badJudgment:Bool // used for mines, etc. makes it so the window isnt scaled by the judge difficulty. defaults to false
+	?comboBehaviour:ComboBehaviour, // how this judge affects your combo (IGNORE, INCREMENT or BREAK). Defaults to INCREMENT
+	?badJudgment:Bool, // used for mines, etc. makes it so the window isnt scaled by the judge difficulty. defaults to false
+	?countAsHit:Bool // False for stuff like hold drops
 
 }
 
@@ -61,68 +61,68 @@ enum abstract Judgment(String) from String to String // this just makes it easie
  * I hate how Psych does judges with its Rating classes so I decided to rewrite it lol
  */
 class JudgmentManager {
-    public var judgmentData:Map<Judgment, JudgmentData> = [
+	public var judgmentData:Map<Judgment, JudgmentData> = [
 		#if USE_EPIC_JUDGEMENT
-        TIER5 => {
-            internalName: "epic",
-            displayName: "Epic",
+		TIER5 => {
+			internalName: "epic",
+			displayName: "Epic",
 			window: ClientPrefs.epicWindow,
-            score: 500,
-            accuracy: 100,
-            health: 1.15, // maybe change to 1, to match V-Slice?
+			score: 500,
+			accuracy: 100,
+			health: 1.15, // maybe change to 1, to match V-Slice?
 			noteSplash: true,
-        },
+		},
 		#end
-        TIER4 => {
-            internalName: "sick",
-            displayName: "Sick",
+		TIER4 => {
+			internalName: "sick",
+			displayName: "Sick",
 			window: ClientPrefs.sickWindow,
-            score: 350,
-            accuracy: 90,
+			score: 350,
+			accuracy: 90,
 			health: 1.15, // maybe change to 0.75, to match V-Slice?
 			noteSplash: true,
-        },
-        TIER3 => {
-            internalName: "good",
-            displayName: "Good",
+		},
+		TIER3 => {
+			internalName: "good",
+			displayName: "Good",
 			window: ClientPrefs.goodWindow,
-            score: 100,
-            accuracy: 10,
-            health: 0, // maybe change to 0.375 to match V-Slice?
+			score: 100,
+			accuracy: 10,
+			health: 0, // maybe change to 0.375 to match V-Slice?
 			noteSplash: false,
-        },
-        TIER2 => {
-            internalName: "bad",
-            displayName: "Bad",
+		},
+		TIER2 => {
+			internalName: "bad",
+			displayName: "Bad",
 			window: ClientPrefs.badWindow,
-            score: 0,
-            accuracy: -75,
-            health: -1.15, // I think we could make this less punishing, just to be closer to V-Slice, but I think shit should stay where it is
+			score: 0,
+			accuracy: -75,
+			health: -1.15, // I think we could make this less punishing, just to be closer to V-Slice, but I think shit should stay where it is
 			comboBehaviour: BREAK,
 			noteSplash: false,
-        },
-        TIER1 => {
-            internalName: "shit",
-            displayName: "Shit",
+		},
+		TIER1 => {
+			internalName: "shit",
+			displayName: "Shit",
 			window: ClientPrefs.hitWindow,
-            score: -150,
-            accuracy: -220,
-            health: -2.375,
+			score: -150,
+			accuracy: -220,
+			health: -2.375,
 			comboBehaviour: BREAK,
 			noteSplash: false,
-        },
-        MISS => {
-            internalName: "miss",
+		},
+		MISS => {
+			internalName: "miss",
 			displayName: "Miss",
-            window: -1,
-            score: -350,
-            accuracy: -275,
+			window: -1,
+			score: -350,
+			accuracy: -275,
 			wifePoints: Wife3.missWeight,
 			pbotPoints: PBot.missWeight,
-            health: -5,
+			health: -5,
 			comboBehaviour: BREAK,
 			noteSplash: false,
-        },
+		},
 		DROPPED_HOLD => {
 			internalName: "miss",
 			displayName: "Miss",
@@ -130,10 +130,11 @@ class JudgmentManager {
 			score: -350,
 			accuracy: -175,
 			wifePoints: Wife3.holdDropWeight,
-			pbotPoints: PBot.missWeight,
+			pbotPoints: 0,
 			health: -2.5,
 			comboBehaviour: BREAK,
 			noteSplash: false,
+			countAsHit: false
 		},
 		DAMAGELESS_MISS => {
 			internalName: "miss",
@@ -147,21 +148,21 @@ class JudgmentManager {
 			comboBehaviour: BREAK,
 			noteSplash: false,
 		},
-        HIT_MINE => {
-            internalName: "mine",
-            displayName: "Mine",
-            window: 75, // same as Etterna's mines
-            score: -200,
+		HIT_MINE => {
+			internalName: "mine",
+			displayName: "Mine",
+			window: 75, // same as Etterna's mines
+			score: -200,
 			accuracy: -450,
 			wifePoints: Wife3.mineWeight,
 			pbotPoints: PBot.mineWeight,
-            health: -5,
-            badJudgment: true,
+			health: -5,
+			badJudgment: true,
 			comboBehaviour: IGNORE,
 			noteSplash: false,
 			hideJudge: true
-        },
-	    MISS_MINE => { // for legacy reasons
+		},
+		MISS_MINE => { // for legacy reasons
 			internalName: "miss",
 			displayName: "Mine",
 			window: 75,
@@ -175,21 +176,21 @@ class JudgmentManager {
 			noteSplash: true,
 			hideJudge: true
 		},
-        CUSTOM_MINE => {
-            internalName: "customMine",
-            displayName: "Mine",
-            window: 75,
-            score: 0,
+		CUSTOM_MINE => {
+			internalName: "customMine",
+			displayName: "Mine",
+			window: 75,
+			score: 0,
 			accuracy: -450,
 			wifePoints: Wife3.mineWeight,
 			pbotPoints: PBot.mineWeight,
-            health: 0,
-            badJudgment: true,
+			health: 0,
+			badJudgment: true,
 			comboBehaviour: IGNORE,
 			noteSplash: false,
 			hideJudge: true
-        }
-    ];
+		}
+	];
 	// these are judgments that you can *actually* hit and arent caused by special notes (i.e Mines) // should be from highest to lowest
 	public var hittableJudgments:Array<Judgment>; 
 	public var judgeTimescale:Float = 1; // scales hit windows
@@ -211,15 +212,26 @@ class JudgmentManager {
 		judgmentData.get(TIER2).comboBehaviour = INCREMENT;
 	}
 
-    /**
-     * Returns the hit window for a judgment, with the judgeTimescale taken into account
-     * @param judgment The judgment to get the hit window for
-     */
-    inline public function getWindow(judgment:Judgment){
+	/**
+	 * Returns the hit window for a judgment, with the judgeTimescale taken into account
+	 * @param judgment The judgment to get the hit window for
+	 */
+	inline public function getWindow(judgment:Judgment){
 		var d:JudgmentData = judgmentData.get(judgment);
 		return d.window * ((d.badJudgment && judgeTimescale<1)?1:judgeTimescale);
-    }
-    
+	}
+	
+	/**
+	 * Returns a judgment for a time difference.
+	 */
+	public function judgeTimeDiff(diff:Float) {
+		for (judge in hittableJudgments) {
+			if (diff <= getWindow(judge))
+				return judge;
+		}
+		return UNJUDGED;
+	}
+
 	/**
 	 * Returns a judgment for a note.
 	 * @param note Note to return a judgment for
@@ -227,38 +239,34 @@ class JudgmentManager {
 	 */
 	public function judgeNote(note:Note, ?hitTime:Float)
 	{
-        // might be inefficient? idk might wanna optimize this at some point if so
+		// might be inefficient? idk might wanna optimize this at some point if so
 
 		if (hitTime==null) hitTime = Conductor.songPosition;
 		var diff:Float = Math.abs(note.strumTime - hitTime);
 
-        switch(note.noteType){
-            case 'Hurt Note':
-                if (diff <= getWindow(HIT_MINE)) 
+		switch(note.noteType){
+			case 'Hurt Note':
+				if (diff <= getWindow(HIT_MINE)) 
 					return HIT_MINE;
 
-            default:
+			default:
 				if (note.noteScript != null){
 					var judge = note.noteScript.executeFunc("judgeNote", [note, diff], note);
 					if (judge != null) return judge;
 				}
 
-				if (note.hitCausesMiss){
+				if (note.hitCausesMiss) {
 					if (diff <= getWindow(MISS_MINE))
 						return MISS_MINE;
-                }else{
-                    for(judge in hittableJudgments){
-                        if(diff <= getWindow(judge))
-                            return judge;
-                    }
-                }
-
-        }
-        // did you know if you always return UNJUDGED a note won't be hittable?
-        // i thought that was interesting
-        return UNJUDGED;
-        // (aka fake notes when)
-    }
+				}
+				
+				return judgeTimeDiff(diff);
+		}
+		// did you know if you always return UNJUDGED a note won't be hittable?
+		// i thought that was interesting
+		return UNJUDGED;
+		// (aka fake notes when)
+	}
 }
 
 // V-Slice
@@ -268,7 +276,6 @@ class PBot
 	public static inline final version:Float = 1; // increment this if any values for scoring changes
 	
 	public static var missThreshold:Float = 160.0; // This gets set in PlayState
-	
 
 	static inline final perfectThreshold:Float = 5.0;
 	public static var holdScorePerSecond:Float = 250.0;
@@ -282,14 +289,16 @@ class PBot
 	static inline final scoringSlope = 0.080;
 	static inline final scoringOffset = 54.99;
 
+	public static function getAcc(noteDiff:Float) {
+		// trace(noteDiff, missThreshold);
 
-	public static function getAcc(noteDiff:Float){
 		// TODO: find a math wizard who can add timescale to this
+		
 		return (switch (noteDiff) {
-			case(_ > missThreshold) => true:
-				missWeight;
 			case(_ <= perfectThreshold) => true:
 				perfectWeight;
+			case(_ > missThreshold) => true:
+				missWeight;
 			default:
 				// Fancy equation.
 				var factor:Float = 1.0 - (1.0 / (1.0 + Math.exp(-scoringSlope * (noteDiff - scoringOffset))));
@@ -301,6 +310,18 @@ class PBot
 // Etterna
 class Wife3
 {
+	public static var judgeScales:Map<String, Float> = [
+		"J1" => 1.50,
+		"J2" => 1.33,
+		"J3" => 1.16,
+		"J4" => 1.0,
+		"J5" => 0.84,
+		"J6" => 0.66,
+		"J7" => 0.5,
+		"J8" => 0.33,
+		"JUSTICE" => 0.2
+	];
+	
 	public static inline final version:Float = 1; // increment this if any values for scoring changes
 
 	public static final missWeight:Float = -5.5;

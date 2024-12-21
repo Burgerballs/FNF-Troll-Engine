@@ -58,7 +58,7 @@ class ChartingState extends MusicBeatState
 {
 	public static var instance:ChartingState;
 	
-    public var offset:Float = 0;
+	public var offset:Float = 0;
 	public var notetypeScripts:Map<String, FunkinHScript> = [];
 	public static var noteTypeList:Array<String> = //Used for backwards compatibility with 0.1 - 0.3.2 charts, though, you should add your hardcoded custom note types here too.
 	[
@@ -70,9 +70,9 @@ class ChartingState extends MusicBeatState
 		'No Animation'
 	];
 
-    var hudList:Array<String> = [
-        'Default'
-    ];
+	var hudList:Array<String> = [
+		'Default'
+	];
 
 	private var noteTypeIntMap:Map<Int, String> = new Map<Int, String>();
 	private var noteTypeMap:Map<String, Null<Int>> = new Map<String, Null<Int>>();
@@ -280,7 +280,7 @@ class ChartingState extends MusicBeatState
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("Chart Editor", _song.song);
 		#end
-        
+		
 		/*
 		if(_song.metadata==null){
 			_song.metadata = {
@@ -477,8 +477,8 @@ class ChartingState extends MusicBeatState
 		}else{
 			reloadGridLayer();
 			updateHeads();
-            trace(curSec);
-            changeSection(curSec);
+			trace(curSec);
+			changeSection(curSec);
 		}
 
 
@@ -557,17 +557,10 @@ class ChartingState extends MusicBeatState
 
 		var loadEventJson:FlxButton = new FlxButton(loadAutosaveBtn.x, loadAutosaveBtn.y + 30, 'Load Events', function()
 		{
-
 			var songName:String = Paths.formatToSongPath(_song.song);
-			var file:String = Paths.songJson(songName + '/events');
-			#if sys
-			if (#if MODS_ALLOWED FileSystem.exists(Paths.modsSongJson(songName + '/events')) || #end FileSystem.exists(file))
-			#else
-			if (OpenFlAssets.exists(file))
-			#end
-			{
+			var events:SwagSong = Song.loadFromJson('events', songName, false);
+			if (events != null) {
 				clearEvents();
-				var events:SwagSong = Song.loadFromJson('events', songName, false);
 				_song.events = events.events;
 				changeSection(curSec);
 			}
@@ -622,8 +615,8 @@ class ChartingState extends MusicBeatState
 		blockPressWhileTypingOnStepper.push(stepperSpeed);
 
 		////
-        var skins:Array<String> = ['default'];
-        #if MODS_ALLOWED
+		var skins:Array<String> = ['default'];
+		#if MODS_ALLOWED
 		var skinsLoaded:Map<String, Bool> = new Map();
 		var directories:Array<String> = Paths.getFolders('hudskins');
 		for (i in 0...directories.length) {
@@ -729,7 +722,7 @@ class ChartingState extends MusicBeatState
 		tab_group_song.add(saveButton);
 		tab_group_song.add(saveEvents);
 
-        // TODO: per-song metadata 
+		// TODO: per-song metadata 
 /* 		tab_group_song.add(saveMetadata);
 		tab_group_song.add(loadMetadata); */
 		tab_group_song.add(reloadSong);
@@ -1618,7 +1611,7 @@ class ChartingState extends MusicBeatState
 		}
 		
 		var firstInstName:String = jsonTracks.inst[0];
-		if (soundTracksMap.exists(firstInstName)){
+		if (soundTracksMap.exists(firstInstName)) {
 			inst = soundTracksMap.get(firstInstName);
 			inst.volume = 0.6;
 
@@ -1710,23 +1703,23 @@ class ChartingState extends MusicBeatState
 				_song.song = UI_songTitle.text;
 			}else if(curSelectedNote != null)
 			{
-                if(curSelectedNote[1][curEventSelected] != null){
-				    if(sender == value1InputText) {
-                        curSelectedNote[1][curEventSelected][1] = value1InputText.text;
-                        updateGrid();
-                    }
-                    else if(sender == value2InputText) {
-                        curSelectedNote[1][curEventSelected][2] = value2InputText.text;
-                        updateGrid();
-                    }
-                }
-                if(sender == strumTimeInputText) {
-                    var value:Float = Std.parseFloat(strumTimeInputText.text);
-                    if(Math.isNaN(value)) value = 0;
-                    curSelectedNote[0] = value;
-                    updateGrid();
-                }
-                
+				if(curSelectedNote[1][curEventSelected] != null){
+					if(sender == value1InputText) {
+						curSelectedNote[1][curEventSelected][1] = value1InputText.text;
+						updateGrid();
+					}
+					else if(sender == value2InputText) {
+						curSelectedNote[1][curEventSelected][2] = value2InputText.text;
+						updateGrid();
+					}
+				}
+				if(sender == strumTimeInputText) {
+					var value:Float = Std.parseFloat(strumTimeInputText.text);
+					if(Math.isNaN(value)) value = 0;
+					curSelectedNote[0] = value;
+					updateGrid();
+				}
+				
 			}
 		}
 		else if (id == FlxUISlider.CHANGE_EVENT && (sender is FlxUISlider))
@@ -2629,7 +2622,7 @@ class ChartingState extends MusicBeatState
 					track.pause();
 					track.time = Conductor.songPosition;
 				}
-                //trace(Conductor.songPosition, inst.time);
+				//trace(Conductor.songPosition, inst.time);
 
 				updateCurStep();
 			}
@@ -2839,13 +2832,12 @@ class ChartingState extends MusicBeatState
 	}
 
 	function initNoteType(notetype:String){
-		if(notetype == '')return;
-		if(notetypeScripts.exists(notetype))return;
+		if(notetype == '') return;
+		if(notetypeScripts.exists(notetype)) return;
 		var did:Bool = false;
+
 		#if PE_MOD_COMPATIBILITY
-		var fuck = ["notetypes", "custom_notetypes"];
-		for (file in fuck)
-		{
+		for (file in ["notetypes", "custom_notetypes"]) {
 			var baseScriptFile:String = '$file/$notetype';
 		#else
 		var baseScriptFile:String = 'notetypes/$notetype';
@@ -2957,10 +2949,16 @@ class ChartingState extends MusicBeatState
 			note.x + (GRID_SIZE - susWidth) * 0.5, 
 			note.y + tailOffset
 		);
-		spr.makeGraphic(1, 1, note.isQuant ? 0xFFFF0000 : noteColors[note.column % noteColors.length]);
+		var color:FlxColor = note.isQuant ? 0xFFFF0000 : noteColors[note.column % noteColors.length];
+		color.setHSB(
+			((color.hue + note.colorSwap.hue * 360) % 360 + 360) % 360,
+			CoolUtil.boundTo(color.saturation * 0.01 * (1.0 + note.colorSwap.saturation), 0.0, 1.0) * 100.0,
+			(color.brightness * 0.01 * (1.0 + note.colorSwap.brightness)) * 100.0,
+			color.alphaFloat
+		);
+		spr.makeGraphic(1, 1, color);
 		spr.scale.set(susWidth, height);
 		spr.updateHitbox();
-		spr.shader = note.shader;
 		
 		return spr;
 	}
@@ -3238,8 +3236,12 @@ class ChartingState extends MusicBeatState
 
 	private function saveLevel()
 	{
-		if(_song.events != null && _song.events.length > 1) _song.events.sort(sortByTime);
+		if (_song.events != null && _song.events.length > 1) 
+			_song.events.sort(sortByTime);
 		
+		var _song = Reflect.copy(_song);
+		Reflect.deleteField(_song, "path");
+
 		var json = {"song": _song};
 		var data:String = Json.stringify(json, "\t");
 

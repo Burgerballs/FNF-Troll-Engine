@@ -11,13 +11,11 @@ import flixel.util.FlxTimer;
 import funkin.objects.shaders.ColorSwap;
 
 using StringTools;
+
 #if DISCORD_ALLOWED
 import funkin.api.Discord.DiscordClient;
 #end
-#if sys
-import sys.FileSystem;
-import sys.io.File;
-#end
+
 // used so stages wont break
 class FakeCharacter
 {
@@ -245,7 +243,7 @@ class TitleState extends MusicBeatState
 		if (initialized){
 			Paths.clearUnusedMemory();
 			skipIntro();
-        }else{
+		}else{
 			initialized = true;
 			MusicBeatState.playMenuMusic(0, true);
 		}
@@ -255,34 +253,18 @@ class TitleState extends MusicBeatState
 	{
 		var swagGoodArray:Array<Array<String>> = [];
 
-		Paths.currentModDirectory = "";
-		var rawFile:Null<String> = Paths.getContent(Paths.txt('introText'));
-
-		if (rawFile != null){
-			for (line in rawFile.rtrim().split('\n'))
-				swagGoodArray.push(line.split('--'));
-		}
-
-		#if MODS_ALLOWED
-		for (mod in Paths.getModDirectories()){
-			Paths.currentModDirectory = mod;
-
-			var rawFile:Null<String> = Paths.getContent(Paths.modsTxt("introText.txt"));
-
-			if (rawFile != null){
+		for (folder in Paths.getFolders("data")) {
+			var rawFile:Null<String> = Paths.getText('$folder/introText.txt');
+			if (rawFile != null) {
 				for (line in rawFile.rtrim().split('\n'))
 					swagGoodArray.push(line.split('--'));
 			}	
 		}
-		Paths.currentModDirectory = '';
-		#end
 
-		////
 		return swagGoodArray;
 	}
 
 	var transitioning:Bool = false;
-	private static var playJingle:Bool = false;
 	var titleTimer:Float = 0;
 
 	override function update(elapsed:Float)
@@ -291,7 +273,7 @@ class TitleState extends MusicBeatState
 			bg.stageScript.set("curDecBeat", curDecBeat);
 			bg.stageScript.set("curDecStep", curDecStep);
 			bg.stageScript.call('update', [elapsed]);
-        }
+		}
 		if (FlxG.sound.music != null)
 			Conductor.songPosition = FlxG.sound.music.time;
 
@@ -344,7 +326,7 @@ class TitleState extends MusicBeatState
 				if (titleText != null)
 					titleText.animation.play('press');
 
-                remove(darkness);
+				remove(darkness);
 				camHUD.flash(ClientPrefs.flashing ? FlxColor.WHITE : 0x4CFFFFFF, 1, null, true);
 				FlxG.sound.play(Paths.sound('confirmMenu'), 0.7 );
 
@@ -419,7 +401,7 @@ class TitleState extends MusicBeatState
 
 		if(!closedState) {
 			sickBeats++;
-            // this could prob be replaced with a json, yaml or even a whole "TitleSequence" script?? :shrug:
+			// this could prob be replaced with a json, yaml or even a whole "TitleSequence" script?? :shrug:
 			switch (sickBeats #if tgt * 0.5 #end)
 			{
 				case 1:
@@ -492,22 +474,22 @@ class TitleState extends MusicBeatState
 	{
 		super.stepHit();
 
-        if (bg != null && bg.stageScript != null)
-        {
-            if (skippedIntro){
-                bg.stageScript.set("curStep", curStep);
-                bg.stageScript.call('onStepHit', []);
-            }
-            var nuSection:Int = Math.floor(curBeat / 4);
-            if (section != nuSection)
-            {
-                section = nuSection;
-                if (skippedIntro){
-                    bg.stageScript.set("curSection", section);
-                    bg.stageScript.call('onSectionHit', []);
-                }
-            }
-        }
+		if (bg != null && bg.stageScript != null)
+		{
+			if (skippedIntro){
+				bg.stageScript.set("curStep", curStep);
+				bg.stageScript.call('onStepHit', []);
+			}
+			var nuSection:Int = Math.floor(curBeat / 4);
+			if (section != nuSection)
+			{
+				section = nuSection;
+				if (skippedIntro){
+					bg.stageScript.set("curSection", section);
+					bg.stageScript.call('onSectionHit', []);
+				}
+			}
+		}
 	}
 
 
@@ -519,7 +501,7 @@ class TitleState extends MusicBeatState
 		{
 			camGame.filters.remove(blurFilter);
 
-            titleText.visible = true;
+			titleText.visible = true;
 			logoBl.visible = true;
 			remove(ngSpr);
 			remove(blackScreen);

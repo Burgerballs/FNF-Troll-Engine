@@ -254,7 +254,6 @@ class NoteOffsetState extends MusicBeatState
 			if(beatTween != null) beatTween.cancel();
 
 			persistentUpdate = false;
-			CustomFadeTransition.nextCamera = camOther;
 			MusicBeatState.switchState(new funkin.states.options.OptionsState());
 			MusicBeatState.playMenuMusic(true);
 			FlxG.mouse.visible = false;
@@ -371,15 +370,15 @@ class NoteOffsetState extends MusicBeatState
 
 		if (!transitioned){
 			transitioned = true;
-		    doDaInTrans();
-        }
-    }
-    
+			doDaInTrans();
+		}
+	}
+	
 	override function finishTransIn()
 		getLowestState().closeSubState();
 	
-    
-    function doDaInTrans(){
+	
+	function doDaInTrans(){
 		if (transIn != null)
 		{
 			if (FlxTransitionableState.skipNextTransIn)
@@ -398,7 +397,7 @@ class NoteOffsetState extends MusicBeatState
 			FadeTransitionSubstate.nextCamera = camOther;
 			trans.start(OUT);
 		}
-    }
+	}
 
 	function doDaOutTrans(?OnExit:Void->Void){
 		_onExit = OnExit;
@@ -414,7 +413,7 @@ class NoteOffsetState extends MusicBeatState
 		{
 			_onExit();
 		}
-    }
+	}
 
 	override function transitionToState(nextState:FlxState):Void
 	{
@@ -429,7 +428,7 @@ class NoteOffsetState extends MusicBeatState
 	}
 
 
-	override public function transitionOut(?OnExit:Void->Void):Void{} // same as transitionin
+	override public function transitionOut(?_):Void{} // same as transitionin
 	
-	override public function transitionIn():Void{} // so the super.create doesnt transition
+	override public function transitionIn(?_):Void{} // so the super.create doesnt transition
 }

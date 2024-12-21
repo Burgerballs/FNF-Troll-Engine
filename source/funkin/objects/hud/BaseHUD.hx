@@ -1,5 +1,7 @@
 package funkin.objects.hud;
 
+import flixel.text.FlxText;
+import flixel.ui.FlxBar;
 import flixel.util.FlxColor;
 import funkin.data.JudgmentManager.JudgmentData;
 import haxe.exceptions.NotImplementedException;
@@ -10,6 +12,12 @@ import flixel.group.FlxSpriteGroup;
 // bunch of basic stuff to be extended by other HUDs
 
 class BaseHUD extends FlxSpriteGroup {
+	public var isUpdating:Bool = true;
+	public var timeBar:FlxBar;
+	public var timeTxt:FlxText;
+	public var timeBarBG:FlxSprite;
+
+	
 	var stats:Stats;
 	// just some ref vars
 	var fullDisplays:Map<String, String> = [
@@ -33,11 +41,11 @@ class BaseHUD extends FlxSpriteGroup {
 	];
 
 	// Used for compatibility with Psych scripts
-    public function getHealthbar():FNFHealthBar 
+	public function getHealthbar():FNFHealthBar 
 		return null; 
 	
-    @:isVar public var displayNames(get, null):Map<String, String>;
-    @:noCompletion function get_displayNames()
+	@:isVar public var displayNames(get, null):Map<String, String>;
+	@:noCompletion function get_displayNames()
 		return ClientPrefs.judgeCounter == 'Shortened' ? shortenedDisplays : fullDisplays;
 
 
@@ -120,7 +128,7 @@ class BaseHUD extends FlxSpriteGroup {
 
 	public function changedOptions(changed:Array<String>){}
 	public function songStarted(){}
-    public function changedCharacter(id:Int, char:Character){}
+	public function changedCharacter(id:Int, char:Character){}
 	public function songEnding(){}
 
 	public function stepHit(step:Int){}

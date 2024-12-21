@@ -1,5 +1,9 @@
 package funkin.scripts;
 
+import funkin.scripts.Util.ModchartSprite;
+#if USING_FLXANIMATE
+import funkin.objects.FlxAnimateCompat; // vscode stfu
+#end
 import funkin.scripts.FunkinScript.ScriptType;
 import funkin.objects.IndependentVideoSprite;
 import funkin.scripts.*;
@@ -128,7 +132,7 @@ class FunkinHScript extends FunkinScript
 		set("Reflect", Reflect);
 		set("Math", Math);
 		set("StringTools", StringTools);
-        set("Main", Main);
+		set("Main", Main);
 
 		set("StringMap", haxe.ds.StringMap);
 		set("ObjectMap", haxe.ds.ObjectMap);
@@ -141,6 +145,40 @@ class FunkinHScript extends FunkinScript
 		set("getClass", Type.resolveClass);
 		set("getEnum", Type.resolveEnum);
 		
+		#if NMV_MOD_COMPATIBILITY
+		set("addHaxeLibrary", function(c:String, ?p:String){
+			// Dumb hardcoded whatever idc!!!
+
+			if (c == 'KUTValueHandler')
+				return;
+
+			if (c == 'HitSingleMenu'){
+				importClass("funkin.states.FreeplayState");
+				return;
+			}
+
+			if (p == 'meta.states')
+				p = 'funkin.states';
+
+			if (p == 'gameObjects')
+				p = 'funkin.objects';
+
+			if (p == 'gameObjects.shader')
+				p = 'funkin.objects.shaders';
+
+			if (p == 'meta.data')
+				p = 'funkin.data';
+
+			if (p == 'meta.data.scripts')
+				p = 'funkin.scripts';
+
+
+			if(p != null)
+				importClass('$p.$c');
+			else
+				importClass(c);
+		});
+		#end
 		set("importClass", importClass);
 		set("importEnum", importEnum);
 
@@ -203,7 +241,11 @@ class FunkinHScript extends FunkinScript
 	private function setFlixelVars() 
 	{
 		set("FlxG", FlxG);
+		#if NMV_MOD_COMPATIBILITY
+		set("FlxSprite", ModchartSprite);
+		#else
 		set("FlxSprite", FlxSprite);
+		#end
 		set("FlxCamera", FlxCamera);
 		set("FlxSound", FlxSound);
 		set("FlxMath", flixel.math.FlxMath);
@@ -214,6 +256,8 @@ class FunkinHScript extends FunkinScript
 		set("FlxSave", flixel.util.FlxSave); // should probably give it 1 save instead of giving it FlxSave
 		set("FlxBar", flixel.ui.FlxBar);
 
+		set("FlxAxes", Wrappers.FlxAxes);
+		set("FlxBarFillDirection", flixel.ui.FlxBar.FlxBarFillDirection);
 		set("FlxText", flixel.text.FlxText);
 		set("FlxTextBorderStyle", flixel.text.FlxText.FlxTextBorderStyle);
 		set("FlxCameraFollowStyle", flixel.FlxCamera.FlxCameraFollowStyle);
@@ -234,9 +278,9 @@ class FunkinHScript extends FunkinScript
 		});
 		set("FlxTextAlign", Wrappers.FlxTextAlign);
 		set("FlxTweenType", Wrappers.FlxTweenType); 
-        #if flxanimate
-        set("FlxAnimate", flxanimate.FlxAnimate);
-        #end
+		#if USING_FLXANIMATE
+		set("FlxAnimate", FlxAnimateCompat);
+		#end
 	}
 
 	private function setVideoVars() {
@@ -308,7 +352,7 @@ class FunkinHScript extends FunkinScript
 
 		set("ProxyField", funkin.objects.proxies.ProxyField);
 		set("ProxySprite", funkin.objects.proxies.ProxySprite);
-        set("AltBGSprite", funkin.objects.BGSprite.AltBGSprite);
+		set("AltBGSprite", funkin.objects.BGSprite.AltBGSprite);
 
 		set("FlxSprite3D", funkin.objects.FlxSprite3D);
 
@@ -394,7 +438,7 @@ class FunkinHScript extends FunkinScript
 	
 	public function run(parsed:Expr) {
 		var returnValue:Dynamic = null;
-        try {
+		try {
 			trace('Running haxe script: $scriptName');
 			returnValue = interpreter.execute(parsed);
 		}
@@ -405,8 +449,8 @@ class FunkinHScript extends FunkinScript
 			
 			haxe.Log.trace(message, posInfo);
 		}
-        return returnValue;
-    }
+		return returnValue;
+	}
 
 	public function stop()
 	{
@@ -437,7 +481,7 @@ class FunkinHScript extends FunkinScript
 
 	public function call(func:String, ?parameters:Array<Dynamic>, ?extraVars:Map<String, Dynamic>):Dynamic
 	{
-        var returnValue:Dynamic = executeFunc(func, parameters, null, extraVars);
+		var returnValue:Dynamic = executeFunc(func, parameters, null, extraVars);
 		
 		return returnValue == null ? Function_Continue : returnValue;
 	}

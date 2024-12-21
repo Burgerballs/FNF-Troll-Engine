@@ -1,5 +1,6 @@
 package openfl.display;
 
+import flixel.util.FlxStringUtil;
 import openfl.text.Font;
 import flixel.FlxG;
 import flixel.math.FlxMath;
@@ -7,7 +8,6 @@ import flixel.math.FlxMath;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.text.TextFormatAlign;
-import openfl.system.System;
 import openfl.events.Event;
 import haxe.Timer;
 
@@ -29,12 +29,22 @@ import openfl.Lib;
 #end
 class FPS extends TextField
 {
+	/**Allows the FPS counter to lie about your framerate because Lime sucks and framerates goes above whats desired**/
+	public var canLie:Bool = true;
 	/** The current frame rate, expressed using frames-per-second **/
 	public var currentFPS(default, null):Float = 0.0;
 	/** The current state class name **/
 	public var currentState(default, null):String = "";
 	/** Whether to show a memory usage counter or not **/
 	public var showMemory:Bool = #if final false #else true #end;
+
+	inline static function getTotalMemory():Int {
+		#if (windows && cpp)
+		return openfl.system.System.totalMemory;
+		#else
+		return openfl.system.System.totalMemory;
+		#end
+	}
 
 	public var align(default, set):TextFormatAlign;
 	function set_align(val) {		
@@ -142,7 +152,7 @@ class FPS extends TextField
 
 		var currentCount = times.length;
 		currentFPS = Math.ffloor((currentCount + cacheCount) * 0.5);
-		if (currentFPS > FlxG.drawFramerate)
+		if (currentFPS > FlxG.drawFramerate && canLie)
 			currentFPS = FlxG.drawFramerate;
 
 		if (currentCount != cacheCount)
@@ -152,7 +162,7 @@ class FPS extends TextField
 			text = 'FPS: $currentFPS';
 			
 			if (showMemory)
-				text += ' • Memory: ${Math.abs(FlxMath.roundDecimal(System.totalMemory / 1000000, 1))}MB';
+				text += ' • Memory: ' + FlxStringUtil.formatBytes(getTotalMemory());
 
 			#if (debug && false)
 			text += '\nState: $currentState';

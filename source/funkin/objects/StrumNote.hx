@@ -4,7 +4,7 @@ import funkin.states.PlayState;
 import funkin.objects.playfields.PlayField;
 import funkin.scripts.FunkinHScript;
 #if !macro
-import funkin.objects.shaders.ColorSwap;
+import funkin.objects.shaders.NoteColorSwap;
 
 using StringTools;
 #end
@@ -21,7 +21,6 @@ class StrumNote extends NoteObject
 
 	////
 	public var texture(default, set):String = null;
-	public var colorSwap:ColorSwap = new ColorSwap();
 	public var downScroll:Bool = false;
 	public var isQuant:Bool = false;
 	public var resetAnim:Float = 0;
@@ -39,12 +38,13 @@ class StrumNote extends NoteObject
 
 	public function new(x:Float, y:Float, leColumn:Int, ?playField:PlayField, ?hudSkin:String = 'default') {
 		super(x, y);
+		colorSwap = new NoteColorSwap();
+		shader = NoteColorSwap.shader;
+
 		objType = STRUM;
 		column = leColumn;
 		field = playField;
 		noteMod = hudSkin;
-		
-		shader = colorSwap.shader;
 	}
 
 	override function toString()
@@ -74,7 +74,7 @@ class StrumNote extends NoteObject
 		zIndex = getZIndex();
 	}
 
-    function set_noteMod(value:String) {
+	function set_noteMod(value:String) {
 		genScript = (PlayState.instance == null) ? null : PlayState.instance.getHudSkinScript(value);
 
 		if (genScript == null) {
@@ -97,10 +97,10 @@ class StrumNote extends NoteObject
 			}
 
 			texture = newTex; // Load texture and anims
-        }
+		}
 
-        return noteMod = value;
-    }
+		return noteMod = value;
+	}
 
 	public function reloadNote()
 	{
@@ -186,4 +186,8 @@ class StrumNote extends NoteObject
 			colorSwap.brightness = 0;
 		}
 	}
+
+	#if NMV_MOD_COMPATIBILITY
+	public function addOffset(name:String, x:Float = 0, y:Float = 0) {} // StrumNotes dont have offsets
+	#end
 }

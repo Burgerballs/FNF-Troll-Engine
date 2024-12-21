@@ -59,7 +59,12 @@ class MusicBeatState extends FlxUIState
 
 	override public function destroy() 
 	{
-		return super.destroy();
+		super.destroy();
+		
+		if (_extensionScript != null) {
+			_extensionScript.stop();
+			_extensionScript = null;
+		}
 	}
 
 	inline function get_controls():Controls
@@ -122,14 +127,6 @@ class MusicBeatState extends FlxUIState
 			stepsToDo += Math.round(beats * 4);
 			sectionHit();
 		}
-	}
-	
-	override function startOutro(fuck:() -> Void)
-	{
-		return super.startOutro(() -> {
-			funkin.scripts.Globals.variables.clear();
-			fuck();
-		});
 	}
 
 
@@ -270,7 +267,7 @@ class MusicBeatState extends FlxUIState
 	}
 
 	// TODO: check the jukebox selection n shit and play THAT instead? idk lol
-	public static function playMenuMusic(?volume:Float=1, ?force:Bool = false){	        	
+	public static function playMenuMusic(?volume:Float=1, ?force:Bool = false){				
 		if (FlxG.sound.music != null && FlxG.sound.music.playing && force != true)
 			return;
 

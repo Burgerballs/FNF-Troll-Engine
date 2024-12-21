@@ -23,8 +23,8 @@ class CommonHUD extends BaseHUD
 	public var iconP2:HealthIcon;
 	public var playbackRate:Float = 1;
 	
-    override function  getHealthbar():FNFHealthBar return healthBar;
-    
+	override function  getHealthbar():FNFHealthBar return healthBar;
+	
 	function get_healthBarBG()
 		return healthBar.healthBarBG;
 
@@ -33,11 +33,6 @@ class CommonHUD extends BaseHUD
 		displayedHealth = value;
 		return value;
 	}
-
-	public var timeBar:FlxBar;
-	public var timeTxt:FlxText;
-
-	private var timeBarBG:FlxSprite;
 
 	public function new(iP1:String, iP2:String, songName:String, stats:Stats)
 	{
@@ -68,13 +63,6 @@ class CommonHUD extends BaseHUD
 		timeBar.numDivisions = 800; // How much lag this causes?? Should i tone it down to idk, 400 or 200?
 		timeBar.scrollFactor.set();
 
-		#if (PE_MOD_COMPATIBILITY && false)
-        if(FlxG.state == PlayState.instance){
-            PlayState.instance.healthBar = healthBar;
-			PlayState.instance.iconP1 = iconP1;
-			PlayState.instance.iconP2 = iconP2;
-        }
-		#end
 		updateTimeBarType();
 
 		add(timeBarBG);
@@ -86,7 +74,11 @@ class CommonHUD extends BaseHUD
 	{
 		if (healthBar != null)
 		{
-			healthBar.createFilledBar(dadColor, bfColor);
+			if (healthBar.isOpponentMode)
+				healthBar.createFilledBar(bfColor, dadColor);
+			else
+				healthBar.createFilledBar(dadColor, bfColor);
+			
 			healthBar.updateBar();
 		}
 	}
@@ -122,21 +114,21 @@ class CommonHUD extends BaseHUD
 		updateTimeBarAlpha();
 	}
 
-    override function changedCharacter(id:Int, char:Character){
+	override function changedCharacter(id:Int, char:Character){
 
-        switch(id){
-            case 0:
+		switch(id){
+			case 0:
 				iconP1.changeIcon(char.healthIcon);
-            case 1:
+			case 1:
 				iconP2.changeIcon(char.healthIcon);
-            case 2:
-                // gf icon
-            default:
-                // idk
-        }
-        
+			case 2:
+				// gf icon
+			default:
+				// idk
+		}
+		
 		super.changedCharacter(id, char);
-    }
+	}
 
 	function updateTimeBarAlpha()
 	{
