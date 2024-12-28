@@ -1551,22 +1551,17 @@ class PlayState extends MusicBeatState
 	}
 
 	function checkCharacterDance(character:Character, ?beat:Float, ignoreBeat:Bool = false){
-		if(character.danceEveryNumBeats == 0)return;
-		if(character.animation.curAnim == null)return;
-		if(beat == null)
-			beat = this.curDecBeat;
-
-
+		if (character.danceEveryNumBeats == 0) return;
+		if (beat == null) beat = this.curDecBeat;
 		
 		var shouldBop = beat >= character.nextDanceBeat;
 		if (shouldBop || ignoreBeat){
 			if (shouldBop)
 				character.nextDanceBeat += character.danceEveryNumBeats;
 
-			if (!character.animation.curAnim.name.startsWith("sing") && !character.stunned) 
+			if ((character.animation.curAnim == null || !character.animation.curAnim.name.startsWith("sing")) && !character.stunned) 
 				character.dance();
 		}
-		
 	}
 
 	function danceCharacters(?curBeat:Float)
@@ -1660,14 +1655,6 @@ class PlayState extends MusicBeatState
 			finishSong(false);
 		};
 
-		for (track in tracks)
-			track.play(false, startOnTime);
-
-		if (paused) {
-			trace('Oopsie doopsie! Paused sound');
-			for (track in tracks)
-				track.pause();
-		}
 		// Song duration in a float, useful for the time left feature
 		songLength = inst.length;
 		hud.songLength = songLength;
@@ -1675,6 +1662,10 @@ class PlayState extends MusicBeatState
 
 		resyncVocals();
 
+		// PLEASE DONT REMOVE YOU REMOVED MY LAST FIXES FOR STARTONTIME :sob:
+		for (track in tracks)
+			track.time = startOnTime;
+		
 		setOnScripts('songLength', songLength);
 		callOnScripts('onSongStart');
 	}
@@ -1793,8 +1784,6 @@ class PlayState extends MusicBeatState
 				songSpeed = ClientPrefs.getGameplaySetting('scrollspeed', SONG.speed);
 		}
 
-		songSpeed *= FlxG.height / 720; // Adjust speed to game size
-
 		////
 		#if tgt if(ClientPrefs.ruin){
 			AL.effecti(sndEffect, AL.EFFECT_TYPE, AL.EFFECT_REVERB);
@@ -1830,6 +1819,8 @@ class PlayState extends MusicBeatState
 
 		inst = instTracks[0];
 		vocals = playerTracks[0];
+
+		songLength = inst.length;
 		
 		//// NEW SHIT
 		var noteData:Array<SwagSection> = PlayState.SONG.notes;
@@ -2009,7 +2000,7 @@ class PlayState extends MusicBeatState
 					swagNote.characterHitAnimSuffix = '-alt';
 					swagNote.characterMissAnimSuffix = '-alt';
 				}
-				swagNote.gfNote = section.gfSection;
+				swagNote.gfNote = section.gfSection && daNoteData < keyCount;
 				swagNote.noteType = daType;
 
 				////
@@ -2503,7 +2494,6 @@ class PlayState extends MusicBeatState
 		for (track in tracks)
 			track.pause();
 
-		inst.play();
 		Conductor.songPosition = inst.time;
 
 		for (track in tracks){
@@ -2513,6 +2503,9 @@ class PlayState extends MusicBeatState
 			}
 		}
 
+		Conductor.lastSongPos = Conductor.songPosition;
+		lastMixTimer2 = Main.getTime();
+		
 		updateSongDiscordPresence();
 	}
 
@@ -2521,6 +2514,7 @@ class PlayState extends MusicBeatState
 	var startedCountdown:Bool = false;
 	var canPause:Bool = true;
 	var lastMixTimer:Float = 0;
+	var lastMixTimer2:Float = 0;
 	var prevNoteCount:Int = 0;
 
 	var svIndex:Int =0;
@@ -2667,14 +2661,26 @@ class PlayState extends MusicBeatState
 					case "Last Mix":
 						// Stepmania method
 						// Works for most people it seems??
-						if (inst.playing && inst.time == Conductor.lastSongPos)
-							lastMixTimer += elapsed * 1000;
-						else{
-							lastMixTimer = 0;
+						if (Conductor.lastSongPos != inst.time) {
 							Conductor.lastSongPos = inst.time;
-						}
+							lastMixTimer = 0;
+						}else
+							lastMixTimer += elapsed * 1000;
+						
 						Conductor.songPosition = inst.time + lastMixTimer;
 
+					case "Sys Last Mix":
+						// Last Mix but using Sys.time() instead of elapsed as it's slightly less precise
+						var offset:Float = 0;
+
+						if (Conductor.lastSongPos != inst.time) {
+							Conductor.lastSongPos = inst.time;
+							lastMixTimer2 = Main.getTime();
+						}else{
+							offset = (Main.getTime() - lastMixTimer2);
+						}
+
+						Conductor.songPosition = inst.time + offset;
 				}
 			}
 		}
@@ -2743,12 +2749,17 @@ class PlayState extends MusicBeatState
 			}
 
 			for (field in playfields) {
-				for (char in field.characters){
-					if (char.canResetDance(field.keysPressed.contains(true))) {
-						// trace("reset");
+				var holdingField = field.keysPressed.contains(true);
+				for (char in field.characters) {
+					if (char != gf && char.canResetDance(holdingField)) {
 						char.resetDance();
 					}
 				}
+			}
+
+			// TODO: maybe give gf her own playfield
+			if (gf != null && gf.canResetDance()) {
+				gf.resetDance();
 			}
 		}
 		
@@ -3464,13 +3475,13 @@ class PlayState extends MusicBeatState
 
 	private function applyJudgmentData(judgeData:JudgmentData, diff:Float, ?bot:Bool = false, ?show:Bool = true){
 		if(judgeData==null){
-			trace("you didnt give a valid JudgmentData to applyJudgmentData!");
+			trace("You didnt give a valid JudgmentData to applyJudgmentData!");
 			return;
 		}
 		if(callOnScripts("onApplyJudgmentData", [judgeData, diff, bot, show]) == Globals.Function_Stop)
 			return;
 
-		if (!bot)stats.score += Math.floor(judgeData.score * playbackRate);
+		stats.score += Math.floor(judgeData.score * playbackRate);
 		health += (judgeData.health * 0.02) * (judgeData.health < 0 ? healthLoss : healthGain);
 		songHits++;
 
@@ -4163,23 +4174,19 @@ class PlayState extends MusicBeatState
 	override function stepHit()
 	{
 		super.stepHit();
-		if(ClientPrefs.songSyncMode == 'Legacy'){
+
+		if (ClientPrefs.songSyncMode == 'Legacy') {
 			var needsResync:Bool = false;
-			if(Math.abs(inst.time - Conductor.songPosition) > 25)
-				needsResync = true;
-			
-			if(!needsResync){
-				for(track in tracks){
-					if(Math.abs(track.time - Conductor.songPosition) > 25){
-						needsResync = true;
-						break;
-					}
+			for (track in tracks) {
+				if (Math.abs(track.time - Conductor.songPosition) > 30){
+					needsResync = true;
+					break;
 				}
 			}
-
 			if(needsResync)
 				resyncVocals();
 		}
+		
 		if (curStep < lastStepHit) 
 			return;
 		

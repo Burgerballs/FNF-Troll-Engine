@@ -48,8 +48,12 @@
 
     <classpath path="source" />
 
+	<section if="desktop">
+		<assets path="alsoft.txt" rename="alsoft.ini" if="windows" />
+		<assets path="alsoft.txt" rename="alsoft.conf" unless="windows" />
+	</section>
+
     <assets path="assets" />
-    <assets path="alsoft.ini" />
     <assets path='default_content' rename='content' embed='false' exclude="*.mp3" />
 
 	<!-- TROLL ENGINE CUSTOMIZATION -->
@@ -100,7 +104,7 @@
     <haxelib name="moonchart" version="0.4.0" if="native"/>
 
 	<haxelib name="hxdiscord_rpc" if="DISCORD_ALLOWED"/>
-	<haxelib name="hxvlc" version="1.6.1" if="VIDEOS_ALLOWED" unless="artifact"/> <!--You can replace with hxcodec if you're stubborn and dont wanna use newer and better libs-->
+	<haxelib name="hxvlc" version="1.6.1" if="VIDEOS_ALLOWED"/> <!--You can replace with hxcodec if you're stubborn and dont wanna use newer and better libs-->
 	<haxelib name="linc_luajit" if="LUA_ALLOWED"/>
 
 	<section if="HSCRIPT_ALLOWED">
@@ -117,7 +121,7 @@
 
 	<haxelib name="faxe" if='switch'/>
 	<haxelib name="hxcpp-debug-server" if="debug" unless="telemetry"/>
-
+		
 	<!-- ______________________________ Haxedefines _____________________________ -->
 
 	<section if="CRASH_HANDLER">

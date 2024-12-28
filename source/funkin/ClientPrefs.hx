@@ -255,7 +255,7 @@ class ClientPrefs
 				desc: "The method used to sync the music to the game.\nOnly touch this if your game is going off-sync.",
 				type: Dropdown,
 				value: "Last Mix",
-				data: ["options" => ["Last Mix", "Psych 1.0", "Direct", "Legacy"]]
+				data: ["options" => ["Sys Last Mix", "Last Mix", "Psych 1.0", "Direct", "Legacy"]]
 			},
 			// UI
 			"timeBarType" => {
@@ -492,6 +492,15 @@ class ClientPrefs
 					"options" => ["Off", "Shortened", "Full"]
 				]
 			},
+			"botplayMarker" => {
+				display: "Botplay Mark",
+				desc: "How to display the Botplay mark.",
+				type: Dropdown,
+				value: "Subtle",
+				data: [
+					"options" => ["Hidden", "Subtle", "Psych"]
+				],
+			},
 			"hudPosition" => {
 				display: "HUD Position",
 				desc: "Where to position HUD elements.",
@@ -583,7 +592,7 @@ class ClientPrefs
 				desc: "The highest framerate the game can hit.",
 				type: Number,
 				value: #if !macro FlxG.stage!=null ? FlxG.stage.application.window.displayMode.refreshRate : #end 60,
-				data: ["suffix" => " FPS", "min" => 30, "max" => 1000, "step" => 1,]
+				data: ["suffix" => " FPS", "min" => 30, "max" => 360, "step" => 1,]
 			},
 			"lowQuality" => {
 				display: "Low Quality",
@@ -756,7 +765,7 @@ class ClientPrefs
 		'fullscreen' => [F11, NONE],
 		'debug_1' => [SEVEN, NONE],
 		'debug_2' => [EIGHT, NONE],
-		'botplay' => [F6, NONE]
+		'botplay' => [F8, NONE]
 	];
 	public static var buttonBinds:Map<String, Array<FlxGamepadInputID>> = [
 		'note_left'	=> [X, DPAD_LEFT],
