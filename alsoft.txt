@@ -1,6 +1,6 @@
 [general]
 sample-type=float32
-stereo-mode=speakers
+stereo-mode=auto
 stereo-encoding=panpot
 hrtf=false
 cf_level=0
@@ -9,6 +9,6 @@ front-stablizer=false
 output-limiter=false
 volume-adjust=0
 [decoder]
-hq-mode=false
+hq-mode=true
 distance-comp=false
 nfc=false

@@ -473,7 +473,7 @@ class ClientPrefs
 			},
 			"etternaHUD" => {
 				display: "HUD Style",
-				desc: "Changes how the HUD looks.",
+				desc: "Changes how the HUD looks. \"Default\" should be used by mods to set the HUD, unless if mods change the HUD for thematic reasons.",
 				type: Dropdown,
 				value: "Default",
 				data: [

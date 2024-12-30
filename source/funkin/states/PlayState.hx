@@ -919,7 +919,7 @@ class PlayState extends MusicBeatState
 				case 'Advanced': hud = new AdvancedHUD(boyfriend.healthIcon, dad.healthIcon, SONG.song, stats);
 				case 'Kade': hud = new KadeHUD(boyfriend.healthIcon, dad.healthIcon, SONG.song, stats);
 				case 'Psych': hud = new PsychHUD(boyfriend.healthIcon, dad.healthIcon, SONG.song, stats);
-				default: hud = HScriptedHUD.fromFile(boyfriend.healthIcon, dad.healthIcon, SONG.song, stats, 'MimicHUD');
+				default: hud = new PsychHUD(boyfriend.healthIcon, dad.healthIcon, SONG.song, stats); // To be set by scripts instead of me.
 			}
 		}
 		hud.cameras = [camHUD];
