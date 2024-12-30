@@ -495,7 +495,7 @@ class OptionsSubstate extends MusicBeatSubstate
 		ignoreVolumeChange = false;
 	}
 
-	var color1 = FlxColor.fromRGB(82, 82, 82);
+	var color1 = FlxColor.fromRGB(22, 22, 22);
 	var color2 = FlxColor.fromRGB(70, 70, 70);
 
 	override function create()
@@ -1760,7 +1760,7 @@ class TextFormats {
 	};
 	
 	public static final OPT_NAME:FlxTextFormatData = {
-		font: "calibri.ttf",
+		font: "vcr.ttf",
 		
 		size: 28,
 		color: 0xFFFFFFFF,
@@ -1768,14 +1768,14 @@ class TextFormats {
 	};
 
 	public static final OPT_VALUE_TEXT:FlxTextFormatData = {
-		font: "calibri.ttf",
+		font: "vcr.ttf",
 		size: 24,
 		color: 0xFFFFFFFF,
 		alignment: LEFT
 	};
 	
 	public static final OPT_DROPDOWN_OPTION_TEXT:FlxTextFormatData = {
-		font: "calibri.ttf",
+		font: "vcr.ttf",
 		size: 24,
 		color: 0xFFFFFFFF,
 		alignment: LEFT
