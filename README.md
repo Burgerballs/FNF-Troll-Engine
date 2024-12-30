@@ -1,3 +1,8 @@
+Hello guys this is me burgerballs, this here is the fork i use for my fnf mods.
+As troll engine is already perfect i kinda only needed to change small tiny things to make it easier for me.
+
+I've modified the `install_haxelibs` files, before building you should check them out.
+
 # Friday Night Funkin': Troll Engine
 
 [Troll Engine](https://github.com/riconuts/troll-engine) is the fork of [Psych Engine](https://github.com/ShadowMario/FNF-PsychEngine) that's used on the [Tails Gets Trolled mod](https://gamebanana.com/mods/320596).
