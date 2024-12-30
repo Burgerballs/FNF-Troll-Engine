@@ -365,12 +365,12 @@ class ClientPrefs
 			},
 			"holdSubdivs" => {
 				display: "Hold Subdivisions",
-				desc: "How many times each hold note should be subdivided. Higher numbers means more lag, but smoother holds.",
+				desc: "How many times each hold note should be subdivided. Higher numbers means more lag, but smoother holds.\nOnly use 4-8 if you are a NASA scientist.",
 				type: Number,
 				value: 2,
 				data: [
 					"min" => 1,
-					"max" => 6,
+					"max" => 8,
 					"step" => 1
 				]
 			},

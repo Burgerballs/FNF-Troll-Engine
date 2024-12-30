@@ -80,6 +80,7 @@ class StartupState extends FlxTransitionableState
 		ClientPrefs.initialize();
 		ClientPrefs.load();
 
+
 		Highscore.load();
 
 		FlxG.sound.onVolumeChange.add((vol:Float) -> {
