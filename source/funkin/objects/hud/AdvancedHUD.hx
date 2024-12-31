@@ -35,12 +35,12 @@ class AdvancedHUD extends CommonHUD
 
 	// Maybe we should move this into CommonHUD??
 	var counterOptions:JudgeCounterSettings = {
-		textBorderSpacing: 5,
-		textLineSpacing: 25,
-		textSize: 24,
+		textBorderSpacing: 3,
+		textLineSpacing: 22,
+		textSize: 22,
 		textBorderSize: 1.25,
-		nameFont: "calibrib.ttf",
-		numbFont: "calibri.ttf"
+		nameFont: "quanticob.ttf",
+		numbFont: "quantico.ttf"
 	}
 	var judgeCounters:JudgementCounters;
 
@@ -103,7 +103,7 @@ class AdvancedHUD extends CommonHUD
 		////
 		var tWidth = 200;
 		scoreTxt = new FlxText(0, 0, tWidth, "0", 20);
-		scoreTxt.setFormat(Paths.font("calibri.ttf"), 40, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		scoreTxt.setFormat(Paths.font("vcr.ttf"), 40, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreTxt.screenCenter(Y);
 		scoreTxt.y -= 120;
 		scoreTxt.x += 20 - 15;
@@ -112,7 +112,7 @@ class AdvancedHUD extends CommonHUD
 		add(scoreTxt);
 
 		ratingTxt = new FlxText(0, 0, tWidth, "100%", 20);
-		ratingTxt.setFormat(Paths.font("calibri.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		ratingTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		ratingTxt.screenCenter(Y);
 		ratingTxt.y -= 90;
 		ratingTxt.x += 20 - 15;
@@ -121,7 +121,7 @@ class AdvancedHUD extends CommonHUD
 		add(ratingTxt);
 
 		fcTxt = new FlxText(0, 0, tWidth, "Clear", 20);
-		fcTxt.setFormat(Paths.font("calibri.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		fcTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		fcTxt.screenCenter(Y);
 		fcTxt.y -= 60;
 		fcTxt.x += 20 - 15;
@@ -130,7 +130,7 @@ class AdvancedHUD extends CommonHUD
 		add(fcTxt);
 
 		gradeTxt = new FlxText(20, 0, FlxG.width - 40, "C", 20);
-		gradeTxt.setFormat(Paths.font("calibri.ttf"), 46, 0xFFD800, (hudPosition == 'Right') ? RIGHT : LEFT);
+		gradeTxt.setFormat(Paths.font("quanticob.ttf"), 46, 0xFFD800, (hudPosition == 'Right') ? RIGHT : LEFT);
 		gradeTxt.setBorderStyle(FlxTextBorderStyle.OUTLINE, 0xFF000000, 1.25);
 		gradeTxt.y = FlxG.height - gradeTxt.height;
 		gradeTxt.scrollFactor.set();
@@ -139,9 +139,9 @@ class AdvancedHUD extends CommonHUD
 		generateJudgementDisplays();
 
 		npsTxt = new FlxText(0, 0, tWidth, '$npsString: 0 ($peakString: 0)', 20);
-		npsTxt.setFormat(Paths.font("calibri.ttf"), 26, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		npsTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		npsTxt.screenCenter(Y);
-		npsTxt.y -= 5 - (25 * npsIdx);
+		npsTxt.y -= 5 - (22 * npsIdx) - 24;
 		npsTxt.x += 20 - 15;
 		npsTxt.scrollFactor.set();
 		npsTxt.borderSize = 1.25;
@@ -149,9 +149,9 @@ class AdvancedHUD extends CommonHUD
 		add(npsTxt);
 		
 		pcTxt = new FlxText(0, 0, tWidth, '$pcString: 0', 20);
-		pcTxt.setFormat(Paths.font("calibri.ttf"), 26, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		pcTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		pcTxt.screenCenter(Y);
-		pcTxt.y -= 5 - (25 * (ClientPrefs.npsDisplay ? (npsIdx + 1) : npsIdx));
+		pcTxt.y -= 5 - (22 * (ClientPrefs.npsDisplay ? (npsIdx + 1) : npsIdx)) - 24;
 		pcTxt.x += 20 - 15;
 		pcTxt.scrollFactor.set();
 		pcTxt.borderSize = 1.25;
