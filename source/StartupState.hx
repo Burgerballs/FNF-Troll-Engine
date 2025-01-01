@@ -1,5 +1,8 @@
 package;
 
+import flixel.ui.FlxBar;
+import flixel.util.FlxColor;
+import flixel.text.FlxText;
 import funkin.*;
 import funkin.states.MusicBeatState;
 import funkin.states.FadeTransitionSubstate;
@@ -66,7 +69,61 @@ class StartupState extends FlxTransitionableState
 		persistentUpdate = true;
 	}
 
+	public static var loadActions:Array<() -> Void> = [
+		function():Void {
+			Paths.init();
+		},
+		function():Void {
+			PlayerSettings.init();
+		},
+		function():Void {
+			ClientPrefs.initialize();
+			ClientPrefs.load();
+		},
+		function():Void {
+			Highscore.load();
+		},
+		function():Void {
+			FlxG.sound.onVolumeChange.add((vol:Float) -> {
+				ClientPrefs.masterVolume = vol;
+	
+				@:privateAccess {
+					Reflect.setField(ClientPrefs.optionSave.data, "masterVolume", vol);
+					ClientPrefs.optionSave.flush();
+				}
+			});
+	
+			specialKeysEnabled = true;
+			FlxG.fixedTimestep = false;
+			FlxG.keys.preventDefaultKeys = [TAB];
+
+			#if (windows || linux || mac) // No idea if this also applies to any other targets
+			FlxG.stage.addEventListener(
+				openfl.events.KeyboardEvent.KEY_DOWN, 
+				(e)->{
+					// Prevent Flixel from listening to key inputs when switching fullscreen mode
+					if (e.keyCode == FlxKey.ENTER && e.altKey)
+						e.stopImmediatePropagation();
+	
+					// Also add F11 to switch fullscreen mode
+					if (specialKeysEnabled && fullscreenKeys.contains(e.keyCode))
+						FlxG.fullscreen = !FlxG.fullscreen;
+				}, 
+				false, 
+				100
+			);
+	
+			FlxG.stage.addEventListener(
+				openfl.events.FullScreenEvent.FULL_SCREEN, 
+				(e) -> FlxG.save.data.fullscreen = e.fullScreen
+			);
+			#end
+
+		}
+	];
+
 	public static var nextState:Class<FlxState> = funkin.states.TitleState;
+	public static var loadPercent:Float = 0;
 	private static var loaded = false;
 	public static function load():Void
 	{
@@ -74,55 +131,12 @@ class StartupState extends FlxTransitionableState
 			return;
 		loaded = true;
 
-		Paths.init();
-		PlayerSettings.init();
-		
-		ClientPrefs.initialize();
-		ClientPrefs.load();
-
-
-		Highscore.load();
-
-		FlxG.sound.onVolumeChange.add((vol:Float) -> {
-			ClientPrefs.masterVolume = vol;
-
-			@:privateAccess {
-				Reflect.setField(ClientPrefs.optionSave.data, "masterVolume", vol);
-				ClientPrefs.optionSave.flush();
-			}
-		});
-
-		specialKeysEnabled = true;
-		FlxG.fixedTimestep = false;
-		FlxG.keys.preventDefaultKeys = [TAB];
-
-		#if (windows || linux) // No idea if this also applies to any other targets
-		FlxG.stage.addEventListener(
-			openfl.events.KeyboardEvent.KEY_DOWN, 
-			(e)->{
-				// Prevent Flixel from listening to key inputs when switching fullscreen mode
-				if (e.keyCode == FlxKey.ENTER && e.altKey)
-					e.stopImmediatePropagation();
-
-				// Also add F11 to switch fullscreen mode
-				if (specialKeysEnabled && fullscreenKeys.contains(e.keyCode))
-					FlxG.fullscreen = !FlxG.fullscreen;
-			}, 
-			false, 
-			100
-		);
-
-		FlxG.stage.addEventListener(
-			openfl.events.FullScreenEvent.FULL_SCREEN, 
-			(e) -> FlxG.save.data.fullscreen = e.fullScreen
-		);
-		#end
-
-		#if (DO_AUTO_UPDATE || display)
-		UpdaterState.getRecentGithubRelease();
-		UpdaterState.checkOutOfDate();
-		UpdaterState.clearTemps("./");
-		#end
+		var it:Float = 0;
+		for (action in loadActions) {
+			action();
+			loadPercent = it/(loadActions.length-1.0) * 100;
+			it++;
+		}
 		
 		#if DISCORD_ALLOWED
 		FlxG.stage.application.onExit.add((exitCode) -> funkin.api.Discord.DiscordClient.shutdown(true));
@@ -137,22 +151,16 @@ class StartupState extends FlxTransitionableState
 		this.transIn = null;
 		this.transOut = null;
 
-		#if tgt
-		this.transIn = FadeTransitionSubstate;
+		var versionShit:FlxText = new FlxText(2, 2, 0, 'Loading...', 18);
+		versionShit.scrollFactor.set();
+		versionShit.setFormat("VCR OSD Mono", 18, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(versionShit);
 
-		warning = new FlxSprite(0, 0, Paths.image("warning"));
-		warning.scale.set(0.65, 0.65);
-		warning.updateHitbox();
-		warning.screenCenter();
-		add(warning);
-		#end
-
+		var loadBar:FlxBar = new FlxBar(versionShit.x + versionShit.width + 32, 2, LEFT_TO_RIGHT, Std.int(FlxG.width - (versionShit.x + versionShit.width + 32) - 32), 16, this, 'loadPercent', 0, 100);
+		add(loadBar);
 		super.create();
 	}
 
-	#if tgt
-	private var warning:FlxSprite;
-	#end
 
 	private var step:Int = 0;
 	private var loadingTime:Float = getTime();

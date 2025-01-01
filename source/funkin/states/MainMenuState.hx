@@ -115,15 +115,14 @@ class MainMenuState extends MusicBeatState
 			menuItems.add(menuItem);
 		}
 
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 44, 0, 'TE ' + Main.Version.displayedVersion, 12);
-		versionShit.scrollFactor.set();
-		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		add(versionShit);
 
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, "Friday Night Funkin' v" + Application.current.meta.get('version'), 12);
+		var versionShit:FlxText = new FlxText(14, FlxG.height - 36, 0, 'TE ' + Main.Version.displayedVersion + "\nFriday Night Funkin' v" + Application.current.meta.get('version') +'\nPsych Engine v0.5.2h', 8);
 		versionShit.scrollFactor.set();
-		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		versionShit.setFormat("VCR OSD Mono", 11, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
+		versionShit.size = 22;
+		versionShit.scale.set(0.5,0.5);
+		versionShit.updateHitbox();
 		
 		changeItem();
 
