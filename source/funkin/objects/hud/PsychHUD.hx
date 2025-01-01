@@ -212,7 +212,8 @@ class PsychHUD extends CommonHUD
 			if (scoreTxtTween != null)
 				scoreTxtTween.cancel();
 
-			judgeCounters.bump(judge.internalName);
+			if (judgeCounters != null)
+				judgeCounters.bump(judge.internalName);
 
 			scoreTxt.scale.x = 1.075;
 			scoreTxt.scale.y = 1.075;
