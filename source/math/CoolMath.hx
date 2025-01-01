@@ -2,7 +2,6 @@ package math;
 
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
-import flixel.tweens.FlxEase;
 
 class CoolMath {
 	inline public static function coolLerp(current:Float, target:Float, elapsed:Float):Float
@@ -78,12 +77,16 @@ class CoolMath {
 	}
 
 	// Returns an array containing a designated amount of values between X and Y, including X and Y as well.
-	public static function interpolateMass(x:Float, y:Float, amount:Int, ?ease:FlxEase):Array<Float> {
+	public static function interpolateMass(x:Float, y:Float, amount:Int, ?ease:(f:Float) -> Float):Array<Float> {
 		var ret:Array<Float> = [];
 		var interval:Float = 1.0 / amount;
 		ret.push(x);
 		for (i in 0...amount+1) {
-			ret.push(FlxMath.lerp(x,y,interval*i));
+			var between = interval*i;
+			if (ease != null) {
+				between = ease(between);
+			}
+			ret.push(FlxMath.lerp(x,y,between));
 		}
 		ret.push(y);
 		return ret;

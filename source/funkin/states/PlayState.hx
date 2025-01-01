@@ -2193,12 +2193,14 @@ class PlayState extends MusicBeatState
 					});
 				} else {
 					var lastSV = speedChanges[speedChanges.length - 1];
+					final values2 = event.value2.split(',');
 					final startingSpeed:Float = speedChanges[speedChanges.length - 1].speed ?? 1;
-					final stepDuration:Float = Std.parseFloat(event.value2);
+					final stepDuration:Float = Std.parseFloat(values2[0]);
 					final duration:Float = stepDuration * Conductor.getBPMFromSeconds(event.strumTime).stepCrochet;
+					final ease:(f:Float) -> Float = values2.length > 1 ? CoolUtil.getEaseFromString(values2[1]) : null;
 					final changeCount:Int = Std.int(stepDuration * ClientPrefs.svDetail);
-					final speeds:Array<Float> = CoolMath.interpolateMass(startingSpeed, speed, changeCount);
-					final times:Array<Float> = CoolMath.interpolateMass(event.strumTime, event.strumTime+duration, changeCount);
+					final speeds:Array<Float> = CoolMath.interpolateMass(startingSpeed, speed, changeCount, ease);
+					final times:Array<Float> = CoolMath.interpolateMass(event.strumTime, event.strumTime+duration, changeCount, ease);
 					for (i in 0...speeds.length) {
 						speedChanges.push({
 							position: getTimeFromSV(times[i], lastSV),

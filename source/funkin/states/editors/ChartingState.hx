@@ -108,7 +108,7 @@ class ChartingState extends MusicBeatState
 		],
 		[
 			"Interpolated Const SV", 
-			"Exact same function as Constant SV, but tweened.\nValue 1: New Speed\nValue 2: Duration in steps"
+			"Exact same function as Constant SV, but tweened.\nValue 1: New Speed\nValue 2: Duration in steps\nIf you wish to add other easings, you must add the easing name to the end of the duration value,\nseparated by commas.\nEg; \"16,sineOut\""
 		],
 		[
 			"Interpolated Mult SV", 
