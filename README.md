@@ -19,6 +19,12 @@ Basically imagine the Scroll Speed Change event in Psych Engine, but for Scroll 
 
 Because of the way that it works, there is an option in the Options Menu, that allows you to change it's smoothness, if it takes a toll on your computer's RAM.
 
+## Themed Options Menu
+
+I've decided to change the appearance of the options menu to make the design more consistant with FNF, instead of the TGT mod specific design the original has.
+
+![image](https://github.com/user-attachments/assets/f0b49edc-c59c-494f-8efb-976d648a7cac)
+
 
 # Friday Night Funkin': Troll Engine
 
