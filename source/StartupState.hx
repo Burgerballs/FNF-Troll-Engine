@@ -1,5 +1,6 @@
 package;
 
+import math.CoolMath;
 import flixel.ui.FlxBar;
 import flixel.util.FlxColor;
 import flixel.text.FlxText;
@@ -72,18 +73,23 @@ class StartupState extends FlxTransitionableState
 	public static var loadActions:Array<() -> Void> = [
 		function():Void {
 			Paths.init();
+			Paths.getAllStrings();
 		},
 		function():Void {
+			actionTxt.text = 'Initializing Player Settings...';
 			PlayerSettings.init();
 		},
 		function():Void {
+			actionTxt.text = 'Initializing Client Preferences...';
 			ClientPrefs.initialize();
 			ClientPrefs.load();
 		},
 		function():Void {
+			actionTxt.text = 'Loading Player Highscores...';
 			Highscore.load();
 		},
 		function():Void {
+			actionTxt.text = 'Doing Flixel System Junk...';
 			FlxG.sound.onVolumeChange.add((vol:Float) -> {
 				ClientPrefs.masterVolume = vol;
 	
@@ -119,6 +125,15 @@ class StartupState extends FlxTransitionableState
 			);
 			#end
 
+			#if DISCORD_ALLOWED
+			FlxG.stage.application.onExit.add((exitCode) -> funkin.api.Discord.DiscordClient.shutdown(true));
+			#end
+	
+			FlxTransitionableState.defaultTransIn = FadeTransitionSubstate;
+			FlxTransitionableState.defaultTransOut = FadeTransitionSubstate;
+		},
+		function() {
+			actionTxt.text = 'Loading up the Title Screen...';
 		}
 	];
 
@@ -134,18 +149,14 @@ class StartupState extends FlxTransitionableState
 		var it:Float = 0;
 		for (action in loadActions) {
 			action();
-			loadPercent = it/(loadActions.length-1.0) * 100;
+			loadPercent = 50;
+			loadBar.value = loadPercent;
 			it++;
 		}
-		
-		#if DISCORD_ALLOWED
-		FlxG.stage.application.onExit.add((exitCode) -> funkin.api.Discord.DiscordClient.shutdown(true));
-		#end
-
-		FlxTransitionableState.defaultTransIn = FadeTransitionSubstate;
-		FlxTransitionableState.defaultTransOut = FadeTransitionSubstate;
 	}
 
+	static var loadBar:FlxBar;
+	static var actionTxt:FlxText;
 	override function create()
 	{
 		this.transIn = null;
@@ -156,7 +167,13 @@ class StartupState extends FlxTransitionableState
 		versionShit.setFormat("VCR OSD Mono", 18, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
 
-		var loadBar:FlxBar = new FlxBar(versionShit.x + versionShit.width + 32, 2, LEFT_TO_RIGHT, Std.int(FlxG.width - (versionShit.x + versionShit.width + 32) - 32), 16, this, 'loadPercent', 0, 100);
+		actionTxt = new FlxText(2, 22, 0, 'Initializing Paths and Localization Strings...', 18);
+		actionTxt.scrollFactor.set();
+		actionTxt.setFormat("VCR OSD Mono", 18, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(actionTxt);
+
+		loadBar = new FlxBar(versionShit.x + versionShit.width + 32, 2, LEFT_TO_RIGHT, Std.int(FlxG.width - (versionShit.x + versionShit.width + 32) - 32), 16, null, null, 0, 100);
+		loadBar.createFilledBar(0xFF000000, 0xFFFFFFFF);
 		add(loadBar);
 		super.create();
 	}

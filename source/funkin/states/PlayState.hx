@@ -2200,7 +2200,9 @@ class PlayState extends MusicBeatState
 					final ease:(f:Float) -> Float = values2.length > 1 ? CoolUtil.getEaseFromString(values2[1]) : null;
 					final changeCount:Int = Std.int(stepDuration * ClientPrefs.svDetail);
 					final speeds:Array<Float> = CoolMath.interpolateMass(startingSpeed, speed, changeCount, ease);
-					final times:Array<Float> = CoolMath.interpolateMass(event.strumTime, event.strumTime+duration, changeCount, ease);
+
+					// do not change the times ease as both counteract eachother in gameplay.
+					final times:Array<Float> = CoolMath.interpolateMass(event.strumTime, event.strumTime+duration, changeCount);
 					for (i in 0...speeds.length) {
 						speedChanges.push({
 							position: getTimeFromSV(times[i], lastSV),
