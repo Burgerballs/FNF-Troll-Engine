@@ -177,8 +177,8 @@ class ClientPrefs
 				value: 4,
 				data: [
 					"suffix" => "x",
-					"min" => 4,
-					"max" => 16,
+					"min" => 2,
+					"max" => 64,
 					"step" => 0.25
 				]
 			},

@@ -3,6 +3,19 @@ As troll engine is already perfect i kinda only needed to change small tiny thin
 
 I've modified the `install_haxelibs` files, before building you should check them out.
 
+# Added features
+
+This fork has some features that are different to the original or are completely new.
+
+## Interpolated Scroll Velocities
+
+Scroll velocities are a big part of Troll Engine, so thats why this modified version adds two extra events for "Interpolated" scroll velocities.
+
+Basically imagine the Scroll Speed Change event in Psych Engine, but for Scroll Velocity instead, with a set duration.
+
+Because of the way that it works, there is an option in the Options Menu, that allows you to change it's smoothness, if it takes a toll on your computer's RAM.
+
+
 # Friday Night Funkin': Troll Engine
 
 [Troll Engine](https://github.com/riconuts/troll-engine) is the fork of [Psych Engine](https://github.com/ShadowMario/FNF-PsychEngine) that's used on the [Tails Gets Trolled mod](https://gamebanana.com/mods/320596).
