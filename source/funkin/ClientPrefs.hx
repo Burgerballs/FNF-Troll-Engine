@@ -172,14 +172,14 @@ class ClientPrefs
 			},
 			"svDetail" => {
 				display: "Scroll Velocity Smoothness",
-				desc: "The amount of SV objects spawned every step in an interpolated SV event. Higher values may consume more RAM. Lower values may be choppy.",
+				desc: "The amount of SV objects spawned every step in an interpolated SV event. Higher values may consume more RAM. Lower values may make changes appear more abrupt.",
 				type: Number,
 				value: 4,
 				data: [
 					"suffix" => "x",
-					"min" => 1,
+					"min" => 4,
 					"max" => 16,
-					"step" => 1
+					"step" => 0.25
 				]
 			},
 			"songVolume" => {
