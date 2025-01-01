@@ -174,10 +174,10 @@ class ClientPrefs
 				display: "Scroll Velocity Smoothness",
 				desc: "The amount of SV objects spawned every step in an interpolated SV event. Higher values may consume more RAM. Lower values may make changes appear more abrupt.",
 				type: Number,
-				value: 4,
+				value: 16,
 				data: [
 					"suffix" => "x",
-					"min" => 2,
+					"min" => 8,
 					"max" => 64,
 					"step" => 0.25
 				]
