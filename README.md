@@ -9,6 +9,10 @@ This fork has some features that are different to the original or are completely
 
 ## Interpolated Scroll Velocities
 
+![image](https://github.com/user-attachments/assets/ae9a373e-4df3-4000-b72a-975f27c9e983)
+
+https://github.com/user-attachments/assets/e747d50d-54f9-4ce5-a58f-a8bf890a0cd9
+
 Scroll velocities are a big part of Troll Engine, so thats why this modified version adds two extra events for "Interpolated" scroll velocities.
 
 Basically imagine the Scroll Speed Change event in Psych Engine, but for Scroll Velocity instead, with a set duration.
