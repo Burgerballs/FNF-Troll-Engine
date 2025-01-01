@@ -139,7 +139,8 @@ class OptionsSubstate extends MusicBeatSubstate
 					"multicoreLoading",
 					"optimizeHolds",
 					"holdSubdivs",
-					"drawDistanceModifier" // apparently i forgot to add this in the new options thing lmao
+					"drawDistanceModifier", // apparently i forgot to add this in the new options thing lmao
+					"svDetail"
 				]
 			]
 		],

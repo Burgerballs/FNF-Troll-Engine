@@ -170,6 +170,18 @@ class ClientPrefs
 					"type" => "percent" // saved value is value / 100
 				]
 			},
+			"svDetail" => {
+				display: "Scroll Velocity Smoothness",
+				desc: "The amount of SV objects spawned every step in an interpolated SV event. Higher values may consume more RAM. Lower values may be choppy.",
+				type: Number,
+				value: 4,
+				data: [
+					"suffix" => "x",
+					"min" => 1,
+					"max" => 16,
+					"step" => 1
+				]
+			},
 			"songVolume" => {
 				display: "Music Volume",
 				desc: "The volume of music.",

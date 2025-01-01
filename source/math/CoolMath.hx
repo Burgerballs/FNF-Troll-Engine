@@ -75,4 +75,14 @@ class CoolMath {
 		var p = point ?? FlxPoint.weak();
 		return p.set((x * c) - (y * s), (x * s) + (y * c));
 	}
+
+	// Returns an array containing a designated amount of values between X and Y
+	public static function linearInterpolateMass(x:Float, y:Float, amount:Int) {
+		var ret:Array<Float> = [];
+		var interval:Float = 1.0 / amount;
+		for (i in 0...amount+1) {
+			ret.push(FlxMath.lerp(x,y,interval*i));
+		}
+		return ret;
+	}
 }
