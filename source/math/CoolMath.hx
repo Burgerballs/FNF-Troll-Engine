@@ -76,13 +76,15 @@ class CoolMath {
 		return p.set((x * c) - (y * s), (x * s) + (y * c));
 	}
 
-	// Returns an array containing a designated amount of values between X and Y
-	public static function linearInterpolateMass(x:Float, y:Float, amount:Int) {
+	// Returns an array containing a designated amount of values between X and Y, including X and Y as well.
+	public static function interpolateMass(x:Float, y:Float, amount:Int, ?ease:FlxEase):Array<Float> {
 		var ret:Array<Float> = [];
 		var interval:Float = 1.0 / amount;
+		ret.push(x);
 		for (i in 0...amount+1) {
 			ret.push(FlxMath.lerp(x,y,interval*i));
 		}
+		ret.push(y);
 		return ret;
 	}
 }

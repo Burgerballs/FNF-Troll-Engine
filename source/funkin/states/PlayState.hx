@@ -2171,9 +2171,11 @@ class PlayState extends MusicBeatState
 					event.value2 = Std.string(-duration);
 				}
 
-			case 'Mult SV' | 'Constant SV':
+			case 'Mult SV' | 'Constant SV' | 'Interpolated Const SV' | 'Interpolated Mult SV':
 				var speed:Float = 1;
-				if(event.event == 'Constant SV'){
+				var isConstant = event.event.contains('Const');
+				var isInterpolated = event.event.contains('Interpolated');
+				if(isConstant){
 					var b = Std.parseFloat(event.value1);
 					speed = Math.isNaN(b) ? songSpeed : (songSpeed / b);
 				}else{
@@ -2181,12 +2183,32 @@ class PlayState extends MusicBeatState
 					if (Math.isNaN(speed)) speed = 1;
 				}
 
-				speedChanges.push({
-					position: getTimeFromSV(event.strumTime, speedChanges[speedChanges.length - 1]),
-					songTime: event.strumTime,
-					startTime: event.strumTime,
-					speed: speed
-				});
+				if (!isInterpolated) {
+					speedChanges.push({
+						position: getTimeFromSV(event.strumTime, speedChanges[speedChanges.length - 1]),
+						songTime: event.strumTime,
+						startTime: event.strumTime,
+						speed: speed
+					});
+				} else {
+					var lastSV = speedChanges[speedChanges.length - 1];
+					final startingSpeed:Float = speedChanges[speedChanges.length - 1].speed ?? 1;
+					final stepDuration:Float = Std.parseFloat(event.value2);
+					final duration:Float = stepDuration * getBPMFromSeconds(time).stepCrochet;
+					final changeCount:Float = stepDuration * ClientPrefs.svDetail;
+					final speeds:Array<Float> = CoolMath.interpolateMass(startingSpeed, speed, changeCount);
+					final times:Array<Float> = CoolMath.interpolateMass(event.strumTime, event.strumTime+duration, changeCount);
+					for (i in 0...speeds.length) {
+						speedChanges.push({
+							position: getTimeFromSV(times[i], lastSV),
+							songTime: times[i],
+							startTime: times[i],
+							speed: speeds[i]
+						});
+						// Refresh the last sv for the next speed change.
+						lastSV = speedChanges[speedChanges.length - 1];
+					}
+				}
 				
 			case 'Change Character':
 				var charType = getCharacterTypeFromString(event.value1);
