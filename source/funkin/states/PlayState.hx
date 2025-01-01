@@ -2,6 +2,7 @@ package funkin.states;
 
 import funkin.objects.playfields.PlayField.NoteCallback;
 import funkin.data.CharacterData;
+import math.CoolMath;
 import funkin.data.Cache;
 import funkin.data.Song;
 import funkin.data.Section;
@@ -2194,8 +2195,8 @@ class PlayState extends MusicBeatState
 					var lastSV = speedChanges[speedChanges.length - 1];
 					final startingSpeed:Float = speedChanges[speedChanges.length - 1].speed ?? 1;
 					final stepDuration:Float = Std.parseFloat(event.value2);
-					final duration:Float = stepDuration * getBPMFromSeconds(time).stepCrochet;
-					final changeCount:Float = stepDuration * ClientPrefs.svDetail;
+					final duration:Float = stepDuration * Conductor.getBPMFromSeconds(event.strumTime).stepCrochet;
+					final changeCount:Int = Std.int(stepDuration * ClientPrefs.svDetail);
 					final speeds:Array<Float> = CoolMath.interpolateMass(startingSpeed, speed, changeCount);
 					final times:Array<Float> = CoolMath.interpolateMass(event.strumTime, event.strumTime+duration, changeCount);
 					for (i in 0...speeds.length) {

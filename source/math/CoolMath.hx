@@ -2,6 +2,7 @@ package math;
 
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
+import flixel.tweens.FlxEase;
 
 class CoolMath {
 	inline public static function coolLerp(current:Float, target:Float, elapsed:Float):Float

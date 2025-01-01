@@ -102,9 +102,18 @@ class ChartingState extends MusicBeatState
 
 		['Change Scroll Speed', "Value 1: Scroll Speed Multiplier (1 is default)\nValue 2: Time it takes to change fully in seconds."],
 		["Constant SV", "Speed changes which don't affect note positions.\n(For example, a speed of 0 stops notes\ninstead of making them go onto the receptors.)\nValue 1: New Speed"],
-		["Mult SV", "Speed changes which don't affect note positions.\n(For example, a speed of 0 stops notes\ninstead of making them go onto the receptors.)\nValue 1: Speed Multiplier"],
-		["Interpolated Const SV", "Exact same function as Constant SV, but tweened.\nValue 1: New Speed\nValue 2: Duration in steps"],
-		["Interpolated Mult SV", "Exact same function as Mult SV, but tweened.\nValue 1: Speed Multiplier\nValue 2: Duration in steps"]
+		[
+			"Mult SV", 
+			"Speed changes which don't affect note positions.\n(For example, a speed of 0 stops notes\ninstead of making them go onto the receptors.)\nValue 1: Speed Multiplier"
+		],
+		[
+			"Interpolated Const SV", 
+			"Exact same function as Constant SV, but tweened.\nValue 1: New Speed\nValue 2: Duration in steps"
+		],
+		[
+			"Interpolated Mult SV", 
+			"Exact same function as Mult SV, but tweened.\nValue 1: Speed Multiplier\nValue 2: Duration in steps"
+		]
 	];
 
 	var _file:FileReference;
