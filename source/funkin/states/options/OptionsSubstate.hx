@@ -39,7 +39,8 @@ class OptionsSubstate extends MusicBeatSubstate
 		"ui",
 		"video",
 		"controls",
-		"misc", 
+		"misc",
+		'credits'
 	];
 
 	static var options:Map<String, Array<Dynamic>> = [
@@ -178,6 +179,7 @@ class OptionsSubstate extends MusicBeatSubstate
 			],
 			#end
 		],
+		"credits" => []
 	];
 
 	static inline function epicWindowVal(val:Float)
@@ -671,6 +673,10 @@ class OptionsSubstate extends MusicBeatSubstate
 			}
 			
 			daY += 4;
+
+			if (tabName == 'credits') {
+				makeCredits(group,optionCamera);
+			}
 			var height = daY > optionCamera.height ? daY - optionCamera.height : 0;
 			heights.push(height);
 			groups.set(tabName, group);
@@ -696,6 +702,46 @@ class OptionsSubstate extends MusicBeatSubstate
 
 		super.create();
 		//trace('OptionState creation took ${Sys.cpuTime() - startTime} seconds.');
+	}
+
+	function getLocalCredits(){	
+		var creditsPath = Paths.getPath('data/credits.txt');
+		trace('using local credits $creditsPath');
+
+		return Paths.getContent(creditsPath);
+	}
+
+	function makeCredits(group, camera) {
+		var credits:Array<String> = CoolUtil.listFromString(getLocalCredits());
+		var it:Int = 0;
+		for (i in credits) {
+			var offset = it * 36;
+			var thing:Array<String> = i.split("::");
+			var size = (thing.length > 1 ? 16 : 32);
+
+			var label = new FlxText(8, offset, 0, thing[0], 16);
+			label.applyFormat(TextFormats.OPT_VALUE_TEXT);
+			label.cameras = [camera];
+			group.add(label);
+			if (thing.length > 1) {
+				var label = new FlxText(8, offset + 13, 0, thing[2], 16);
+				label.applyFormat(TextFormats.OPT_VALUE_TEXT);
+				label.cameras = [camera];
+				label.size = 10;
+				group.add(label);
+				label.font = Paths.font('quantico.ttf');
+				var label = new FlxText(8, offset + 24, 0, thing[3], 16);
+				label.applyFormat(TextFormats.OPT_VALUE_TEXT);
+				label.cameras = [camera];
+				label.size = 10;
+				group.add(label);
+				label.font = Paths.font('quantico.ttf');
+			}
+			label.size = size;
+
+			it++;
+		}
+		
 	}
 
 	function createWidget(name:String, drop:FlxSprite, text:FlxText, data:OptionData):Widget

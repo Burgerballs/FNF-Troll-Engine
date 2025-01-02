@@ -405,13 +405,11 @@ class NoteField extends FieldBase
 
 		var p2 = modManager.getPos(-(vDiff + 1) * speed, diff + 1, curDecBeat, hold.column, modNumber, hold, this, []);
 		p2.z = 0;
-
 		p2.decrementBy(p1);
 		p2.normalize();
-		var unit = p2;
 
 		var w = (quad0.subtract(quad1, quad0).length / 2) * scale;
-		var off1 = new Vector3(unit.y * w, 	-unit.x * w,	0.0);
+		var off1 = new Vector3(p2.y * w, 	-p2.x * w,	0.0);
 		var off2 = new Vector3(-off1.x, 	-off1.y,		0.0);
 
 		return [p1.add(off1, off1), p1.add(off2, off2), p1];
