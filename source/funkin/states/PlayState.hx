@@ -2192,6 +2192,7 @@ class PlayState extends MusicBeatState
 						speed: speed
 					});
 				} else {
+					// Super janky but would you blame me if I told you it worked flawlessly?
 					var lastSV = speedChanges[speedChanges.length - 1];
 					final values2 = event.value2.split(',');
 					final startingSpeed:Float = speedChanges[speedChanges.length - 1].speed ?? 1;

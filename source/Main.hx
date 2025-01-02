@@ -172,6 +172,7 @@ class Main extends Sprite
 		bread.visible = false;
 		addChild(bread);
 
+
 		#if CRASH_HANDLER
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(
 			UncaughtErrorEvent.UNCAUGHT_ERROR, 
