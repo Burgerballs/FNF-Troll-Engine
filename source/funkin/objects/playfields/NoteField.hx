@@ -434,10 +434,11 @@ class NoteField extends FieldBase
 			return null;
 
 		var simpleDraw = !hold.copyX && !hold.copyY;
+		var subDivs:Int = simpleDraw ? 1 : holdSubdivisions;
 		// TODO: make simpleDraw reduce the amount of subdivisions used by the hold
 
-		var vertices = new Vector<Float>(8 * holdSubdivisions, true);
-		var uvData = new Vector<Float>(8 * holdSubdivisions, true);
+		var vertices = new Vector<Float>(8 * subDivs, true);
+		var uvData = new Vector<Float>(8 * subDivs, true);
 		var alphas:Array<Float> = [];
 		var glows:Array<Float> = [];
 		var lastMe = null;
@@ -468,11 +469,11 @@ class NoteField extends FieldBase
 		var zIndex:Float = basePos.z + hold.zIndex;
 		var sv = PlayState.instance.getSV(hold.strumTime).speed;
 
-		for (sub in 0...holdSubdivisions)
+		for (sub in 0...subDivs)
 		{
-			var prog = sub / (holdSubdivisions + 1);
-			var nextProg = (sub + 1) / (holdSubdivisions + 1);
-			var strumSub = (crotchet / holdSubdivisions);
+			var prog = sub / (subDivs + 1);
+			var nextProg = (sub + 1) / (subDivs + 1);
+			var strumSub = (crotchet / subDivs);
 			var strumOff = (strumSub * sub);
 			strumSub *= sv;
 			strumOff *= sv;
