@@ -402,10 +402,23 @@ class ClientPrefs
 			},
 			"midScroll" => {
 				display: "Middlescroll",
-				desc: "When toggled, notes will be centered.",
+				desc: "When toggled, notes will be centered. Don't expect this option to be reflected in modcharts.",
 				type: Toggle,
 				value: false,
 				data: [#if !tgt "recommendsRestart" => true #end]
+			},
+			"midScrollType" => {
+				display: "Centered Notefields Type",
+				desc: "This option determines how the the opponent notes will be handled if Centered Strumlines is enabled.",
+				type: Dropdown,
+				value: "Psych",
+				data: [
+					"options" => [
+						'"Ro-FNF"',
+						"Psych",
+						"Kade"
+					]
+				]
 			},
 			"accuracyCalc" => {
 				display: "Accuracy Calculation",

@@ -1489,18 +1489,9 @@ class PlayState extends MusicBeatState
 			if (midScroll) {
 				var off:Float = Math.min(FlxG.width, 1280) / 4;
 				var opp:Int = playOpponent ? 0 : 1;
-				
-				var halfKeys:Int = Math.floor(keyCount / 2);
-				if (keyCount % 2 != 0) // middle receptor dissappears, if there is one
-					modManager.setValue('alpha${halfKeys + 1}', 1.0, opp);
-				
-				for (i in 0...halfKeys)
-					modManager.setValue('transform${i}X', -off, opp);
-				for (i in keyCount-halfKeys...keyCount)
-					modManager.setValue('transform${i}X', off, opp);
-	
-				modManager.setValue("alpha", 0.6, opp);
-				modManager.setValue("opponentSwap", 0.5);
+				modManager.setValue('transformZ', -1280, opp);
+				modManager.setValue('transformX', -480, opp);
+				modManager.setValue("opponentSwap", 0.5, playOpponent ? 1 : 0);
 			}
 			#end
 

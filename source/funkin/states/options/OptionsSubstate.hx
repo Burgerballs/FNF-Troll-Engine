@@ -93,6 +93,7 @@ class OptionsSubstate extends MusicBeatSubstate
 					"noteOpacity",
 					"downScroll",
 					"midScroll",
+					"midScrollType",
 					"noteSplashes",
 					"noteSkin",
 					"customizeColours"
