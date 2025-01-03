@@ -1487,10 +1487,12 @@ class PlayState extends MusicBeatState
 
 			#if !tgt
 			if (midScroll) {
-				var off:Float = Math.min(FlxG.width, 1280) / 4;
 				var opp:Int = playOpponent ? 0 : 1;
 				modManager.setValue('transformZ', -1280, opp);
 				modManager.setValue('transformX', -480, opp);
+				modManager.setValue('transformX', -480, opp);
+				modManager.setValue('drawDistance', 4000, opp);
+				modManager.setPercent('sudden', 75, opp);
 				modManager.setValue("opponentSwap", 0.5, playOpponent ? 1 : 0);
 			}
 			#end

@@ -724,14 +724,15 @@ class OptionsSubstate extends MusicBeatSubstate
 			label.applyFormat(TextFormats.OPT_VALUE_TEXT);
 			label.cameras = [camera];
 			group.add(label);
+			label.font = Paths.font('quanticob.ttf');
 			if (thing.length > 1) {
-				var label = new FlxText(8, offset + 13, 0, thing[2], 16);
+				var label = new FlxText(8, offset + 16, 0, thing[2], 16);
 				label.applyFormat(TextFormats.OPT_VALUE_TEXT);
 				label.cameras = [camera];
 				label.size = 10;
 				group.add(label);
 				label.font = Paths.font('quantico.ttf');
-				var label = new FlxText(8, offset + 24, 0, thing[3], 16);
+				var label = new FlxText(8, offset + 26, 0, thing[3], 16);
 				label.applyFormat(TextFormats.OPT_VALUE_TEXT);
 				label.cameras = [camera];
 				label.size = 10;
