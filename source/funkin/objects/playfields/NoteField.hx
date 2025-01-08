@@ -23,17 +23,16 @@ import haxe.ds.Vector as FastVector;
 
 using StringTools;
 
-@:structInit
-class RenderObject {
-	public var graphic:FlxGraphic;
-	public var shader:FlxShader;
-	public var alphas:Array<Float>;
-	public var glows:Array<Float>;
-	public var uvData:Vector<Float>;
-	public var vertices:Vector<Float>;
-	public var indices:Vector<Int>;
-	public var zIndex:Float;
-	public var colorSwap:NoteColorSwap;
+typedef RenderObject = {
+	graphic:FlxGraphic,
+	shader:FlxShader,
+	alphas:Array<Float>,
+	glows:Array<Float>,
+	uvData:Vector<Float>,
+	vertices:Vector<Float>,
+	indices:Vector<Int>,
+	zIndex:Float,
+	colorSwap:NoteColorSwap
 }
 
 final scalePoint = new FlxPoint(1, 1);
@@ -139,7 +138,7 @@ class NoteField extends FieldBase
 			var shit = ((Conductor.songPosition - ClientPrefs.noteOffset) - lastChange.songTime) / lastChange.stepCrochet;
 			curDecStep = lastChange.stepTime + shit;
 		}
-		curDecBeat = curDecStep / 4;
+		curDecBeat = (Std.int(curDecStep * 1000) >> 4) / 1000;
 
 		zoom = modManager.getFieldZoom(baseZoom, curDecBeat, (Conductor.songPosition - ClientPrefs.noteOffset), modNumber, this);
 		var notePos:Map<Note, Vector3> = [];
@@ -198,6 +197,17 @@ class NoteField extends FieldBase
 
 		var lookupMap = new haxe.ds.ObjectMap<Dynamic, RenderObject>();
 
+		// draw hold notes (credit to 4mbr0s3 2)
+		for (note in holds)
+		{
+			var object = drawHold(note);
+			if (object == null)
+				continue;
+			object.zIndex -= 1;
+			lookupMap.set(note, object);
+			drawQueue.push(object);
+		}
+
 		// draw the receptors
 		for (obj in field.strumNotes)
 		{
@@ -217,26 +227,15 @@ class NoteField extends FieldBase
 
 		// draw tap notes
 		for (note in taps)
-		{
-			var pos = notePos.get(note);
-			var object = drawNote(note, pos);
-			if (object == null)
-				continue;
-			object.zIndex = pos.z + note.zIndex;
-			lookupMap.set(note, object);
-			drawQueue.push(object);
-		}
-
-		// draw hold notes (credit to 4mbr0s3 2)
-		for (note in holds)
-		{
-			var object = drawHold(note);
-			if (object == null)
-				continue;
-			object.zIndex -= 1;
-			lookupMap.set(note, object);
-			drawQueue.push(object);
-		}
+			{
+				var pos = notePos.get(note);
+				var object = drawNote(note, pos);
+				if (object == null)
+					continue;
+				object.zIndex = pos.z + note.zIndex;
+				lookupMap.set(note, object);
+				drawQueue.push(object);
+			}
 
 		// draw notesplashes
 		for (obj in field.grpNoteSplashes.members)
@@ -273,7 +272,8 @@ class NoteField extends FieldBase
 		// one example would be reimplementing Die Batsards' original bullet mechanic
 		// if you need an example on how this all works just look at the tap note drawing portion
 
-		drawQueue.sort(drawQueueSort);
+		// No need to sort dude, its already in order!
+		//drawQueue.sort(drawQueueSort);
 
 		if(zoom != 1){
 			for(object in drawQueue){
