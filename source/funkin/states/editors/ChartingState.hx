@@ -101,18 +101,19 @@ class ChartingState extends MusicBeatState
 		['Game Flash', "Value 1: Hexadecimal Color (0xFFFFFFFF is default)\nValue 2: Duration in seconds (0.5 is default)"],
 
 		['Change Scroll Speed', "Value 1: Scroll Speed Multiplier (1 is default)\nValue 2: Time it takes to change fully in seconds."],
-		["Constant SV", "Speed changes which don't affect note positions.\n(For example, a speed of 0 stops notes\ninstead of making them go onto the receptors.)\nValue 1: New Speed"],
+		[
+			"Constant SV", 
+			"Speed changes which don't affect note positions.\n(For example, a speed of 0 stops notes\ninstead of making them go onto the receptors.)\nValue 1: New Speed. Defaults to 1"
+			#if EASED_SVs
+			+ "\nValue 2: Tween settings\n(Duration and EaseFunc seperated by a / (ex. 1/quadOut))"
+			#end
+		],
 		[
 			"Mult SV", 
-			"Speed changes which don't affect note positions.\n(For example, a speed of 0 stops notes\ninstead of making them go onto the receptors.)\nValue 1: Speed Multiplier"
-		],
-		[
-			"Interpolated Const SV", 
-			"Exact same function as Constant SV, but tweened.\nValue 1: New Speed\nValue 2: Duration in steps\nIf you wish to add other easings, you must add the easing name to the end of the duration value,\nseparated by commas.\nEg; \"16,sineOut\""
-		],
-		[
-			"Interpolated Mult SV", 
-			"Exact same function as Mult SV, but tweened.\nValue 1: Speed Multiplier\nValue 2: Duration in steps"
+			"Speed changes which don't affect note positions.\n(For example, a speed of 0 stops notes\ninstead of making them go onto the receptors.)\nValue 1: Speed Multiplier. Defaults to 1"
+			#if EASED_SVs
+			+ "\nValue 2: Tween settings\n(Duration and EaseFunc seperated by a /(ex. 1/quadOut))"
+			#end
 		]
 	];
 
@@ -168,7 +169,6 @@ class ChartingState extends MusicBeatState
 	
 	var currentSongName:String;
 	var songLength:Float = 0.0;
-	var tempBpm:Float = 0;
 
 	var leftIcon:HealthIcon;
 	var rightIcon:HealthIcon;
@@ -302,7 +302,6 @@ class ChartingState extends MusicBeatState
 		*/
 
 		currentSongName = Paths.formatToSongPath(_song.song);
-		tempBpm = _song.bpm;
 		
 		MusicBeatState.stopMenuMusic();
 
@@ -1686,9 +1685,9 @@ class ChartingState extends MusicBeatState
 			}
 			else if (wname == 'song_bpm')
 			{
-				tempBpm = nums.value;
+				_song.bpm = nums.value;
 				Conductor.mapBPMChanges(_song);
-				Conductor.changeBPM(nums.value);
+				updateGrid();
 			}
 			else if (wname == 'note_susLength')
 			{
@@ -1702,6 +1701,7 @@ class ChartingState extends MusicBeatState
 			else if (wname == 'section_bpm')
 			{
 				_song.notes[curSec].bpm = nums.value;
+				Conductor.mapBPMChanges(_song);
 				updateGrid();
 			}
 		}
@@ -1965,8 +1965,6 @@ class ChartingState extends MusicBeatState
 					typebox.hasFocus = false;
 			}
 		}
-
-		_song.bpm = tempBpm;
 		
 		if (inst.playing && inst.time == Conductor.lastSongPos)
 			lastMixTimer += elapsed * 1000;
@@ -2807,7 +2805,7 @@ class ChartingState extends MusicBeatState
 		for (file in ["notetypes", "custom_notetypes"]) {
 			var baseScriptFile:String = '$file/$notetype';
 		#else
-		var baseScriptFile:String = 'notetypes/$notetype';
+			var baseScriptFile:String = 'notetypes/$notetype';
 		#end
 			var exts = Paths.HSCRIPT_EXTENSIONS; // TODO: maybe FunkinScript.extensions, FunkinScript.hscriptExtensions and FunkinScript.luaExtensions??
 			for (ext in exts)
