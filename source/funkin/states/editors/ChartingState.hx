@@ -101,19 +101,18 @@ class ChartingState extends MusicBeatState
 		['Game Flash', "Value 1: Hexadecimal Color (0xFFFFFFFF is default)\nValue 2: Duration in seconds (0.5 is default)"],
 
 		['Change Scroll Speed', "Value 1: Scroll Speed Multiplier (1 is default)\nValue 2: Time it takes to change fully in seconds."],
-		[
-			"Constant SV", 
-			"Speed changes which don't affect note positions.\n(For example, a speed of 0 stops notes\ninstead of making them go onto the receptors.)\nValue 1: New Speed. Defaults to 1"
-			#if EASED_SVs
-			+ "\nValue 2: Tween settings\n(Duration and EaseFunc seperated by a / (ex. 1/quadOut))"
-			#end
-		],
+		["Constant SV", "Speed changes which don't affect note positions.\n(For example, a speed of 0 stops notes\ninstead of making them go onto the receptors.)\nValue 1: New Speed"],
 		[
 			"Mult SV", 
-			"Speed changes which don't affect note positions.\n(For example, a speed of 0 stops notes\ninstead of making them go onto the receptors.)\nValue 1: Speed Multiplier. Defaults to 1"
-			#if EASED_SVs
-			+ "\nValue 2: Tween settings\n(Duration and EaseFunc seperated by a /(ex. 1/quadOut))"
-			#end
+			"Speed changes which don't affect note positions.\n(For example, a speed of 0 stops notes\ninstead of making them go onto the receptors.)\nValue 1: Speed Multiplier"
+		],
+		[
+			"Interpolated Const SV", 
+			"Exact same function as Constant SV, but tweened.\nValue 1: New Speed\nValue 2: Duration in steps\nIf you wish to add other easings, you must add the easing name to the end of the duration value,\nseparated by commas.\nEg; \"16,sineOut\""
+		],
+		[
+			"Interpolated Mult SV", 
+			"Exact same function as Mult SV, but tweened.\nValue 1: New Speed\nValue 2: Duration in steps\nIf you wish to add other easings, you must add the easing name to the end of the duration value,\nseparated by commas.\nEg; \"16,sineOut\""
 		]
 	];
 

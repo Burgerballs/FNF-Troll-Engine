@@ -2072,41 +2072,34 @@ class PlayState extends MusicBeatState
 					speed = Std.parseFloat(event.value1);
 					if (Math.isNaN(speed)) speed = 1;
 				}
-				#if EASED_SVs
-				var endTime:Null<Float> = null;
-				var easeFunc:Null<EaseFunction> = null;
-
-				var tweenOptions = event.value2.split("/");
-				if(tweenOptions.length >= 1){
-					easeFunc = FlxEase.linear;
-					var parsed:Float = Std.parseFloat(tweenOptions[0]);
-					if(!Math.isNaN(parsed))
-						endTime = event.strumTime + (parsed * 1000);
-
-					if(tweenOptions.length > 1){
-						var f:EaseFunction = ScriptingUtil.getFlxEaseByString(tweenOptions[1]);
-						if(f != null)
-							easeFunc = f;
+				if (!isInterpolated) {
+					speedChanges.push({
+						position: getTimeFromSV(event.strumTime, speedChanges[speedChanges.length - 1]),
+						startTime: event.strumTime,
+						speed: speed
+					});
+				} else {
+					// Super janky but would you blame me if I told you it worked flawlessly?
+					var lastSV = speedChanges[speedChanges.length - 1];
+					final values2 = event.value2.split(',');
+					final startingSpeed:Float = speedChanges[speedChanges.length - 1].speed ?? 1;
+					final stepDuration:Float = Std.parseFloat(values2[0]);
+					final duration:Float = stepDuration * Conductor.getBPMFromSeconds(event.strumTime).stepCrochet;
+					final ease:(f:Float) -> Float = values2.length > 1 ? CoolUtil.getEaseFromString(values2[1]) : null;
+					final changeCount:Int = Std.int(stepDuration * ClientPrefs.svDetail);
+					final speeds:Array<Float> = CoolMath.interpolateMass(startingSpeed, speed, changeCount, ease);
+					// do not change the times ease as both counteract eachother in gameplay.
+					final times:Array<Float> = CoolMath.interpolateMass(event.strumTime, event.strumTime+duration, changeCount);
+					for (i in 0...speeds.length) {
+						speedChanges.push({
+							position: getTimeFromSV(times[i], lastSV),
+							startTime: times[i],
+							speed: speeds[i]
+						});
+						// Refresh the last sv for the next speed change.
+						lastSV = speedChanges[speedChanges.length - 1];
 					}
 				}
-
-				var lastChange:SpeedEvent = speedChanges[speedChanges.length - 1];
-				speedChanges.push({
-					position: getTimeFromSV(event.strumTime, lastChange),
-					startTime: event.strumTime,
-					endTime: endTime,
-					easeFunc: easeFunc,
-					startSpeed: lastChange.startSpeed,
-					speed: speed
-				});
-				#else
-				var lastChange:SpeedEvent = speedChanges[speedChanges.length - 1];
-				speedChanges.push({
-					position: getTimeFromSV(event.strumTime, lastChange),
-					startTime: event.strumTime,
-					speed: speed
-				});
-				#end
 				
 			case 'Change Character':
 				var charType = getCharacterTypeFromString(event.value1);
