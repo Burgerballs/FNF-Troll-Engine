@@ -1279,20 +1279,7 @@ class CharacterEditorState extends MusicBeatState
 	}
 
 	function saveCharacter() {
-		var json = {
-			"animations": char.animationsArray,
-			"image": char.imageFile,
-			"scale": char.baseScale,
-			"sing_duration": char.singDuration,
-			"healthicon": char.healthIcon,
-
-			"position":	char.positionArray,
-			"camera_position": char.cameraPosition,
-
-			"flip_x": char.originalFlipX,
-			"no_antialiasing": char.noAntialiasing,
-			"healthbar_colors": char.healthColorArray
-		};
+		var json = CharacterData.charToPsychData(char);
 
 		var data:String = Json.stringify(json, "\t");
 

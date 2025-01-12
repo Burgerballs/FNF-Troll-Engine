@@ -19,6 +19,7 @@ typedef CharacterFile = {
 	var healthbar_colors:Array<Int>;
 	var healthicon:String;
 
+	@:optional var renderType:CharacterRenderType;
 	@:optional var x_facing:Float;
 	@:optional var death_name:String;
 	@:optional var script_name:String;
@@ -31,6 +32,7 @@ typedef AnimArray = {
 	var loop:Bool;
 	var indices:Array<Int>;
 	var offsets:Array<Int>;
+	@:optional var assetPath:String; // to be used for multisparrow.
 	@:optional var cameraOffset:Array<Float>;
 }
 
@@ -46,8 +48,13 @@ class CharacterData {
 
 		switch (Reflect.field(json, "format")){
 			case "andromeda": return fileFromAndromeda(json);
-			// case "troll.1": // base game better hurry the fuck up on fixing their shit or im making my own format
-		}			
+		}
+
+		// this is bullshit but i'm gonna jump the gun and assume that anything with a version tag is v-slice char data
+		// if you have a format with a version tag data you are probably as dumb as eric
+		if (Reflect.field(json, "version") != null) {
+			return fileFromVSlice(json);
+		}
 
 		var json:CharacterFile = json;
 		
@@ -118,8 +125,14 @@ class CharacterData {
 	/**	
 		Returns "texture", "packer" or "sparrow"
 	**/
-	public static function getImageFileType(path:String):String
+	public static function getImageFileType(file:CharacterFile):String
 	{
+		if (file.renderType != null) {
+			var type:String = file.renderType;
+			if (type == 'animateatlas') type = 'texture';
+			return type;
+		}
+		var path = file.image;
 		if (Paths.fileExists('images/$path/Animation.json', TEXT))
 			return "texture";
 		else if (Paths.fileExists('images/$path.txt', TEXT))
@@ -176,6 +189,39 @@ class CharacterData {
 		return conv;
 	}
 
+	private static function fileFromVSlice(data:Dynamic):CharacterFile {
+		var data:VSliceCharacterData = data;
+		var conv:CharacterFile = {
+			animations: [for (anim in data.animations) VSliceToPsychAnim(anim)],
+			image: data.assetPath,
+			scale: data.scale ?? 1,
+			sing_duration: data.singTime ?? 8.0,
+			
+			position: data.offsets ?? [0,0],
+			camera_position: data.cameraOffsets ?? [0,0],
+	
+			renderType: data.renderType ?? null,
+			flip_x: data.flipX ?? true,
+			no_antialiasing: data.isPixel ?? false,
+			healthicon: data?.healthIcon?.id ?? 'face',
+			//
+			healthbar_colors: [255,255,255]
+		};
+	
+		return conv;
+	}
+	private static function VSliceToPsychAnim(anim:AnimationData):AnimArray {
+		return {
+			anim: anim.name,
+			name: anim.prefix,
+			fps: anim.frameRate ?? 24,
+			indices: anim.frameIndices ?? null,
+			loop: anim.looped ?? false,
+			offsets: [Std.int(anim.offsets[0] ?? 0), Std.int(anim.offsets[1] ?? 0)],
+			assetPath: anim.assetPath ?? null
+		}
+	}
+
 	private static function andromedaToPsychAnim(anim:AndromedaAnimShit):AnimArray {
 		return {
 			anim: anim.name,
@@ -194,6 +240,7 @@ class CharacterData {
 			"scale": char.baseScale,
 			"sing_duration": char.singDuration,
 			"healthicon": char.healthIcon,
+			"renderType": getImageFileType(char.characterFile),
 
 			"position": char.positionArray,
 			"camera_position": char.cameraPosition,
@@ -221,7 +268,7 @@ class CharacterData {
 
 			"name": char.curCharacter,
 			"assetPath": char.imageFile,
-			"renderType": CharacterData.getImageFileType(char.imageFile),
+			"renderType": CharacterData.getImageFileType(char.characterFile),
 			"flipX": char.originalFlipX,
 			"scale": char.baseScale,
 			"isPixel": char.noAntialiasing == true, // i think // isPixel also assumes its scaled up by 6 so
@@ -312,4 +359,97 @@ typedef AndromedaCharJson = {
 	@:optional var camOffset:Array<Float>;
 	@:optional var scale:Float;
 	@:optional var antialiasing:Bool;
+}
+
+enum abstract CharacterRenderType(String) from String to String
+{
+	/**
+	 * Renders the character using a single spritesheet and XML data.
+	 */
+	public var Sparrow = 'sparrow';
+
+	/**
+	 * Renders the character using a single spritesheet and TXT data.
+	 */
+	public var Packer = 'packer';
+
+	/**
+	 * Renders the character using multiple spritesheets and XML data.
+	 */
+	public var MultiSparrow = 'multisparrow';
+
+	/**
+	 * Renders the character using a spritesheet of symbols and JSON data.
+	 */
+	public var AnimateAtlas = 'animateatlas';
+}
+
+typedef VSliceCharacterData =
+{
+	var version:String;
+	var name:String;
+	var renderType:CharacterRenderType;
+	var assetPath:String;
+	var scale:Null<Float>;
+	var healthIcon:Null<HealthIconData>;
+	var offsets:Null<Array<Float>>;
+	var cameraOffsets:Array<Float>;
+	var isPixel:Null<Bool>;
+	@:optional
+	@:default(1.0)
+	var danceEvery:Null<Float>;
+	var singTime:Null<Float>;
+	var animations:Array<AnimationData>;
+	var startingAnimation:Null<String>;
+	var flipX:Null<Bool>;
+};
+typedef AnimationData =
+{
+	> UnnamedAnimationData,
+	var name:String;
+}
+
+/**
+ * A data structure representing an animation in a spritesheet.
+ * This animation doesn't specify a name, that's presumably specified by the parent data structure.
+ */
+typedef UnnamedAnimationData =
+{
+	@:optional
+	var prefix:String;
+	@:optional
+	var assetPath:Null<String>;
+	@:default([0, 0])
+	@:optional
+	var offsets:Null<Array<Float>>;
+	@:default(false)
+	@:optional
+	var looped:Bool;
+	@:default(false)
+	@:optional
+	var flipX:Null<Bool>;
+	@:default(false)
+	@:optional
+	var flipY:Null<Bool>;
+	@:default(24)
+	@:optional
+	var frameRate:Null<Int>;
+	@:default([])
+	@:optional
+	var frameIndices:Null<Array<Int>>;
+}
+
+/**
+ * The JSON data schema used to define the health icon for a character.
+ */
+typedef HealthIconData =
+{
+	@:optional
+	@:default([200,200,200])
+	var colorRGB:Array<Int>;
+	/**
+	 * The ID to use for the health icon.
+	 * @default The character's ID
+	 */
+	var id:Null<String>;
 }

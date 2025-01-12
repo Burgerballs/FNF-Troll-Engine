@@ -1,5 +1,6 @@
 package funkin.objects;
 
+import flixel.graphics.frames.FlxAtlasFrames;
 import funkin.states.PlayState;
 import funkin.scripts.FunkinScript.ScriptType;
 import funkin.objects.playfields.PlayField;
@@ -125,6 +126,7 @@ class Character extends FlxSprite
 	public var noAntialiasing:Bool = false;
 	public var originalFlipX:Bool = false;
 	public var healthColorArray:Array<Int> = [255, 0, 0];
+	public var characterFile:CharacterFile;
 
 	override function destroy()
 	{
@@ -132,6 +134,21 @@ class Character extends FlxSprite
 			removeScript(script, true);
 		
 		return super.destroy();
+	}
+
+	function setupMultiSparrow(json:CharacterFile) {
+		var texture:FlxAtlasFrames = Paths.getSparrowAtlas(json.image);
+		var assetList = [];
+		for (anim in json.animations)
+		{
+			if (anim.assetPath != null && !assetList.contains(anim.assetPath))
+			{
+				assetList.push(anim.assetPath);
+				var subTexture:FlxAtlasFrames = Paths.getSparrowAtlas(anim.assetPath);
+				texture.addAtlas(subTexture);
+			}
+		}
+		frames = texture;
 	}
 
 	function loadFromPsychData(json:CharacterFile)
@@ -147,11 +164,12 @@ class Character extends FlxSprite
 		////
 		imageFile = json.image;
 
-		switch (getImageFileType(imageFile))
+		switch (getImageFileType(json))
 		{
 			case "texture":	frames = AtlasFrameMaker.construct(imageFile);
 			case "packer":	frames = Paths.getPackerAtlas(imageFile);
 			case "sparrow":	frames = Paths.getSparrowAtlas(imageFile);
+			case "multisparrow": setupMultiSparrow(json);
 		}
 
 		////
@@ -208,6 +226,7 @@ class Character extends FlxSprite
 		{
 			quickAnimAdd('idle', 'BF idle dance');
 		}
+		characterFile = json;
 	}
 
 	public function new(x:Float, y:Float, ?characterName:String = 'bf', ?isPlayer:Bool = false, ?debugMode:Bool = false)

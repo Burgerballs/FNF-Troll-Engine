@@ -27,6 +27,12 @@ I've decided to change the appearance of the options menu to make the design mor
 
 ![image](https://github.com/user-attachments/assets/f0b49edc-c59c-494f-8efb-976d648a7cac)
 
+## (!!WIP!!) V-Slice Character Support
+
+V-Slice's character format is supported.
+
+Along with this are some small optional changes to the Psych Engine character format. Allowing you to use multiple sparrow atlases.
+
 
 # Friday Night Funkin': Troll Engine
 
