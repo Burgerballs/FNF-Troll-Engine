@@ -273,7 +273,8 @@ class NoteField extends FieldBase
 		// if you need an example on how this all works just look at the tap note drawing portion
 
 		// No need to sort dude, its already in order!
-		//drawQueue.sort(drawQueueSort);
+		// no riconuts ur wrong the opponent notes are over the player's thats not how it works - burgerballs
+		drawQueue.sort(drawQueueSort);
 
 		if(zoom != 1){
 			for(object in drawQueue){
