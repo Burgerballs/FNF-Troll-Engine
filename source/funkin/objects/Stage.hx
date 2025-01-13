@@ -26,6 +26,9 @@ typedef StageFile =
 	@:optional var camera_speed:Null<Float>;
 
 	@:optional var bg_color:Null<String>;
+	
+	// Just in case if you wish for character positioning to operate like how it is on V-Slice
+	@:optional var vslice_positioning:Bool;
 
 	// title screen vars
 	@:optional var camera_stage:Array<Float>; 
@@ -49,7 +52,7 @@ class Stage extends FlxTypedGroup<FlxBasic>
 		camera_boyfriend: [0, 0],
 		camera_opponent: [0, 0],
 		camera_girlfriend: [0, 0],
-		camera_speed: 1
+		vslice_positioning: false
 	};
 	public var foreground = new FlxTypedGroup<FlxBasic>();
 

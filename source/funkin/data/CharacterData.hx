@@ -201,7 +201,7 @@ class CharacterData {
 			camera_position: data.cameraOffsets ?? [0,0],
 	
 			renderType: data.renderType ?? null,
-			flip_x: data.flipX ?? true,
+			flip_x: data.flipX ?? false,
 			no_antialiasing: data.isPixel ?? false,
 			healthicon: data?.healthIcon?.id ?? 'face',
 			//
