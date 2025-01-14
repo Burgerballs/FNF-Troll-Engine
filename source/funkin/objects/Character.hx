@@ -136,19 +136,16 @@ class Character extends FlxSprite
 		return super.destroy();
 	}
 
-	function setupMultiSparrow(json:CharacterFile) {
-		var texture:FlxAtlasFrames = Paths.getSparrowAtlas(json.image);
-		var assetList = [];
+	function setupAtliBulk(json:CharacterFile, func:(key:String, ?library:String) -> FlxAtlasFrames) {
+		var images:Array<String> = [json.image];
 		for (anim in json.animations)
 		{
-			if (anim.assetPath != null && !assetList.contains(anim.assetPath))
+			if (anim.assetPath != null && !images.contains(anim.assetPath))
 			{
-				assetList.push(anim.assetPath);
-				var subTexture:FlxAtlasFrames = Paths.getSparrowAtlas(anim.assetPath);
-				texture.addAtlas(subTexture);
+				images.push(anim.assetPath);
 			}
 		}
-		frames = texture;
+		frames = Paths.getAtliBulk(images, func);
 	}
 
 	function loadFromPsychData(json:CharacterFile)
@@ -167,9 +164,13 @@ class Character extends FlxSprite
 		switch (getImageFileType(json))
 		{
 			case "texture":	frames = AtlasFrameMaker.construct(imageFile);
+
 			case "packer":	frames = Paths.getPackerAtlas(imageFile);
 			case "sparrow":	frames = Paths.getSparrowAtlas(imageFile);
-			case "multisparrow": setupMultiSparrow(json);
+			case "aseprite": frames = Paths.getAsepriteAtlas(imageFile);
+			case "multisparrow": setupAtliBulk(json, Paths.getSparrowAtlas);
+			case "multipacker": setupAtliBulk(json, Paths.getPackerAtlas);
+			case "multiaseprite": setupAtliBulk(json, Paths.getAsepriteAtlas);
 		}
 
 		////

@@ -550,6 +550,7 @@ class NoteField extends FieldBase
 		var graphic:FlxGraphic = hold.frame == null ? hold.graphic : hold.frame.parent;
 
 		shader.bitmap.input = graphic.bitmap;
+		shader.bitmap.wrap = REPEAT;
 		shader.bitmap.filter = hold.antialiasing ? LINEAR : NEAREST;
 
 		return {

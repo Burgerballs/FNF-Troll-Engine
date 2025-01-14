@@ -204,7 +204,9 @@ class CharacterData {
 			flip_x: data.flipX ?? false,
 			no_antialiasing: data.isPixel ?? false,
 			healthicon: data?.healthIcon?.id ?? 'face',
-			//
+			// V-Slice characters have no icon colors
+			// might make some stuff later to make them automatically become red and green
+			// but burgerballs happens to be burgerlazy today
 			healthbar_colors: [255,255,255]
 		};
 	
@@ -363,24 +365,22 @@ typedef AndromedaCharJson = {
 
 enum abstract CharacterRenderType(String) from String to String
 {
-	/**
-	 * Renders the character using a single spritesheet and XML data.
-	 */
+	// Unspecial Atli
+	// Sparrow atlas
 	public var Sparrow = 'sparrow';
-
-	/**
-	 * Renders the character using a single spritesheet and TXT data.
-	 */
+	// Packer Atlas
 	public var Packer = 'packer';
+	// Aseprite JSON Atlas
+	public var Aseprite = 'aseprite';
 
-	/**
-	 * Renders the character using multiple spritesheets and XML data.
-	 */
+	// Special atli
+	// Multiple Sparrow Atli
 	public var MultiSparrow = 'multisparrow';
-
-	/**
-	 * Renders the character using a spritesheet of symbols and JSON data.
-	 */
+	// Multiple Packer Atli
+	public var MultiPacker = 'multipacker';
+	// Multiple Packer Atli
+	public var MultiAseprite = 'multiaseprite';
+	// Adobe Animate Atlas
 	public var AnimateAtlas = 'animateatlas';
 }
 

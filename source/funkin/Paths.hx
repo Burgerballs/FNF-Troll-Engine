@@ -375,6 +375,21 @@ class Paths
 
 		return ret;
 	}
+	inline static public function getAtliBulk(keys:Array<String>, func:(key:String, ?library:String) -> FlxAtlasFrames, ?library):FlxAtlasFrames {
+		var alreadyUsedKeys:Array<String> = [];
+		var atlas:FlxAtlasFrames = null;
+		for (key in keys) {
+			if (alreadyUsedKeys.contains(key) || key == '')
+				continue;
+			if (atlas == null) {
+				atlas = func(key, library);
+			} else {
+				atlas.addAtlas(func(key,library));
+			}
+			alreadyUsedKeys.push(key);
+		}
+		return atlas;
+	}
 	inline static public function getSparrowAtlas(key:String, ?library:String):FlxAtlasFrames
 	{
 		var xmlPath = getPath('images/$key.xml');
@@ -388,6 +403,14 @@ class Paths
 	{
 		var txtPath:String = getPath('images/$key.txt');
 		return FlxAtlasFrames.fromSpriteSheetPacker(
+			image(key, library),
+			exists(txtPath) ? getContent(txtPath) : txtPath
+		);
+	}
+	inline static public function getAsepriteAtlas(key:String, ?library:String):FlxAtlasFrames
+	{
+		var txtPath:String = getPath('images/$key.json');
+		return FlxAtlasFrames.fromTexturePackerJson(
 			image(key, library),
 			exists(txtPath) ? getContent(txtPath) : txtPath
 		);
