@@ -1874,7 +1874,7 @@ class PlayState extends MusicBeatState
 				#if ALLOW_DEPRECATION
 				swagNote.realColumn = daNoteData;
 				#end
-				swagNote.sustainLength = songNotes[2] <= (Conductor.stepCrotchet*0.85) ? songNotes[2] : (susLength + 1) * Conductor.stepCrotchet; // +1 because hold end
+				swagNote.sustainLength = songNotes[2] <= (Conductor.stepCrotchet*1) ? songNotes[2] : (susLength + 1) * Conductor.stepCrotchet; // +1 because hold end
 				swagNote.ID = notes.length;
 
 				modchartObjects.set('note${swagNote.ID}', swagNote);
@@ -1949,7 +1949,8 @@ class PlayState extends MusicBeatState
 					prevNote = sustainNote;
 				}
 				
-				if (susLength > 0){
+				if (songNotes[2] / Conductor.stepCrochet != 0) {
+					// this should be ignored if the sustain is shorter than 1.
 					for (susNote in 0...susLength)
 						makeSustain(susNote, PART);
 					makeSustain(susLength, END);
