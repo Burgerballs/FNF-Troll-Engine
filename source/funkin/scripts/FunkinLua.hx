@@ -708,7 +708,7 @@ class FunkinLua extends FunkinScript
 
 		//stupid bietch ass functions
 		addCallback("addScore", function(value:Int = 0) {
-			PlayState.instance.songScore += value;
+			PlayState.instance.stats.score += value;
 			PlayState.instance.RecalculateRating();
 		});
 		addCallback("addMisses", function(value:Int = 0) {
@@ -928,9 +928,7 @@ class FunkinLua extends FunkinScript
 			PlayState.instance.ratingPercent = value;
 		});
 		addCallback("setRatingName", function(value:String) {
-			//PlayState.instance.ratingName = value;/
-			// Barely works ^^ 
-			// Maybe add Stats.overrideGrade????
+			PlayState.instance.stats.grade = value; // TODO: Maybe some sort of stats.overrideGrade thing??
 		});
 		addCallback("setRatingFC", function(value:String) {
 			PlayState.instance.ratingFC = value;

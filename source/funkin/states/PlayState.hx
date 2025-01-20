@@ -660,6 +660,12 @@ class PlayState extends MusicBeatState
 		}
 		
 		PlayState.keyCount = SONG.keyCount;
+		StrumNote.defaultStaticAnimNames = ['arrowLEFT', 'arrowDOWN', 'arrowUP', 'arrowRIGHT']; 
+		StrumNote.defaultPressAnimNames = ["left press", "down press", "up press", "right press"];
+		StrumNote.defaultConfirmAnimNames = ["left confirm", "down confirm", "up confirm", "right confirm"];
+		Note.defaultNoteAnimNames = ['purple0', 'blue0', 'green0', 'red0'];
+		Note.defaultHoldAnimNames = ['purple hold piece', 'blue hold piece', 'green hold piece', 'red hold piece'];
+		Note.defaultTailAnimNames = ['purple hold end', 'blue hold end', 'green hold end', 'red hold end'];
 		Note.spriteScale = (4 / keyCount) * 0.7;
 		Note.swagWidth = Note.spriteScale * 160;
 		/**
@@ -913,10 +919,12 @@ class PlayState extends MusicBeatState
 			scoreTxt = (cast hud).scoreTxt;
 		
 		#end
+		
 		//// Generate playfields so you can actually, well, play the game
+		#if ALLOW_DEPRECATION
 		callOnScripts("prePlayfieldCreation"); // backwards compat
 		// TODO: add deprecation messages to function callbacks somehow
-
+		#end
 		callOnScripts("onPlayfieldCreation"); // you should use this
 		playfields.cameras = [camHUD];
 		notes.cameras = [camHUD];
@@ -941,7 +949,9 @@ class PlayState extends MusicBeatState
 			dadField.noteHitCallback = playOpponent ? goodNoteHit : opponentNoteHit;
 		}
 		
+		#if ALLOW_DEPRECATION
 		callOnScripts("postPlayfieldCreation"); // backwards compat
+		#end
 		callOnScripts("onPlayfieldCreationPost");
 
 		////
@@ -985,19 +995,7 @@ class PlayState extends MusicBeatState
 
 		//// STAGE LUA SCRIPTS
 		var file = Paths.getLuaPath('stages/$curStage');
-		if(file != null)
-			createLua(file);
-		
-/* 		var baseFile:String = 'stages/$curStage.lua';
-		for (file in [#if MODS_ALLOWED Paths.modFolders(baseFile), #end Paths.getPreloadPath(baseFile)])
-		{
-			if (!Paths.exists(file))
-				continue;
-
-			createLua(file);
-
-			break;
-		} */
+		if (file != null) createLua(file);
 
 		// SONG SPECIFIC LUA SCRIPTS
 		var foldersToCheck:Array<String> = Paths.getFolders('songs/$songName');
@@ -2431,7 +2429,19 @@ class PlayState extends MusicBeatState
 	var lastMixTimer2:Float = 0;
 	var prevNoteCount:Int = 0;
 
-	var svIndex:Int =0;
+	private var svIndex:Int =0;
+	private inline function updateVisualPosition() {
+		var event:SpeedEvent = speedChanges[svIndex];
+		if (svIndex < speedChanges.length - 1){
+			while (speedChanges[svIndex + 1] != null && speedChanges[svIndex + 1].startTime <= Conductor.songPosition){
+				event = speedChanges[svIndex + 1];
+				svIndex++;
+			}
+		}
+		Conductor.visualPosition = getTimeFromSV(Conductor.songPosition, event);
+		FlxG.watch.addQuick("visualPos", Conductor.visualPosition);
+	}
+
 	override public function update(elapsed:Float)
 	{
 		if (paused){
@@ -2535,12 +2545,14 @@ class PlayState extends MusicBeatState
 		////
 		if (startedCountdown && !paused) {
 
-			if (startingSong || !inst.playing || ClientPrefs.songSyncMode == 'Psych 1.0')
+			if (startingSong) {
 				Conductor.songPosition += elapsed * 1000;
-
-			if (Conductor.songPosition >= 0) {
-				if (startingSong)
+				if (Conductor.songPosition >= 0)
 					startSong(0);
+			}
+			else if (Conductor.songPosition >= 0) 
+			{
+				var instTime = inst.time;
 
 				switch(ClientPrefs.songSyncMode ){
 					case "Direct":
@@ -2555,10 +2567,12 @@ class PlayState extends MusicBeatState
 					case "Psych 1.0":
 						// Psych 1.0 method
 						// Since this works better for Rico so might work better for some other machines too
+						Conductor.songPosition += elapsed * 1000;
 						Conductor.songPosition = FlxMath.lerp(inst.time, Conductor.songPosition, Math.exp(-elapsed * 5));
 						var timeDiff:Float = Math.abs(inst.time - Conductor.songPosition);
 						if (timeDiff > 1000)
 							Conductor.songPosition = Conductor.songPosition + 1000 * FlxMath.signOf(timeDiff);
+					
 					case "Last Mix":
 						// Stepmania method
 						// Works for most people it seems??
@@ -2585,9 +2599,6 @@ class PlayState extends MusicBeatState
 				}
 			}
 		}
-		
-		FlxG.watch.addQuick("beatShit", curBeat);
-		FlxG.watch.addQuick("stepShit", curStep);		
 		
 		if (!endingSong){
 			//// time travel
@@ -2629,20 +2640,10 @@ class PlayState extends MusicBeatState
 		}
 
 		////
-		var event:SpeedEvent = speedChanges[svIndex];
-		if (svIndex < speedChanges.length - 1){
-			while (speedChanges[svIndex + 1] != null && speedChanges[svIndex + 1].startTime <= Conductor.songPosition){
-				event = speedChanges[svIndex + 1];
-				svIndex++;
-			}
-		}
-		Conductor.visualPosition = getTimeFromSV(Conductor.songPosition, event);
-		FlxG.watch.addQuick("visualPos", Conductor.visualPosition);
-
-		checkEventNote();
-
 		super.update(elapsed);
+		updateVisualPosition();
 		danceCharacters(); // Update characters dancing
+		checkEventNote();
 		modManager.update(elapsed, curDecBeat, curDecStep);
 
 		if (generatedMusic && !isDead) {
@@ -2813,11 +2814,11 @@ class PlayState extends MusicBeatState
 		if (name.startsWith(oldChar.curCharacter) || oldChar.curCharacter.startsWith(name)) {
 			if (oldChar.animation!=null && oldChar.animation.curAnim!=null) {
 				var anim:String = oldChar.animation.curAnim.name;
-				var frame:Int = oldChar.animation.curAnim.curFrame;
-
+				
 				if (newChar.animation.exists(anim)) {
-					newChar.playAnim(anim, true);
-					newChar.animation.curAnim.curFrame = frame;
+					var reversed:Bool = oldChar.animation.curAnim.reversed;
+					var frame:Int = oldChar.animation.curAnim.curFrame;
+					newChar.playAnim(anim, true, reversed, frame);
 				}
 			}
 		}
