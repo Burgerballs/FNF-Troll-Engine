@@ -1,5 +1,6 @@
 package funkin.states;
 
+import haxe.Timer;
 import funkin.objects.playfields.PlayField.NoteCallback;
 import funkin.data.CharacterData;
 import math.CoolMath;
@@ -2455,7 +2456,6 @@ class PlayState extends MusicBeatState
 
 			return;
 		}
-
 		////
 		for (idx in 0...playfields.members.length)
 			playfields.members[idx].noteField.songSpeed = songSpeed;

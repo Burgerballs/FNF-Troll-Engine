@@ -124,6 +124,7 @@ class CharacterData {
 
 	/**	
 		Returns "texture", "packer" or "sparrow"
+		or other stuff depending on if you have data for it
 	**/
 	public static function getImageFileType(file:CharacterFile):String
 	{
@@ -372,7 +373,6 @@ enum abstract CharacterRenderType(String) from String to String
 	public var Packer = 'packer';
 	// Aseprite JSON Atlas
 	public var Aseprite = 'aseprite';
-
 	// Special atli
 	// Multiple Sparrow Atli
 	public var MultiSparrow = 'multisparrow';
@@ -405,16 +405,7 @@ typedef VSliceCharacterData =
 };
 typedef AnimationData =
 {
-	> UnnamedAnimationData,
 	var name:String;
-}
-
-/**
- * A data structure representing an animation in a spritesheet.
- * This animation doesn't specify a name, that's presumably specified by the parent data structure.
- */
-typedef UnnamedAnimationData =
-{
 	@:optional
 	var prefix:String;
 	@:optional
@@ -438,18 +429,8 @@ typedef UnnamedAnimationData =
 	@:optional
 	var frameIndices:Null<Array<Int>>;
 }
-
-/**
- * The JSON data schema used to define the health icon for a character.
- */
 typedef HealthIconData =
 {
 	@:optional
-	@:default([200,200,200])
-	var colorRGB:Array<Int>;
-	/**
-	 * The ID to use for the health icon.
-	 * @default The character's ID
-	 */
 	var id:Null<String>;
 }

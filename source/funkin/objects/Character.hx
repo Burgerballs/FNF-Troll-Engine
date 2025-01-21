@@ -164,7 +164,6 @@ class Character extends FlxSprite
 		switch (getImageFileType(json))
 		{
 			case "texture":	frames = AtlasFrameMaker.construct(imageFile);
-
 			case "packer":	frames = Paths.getPackerAtlas(imageFile);
 			case "sparrow":	frames = Paths.getSparrowAtlas(imageFile);
 			case "aseprite": frames = Paths.getAsepriteAtlas(imageFile);
