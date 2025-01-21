@@ -35,6 +35,17 @@ Along with this are some small optional changes to the Psych Engine character fo
 
 Stages can now also be modified to use V-Slice stage positioning with a small json edit.
 
+# More Atlas Support
+
+Aseprite JSON atlases are supported.
+
+More supported atlas rendering types are as follows:
+
+MultiSparrow (multiple Sparrow atlases on single sprite)
+
+MultiPacker (multiple Packer atlases on single sprite)
+
+MultiAseprite (multiple JSON Packer atlases on single sprite)
 
 # Friday Night Funkin': Troll Engine
 
