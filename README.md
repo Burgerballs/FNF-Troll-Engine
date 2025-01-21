@@ -46,7 +46,10 @@ MultiSparrow (multiple Sparrow atlases on single sprite)
 MultiPacker (multiple Packer atlases on single sprite)
 
 MultiAseprite (multiple JSON Packer atlases on single sprite)
-
+```
+Original Description VVVVVV
+The description remains unchanged for the purpose of accurate crediting upon the existence of later changes.
+```
 # Friday Night Funkin': Troll Engine
 
 [Troll Engine](https://github.com/riconuts/troll-engine) is the fork of [Psych Engine](https://github.com/ShadowMario/FNF-PsychEngine) originally made for the [Tails Gets Trolled mod](https://gamebanana.com/mods/320596).
