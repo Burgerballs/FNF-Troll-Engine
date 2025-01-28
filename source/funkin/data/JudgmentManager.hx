@@ -195,6 +195,7 @@ class JudgmentManager {
 	public var hittableJudgments:Array<Judgment>; 
 	public var judgeTimescale:Float = 1; // scales hit windows
 	public var useEpics:Bool;
+	public static var instance:JudgmentManager;
 
 	public function new(?useEpics:Bool)
 	{
@@ -210,6 +211,7 @@ class JudgmentManager {
 		hittableJudgments = [TIER4, TIER3, TIER2, TIER1];
 		judgmentData.get(TIER4).accuracy = 100;
 		judgmentData.get(TIER2).comboBehaviour = INCREMENT;
+		instance = this;
 	}
 
 	/**

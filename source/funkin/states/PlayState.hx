@@ -1322,7 +1322,7 @@ class PlayState extends MusicBeatState
 		char.nextDanceBeat = startBopBeat;
 		// center-bottom the character if stage positioning is vslice adjacent.
 		if (stageData?.vslice_positioning ?? false) {
-			char.x -= char.width/2;
+			char.x -= Math.floor(char.width / 2);
 			char.y -= char.height;
 		}
 		

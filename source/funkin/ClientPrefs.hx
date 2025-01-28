@@ -99,11 +99,11 @@ class ClientPrefs
 					"requiresRestart" => true,
 					"options" => [
 						"Psych", 
-						"V-Slice", 
+						"V-Slice",
 						#if USE_EPIC_JUDGEMENT "PBot", #end
 						"Week 7", 
 						"Standard", 
-						"ITG", 
+						"ITG",
 						"Custom"
 					]
 				]
@@ -424,13 +424,15 @@ class ClientPrefs
 				display: "Accuracy Calculation",
 				desc: "The method used to calculate your song accuracy. Wife3 is Etterna's and PBot is V-Slice's.",
 				type: Dropdown,
-				value: "Judgement",
+				value: "BBE2Complex",
 				data: [
 					"options" => [
 						"Simple",
 						"Judgement",
 						"Wife3",
-						"PBot"
+						"PBot",
+						"BBE2Complex", // self indulgence
+						"SuperBBE2Complex"
 					]
 				]
 			},

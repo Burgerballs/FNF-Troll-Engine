@@ -131,6 +131,12 @@
 		<haxedef name="openfl-enable-handle-error" />
 	</section>
 
+	<!-- 
+		Used for mods personally by me or mods i have heavy involvement in
+		Don't enable unless if you like the features this includes.
+	-->
+	<haxedef name="BBTE_BURGERBALLS_SIGNATURE" />
+
 	<!-- NOTE TO SELF: DISABLE THIS IF ISSUES ARE FOUND -->
 	<haxedef name="LINC_LUA_RELATIVE_DYNAMIC_LIB" if="LUA_ALLOWED" /> <!-- stable luas PUT AFTER FIRST LINE WITH APP NAME AND ETC -->
 

@@ -13,6 +13,8 @@ enum abstract AccuracySystem(String) from String to String
 	var JUDGEMENT = "Judgement";
 	var WIFE3 = "Wife3";
 	var PBOT = "PBot";
+	var BBE2COMPLEX = "BBE2Complex";
+	var SUPERBBE2COMPLEX = "SuperBBE2Complex";
 }
 
 typedef NoteHitInfo = {
@@ -247,6 +249,12 @@ class Stats {
 		// trace(score, grade, clearType);
 	}
 
+	// this shit is so simple i am not even going to give it its own class
+    public inline function BBE2ComplexGetAccuracy(diff:Float):Float {
+		var highDiff = #if USE_EPIC_JUDGEMENT ClientPrefs.useEpics ? ClientPrefs.epicWindow : #end ClientPrefs.sickWindow;
+		return diff > highDiff ? highDiff / diff : 1;
+	}
+
 	public function calculateAccuracy(data:JudgmentData, diff:Float, ?incrementPlayed:Bool = true) {
 		switch(accuracySystem)
 		{
@@ -276,6 +284,18 @@ class Stats {
 				
 				if (data.countAsHit != false)
 					totalPlayed += 5;
+			case BBE2COMPLEX: // Milisecond-based accuracy, this literally just divides the diff by the highest rating window lmao
+				totalNotesHit += BBE2ComplexGetAccuracy(Math.abs(diff));
+				if (data.countAsHit != false)
+					totalPlayed += 1;
+			case SUPERBBE2COMPLEX:
+				var shit = BBE2ComplexGetAccuracy(Math.abs(diff));
+				shit = Math.pow(shit, 5.22);
+				if (shit > 1)
+					shit = 1;
+				totalNotesHit += shit;
+				if (data.countAsHit != false)
+					totalPlayed += 1;
 
 			default: // accuracy depends on the judgement
 				totalNotesHit += data.accuracy * 0.01;
