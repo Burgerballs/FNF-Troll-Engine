@@ -686,7 +686,7 @@ class Character extends FlxSprite
 
 		return returnVal;
 		#else
-		return Globals.Function_Continue
+		return Globals.Function_Continue;
 		#end
 	}
 
