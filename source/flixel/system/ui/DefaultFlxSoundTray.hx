@@ -70,7 +70,7 @@ class DefaultFlxSoundTray extends FlxSoundTray
 		#if tgt
 		var dtf:TextFormat = new TextFormat(funkin.Paths.font("calibrib.ttf"), 10, 0xffffff);
 		#else
-		var dtf:TextFormat = new TextFormat(FlxAssets.FONT_DEFAULT, 8, 0xffffff);
+		var dtf:TextFormat = new TextFormat(funkin.Paths.font("vcr.ttf"), 8, 0xffffff);
 		#end
 		dtf.align = TextFormatAlign.CENTER;
 		_text.defaultTextFormat = dtf;
@@ -141,6 +141,7 @@ class DefaultFlxSoundTray extends FlxSoundTray
 		{
 			globalVolume = 0;
 		}
+		_text.text = "VOLUME:" + (globalVolume*10) + "%";
 
 		for (i in 0..._bars.length)
 		{
