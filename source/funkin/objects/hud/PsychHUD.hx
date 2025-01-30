@@ -232,8 +232,10 @@ class PsychHUD extends CommonHUD
 		{
 			case 'misses':
 				misses = val;
-				judgeCounters.bump('miss');
-				judgeCounters.setCount('miss', val);
+				if (judgeCounters != null) {
+					judgeCounters.bump('miss');
+					judgeCounters.setCount('miss', val);
+				}
 			
 			case 'totalNotesHit':
 				if (ClientPrefs.showWifeScore)
