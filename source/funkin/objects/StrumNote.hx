@@ -28,6 +28,7 @@ class StrumNote extends NoteObject
 	////
 	public var noteMod(default, set):String;
 	public var genScript:FunkinHScript;
+	public var copyNoteHSB:Bool = true;
 
 	////
 	public var z:Float = 0;
@@ -165,9 +166,13 @@ class StrumNote extends NoteObject
 		if (animation.name == 'static') {
 			colorSwap.setHSB();
 		} 
-		else if (note != null) {
+		else if (note != null && copyNoteHSB) {
 			// ok now the quants should b fine lol
 			colorSwap.copyFrom(note.colorSwap);
+			if (note.indicated) {
+				colorSwap.brightness -= 2;
+				colorSwap.saturation -= 0.2;
+			}
 		}
 		else if(!isQuant) {
 			colorSwap.setHSBIntArray(ClientPrefs.arrowHSV[column % 4]);

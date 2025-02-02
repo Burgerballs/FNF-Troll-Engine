@@ -15,6 +15,10 @@ import openfl.utils.AssetType;
 import openfl.utils.Assets;
 import haxe.Json;
 
+import sys.thread.Thread;
+import sys.thread.Mutex;
+
+
 using StringTools;
 
 #if sys
@@ -508,8 +512,10 @@ class Paths
 			newGraphic.destroyOnNoUse = false;
 
 			if (cache) {
-				localTrackedAssets.push(path);
-				currentTrackedAssets.set(path, newGraphic);
+				Thread.create(() -> { 
+					localTrackedAssets.push(path);
+					currentTrackedAssets.set(path, newGraphic);
+				});
 			}
 		}
 

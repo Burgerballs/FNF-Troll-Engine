@@ -224,6 +224,8 @@ class StartupState extends FlxTransitionableState
 				
 			#if !tgt
 			case 10:
+				if (ClientPrefs.scaleGame)
+					Main.instance.resizeGame();
 				trace('loading lasted $loadingTime');
 				step = 50;
 			#end

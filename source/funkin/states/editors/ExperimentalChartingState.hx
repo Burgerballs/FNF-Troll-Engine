@@ -132,7 +132,7 @@ class ExperimentalChartingState extends MusicBeatState
 	var _file:FileReference;
 
 	var UI_box:FlxUITabMenu;
-	var noteArr:Array<ChartNoteData>;
+	var noteArr:Array<ChartNoteData> = [];
 
 	public static var curSec:Int = 0;
 	public static var lastSection:Int = 0;

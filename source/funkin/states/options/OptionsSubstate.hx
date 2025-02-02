@@ -96,6 +96,8 @@ class OptionsSubstate extends MusicBeatSubstate
 					"midScrollType",
 					"noteSplashes",
 					"noteSkin",
+					"styledNoteSkins",
+					"indicateNear",
 					"customizeColours"
 				]
 			],
@@ -132,7 +134,7 @@ class OptionsSubstate extends MusicBeatSubstate
 		],
 		"video" => [
 			["video", ["shaders", "showFPS"]],
-			["display", ["framerate", "bread"]],
+			["display", ["framerate", "bread", "scaleGame"]],
 			[
 				"performance",
 				[

@@ -5,9 +5,15 @@ import funkin.objects.shaders.NoteColorSwap;
 class ColorSwap
 {
 	public var shader(default, null):ColorSwapShader = new ColorSwapShader();
+
+	public var baseHue(default, set):Float = 0;
+	public var baseSat(default, set):Float = 0;
+	public var baseBri(default, set):Float = 0;
+	
 	public var hue(default, set):Float = 0;
 	public var saturation(default, set):Float = 0;
 	public var brightness(default, set):Float = 0;
+
 	public var daAlpha(default, set):Float = 1;
 	public var flash(default, set):Float = 0;
 
@@ -15,6 +21,23 @@ class ColorSwap
 	public var flashG(default, set):Float = 1;
 	public var flashB(default, set):Float = 1;
 	public var flashA(default, set):Float = 1;
+
+	private function set_baseHue(value:Float) {
+		baseHue = value;
+		set_hue(hue);
+		return value;
+	}
+	private function set_baseSat(value:Float) {
+		baseSat = value;
+		set_saturation(saturation);
+		return value;
+	}
+	private function set_baseBri(value:Float) {
+		baseBri = value;
+		set_hue(brightness);
+
+		return value;
+	}
 
 	private function set_flashR(value:Float)
 	{
@@ -61,21 +84,21 @@ class ColorSwap
 	private function set_hue(value:Float)
 	{
 		hue = value;
-		shader.uTime.value[0] = hue;
+		shader.uTime.value[0] = baseHue + hue;
 		return hue;
 	}
 
 	private function set_saturation(value:Float)
 	{
 		saturation = value;
-		shader.uTime.value[1] = saturation;
+		shader.uTime.value[1] = baseSat + saturation;
 		return saturation;
 	}
 
 	private function set_brightness(value:Float)
 	{
 		brightness = value;
-		shader.uTime.value[2] = brightness;
+		shader.uTime.value[2] = baseBri + brightness;
 		return brightness;
 	}
 

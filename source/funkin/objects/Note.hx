@@ -158,6 +158,7 @@ class Note extends NoteObject
 	public var ratingMod:Float = 0; // 0 = unknown, 0.25 = shit, 0.5 = bad, 0.75 = good, 1 = sick
 	
 	//// note type/customizable shit
+	public var canIndicateNear:Bool = true; // Like FPS-Plus!
 	public var noteMod(default, set):String = null; 
 	public var noteType(default, set):String = null;  // the note type
 	public var texture(default, set):String; // texture for the note
@@ -316,6 +317,7 @@ class Note extends NoteObject
 			genScript = PlayState.instance.getHudSkinScript(value);
 
 		////
+		canIndicateNear = ClientPrefs.indicateNear;
 		if (genScript == null){
 			texture = "";
 
@@ -633,6 +635,8 @@ class Note extends NoteObject
 		scale.set(spriteScale, spriteScale); 
 	} 
 
+	public var indicated = false;
+
 	override function draw()
 	{
 		var holdMult:Float = baseAlpha;
@@ -641,10 +645,15 @@ class Note extends NoteObject
 			holdMult = FlxMath.lerp(0.3, 1, parent.tripProgress);
 		
 		colorSwap.daAlpha = alphaMod * alphaMod2 * holdMult;
+		if (canIndicateNear && canBeHit) {
+			canIndicateNear = false;
+			indicated = true;
+			colorSwap.brightness += 2;
+			colorSwap.saturation += 0.2;
+		}
 
-		if (tooLate && !inEditor)
+		if (tooLate && !inEditor && alpha > 0.3)
 		{
-			if (alpha > 0.3)
 				alpha = 0.3;
 		}
 

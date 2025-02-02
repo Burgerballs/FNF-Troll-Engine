@@ -36,7 +36,7 @@ import funkin.api.Windows;
 final class Version
 {
 	public static final engineVersion:String = '0.2.0'; // Used for autoupdating n stuff
-	public static final betaVersion:String = 'M'; // beta version, set it to 0 if not on a beta version, otherwise do it based on semantic versioning (alpha.1, beta.1, rc.1, etc)
+	public static final betaVersion:String = '0'; // beta version, set it to 0 if not on a beta version, otherwise do it based on semantic versioning (alpha.1, beta.1, rc.1, etc)
 	public static final isBeta:Bool = betaVersion != '0';
 
 	public static final buildCode:String = Sowy.getBuildDate();
@@ -48,6 +48,7 @@ final class Version
 
 class Main extends Sprite
 {
+	public static var instance:Main = null;
 	var gameWidth:Int = 1280; // Width of the game in pixels (might be less / more in actual pixels depending on your zoom).
 	var gameHeight:Int = 720; // Height of the game in pixels (might be less / more in actual pixels depending on your zoom).
 	var adjustGameSize:Bool = true; // If true, the game size is adjusted to fit within the screen resolution
@@ -79,6 +80,7 @@ class Main extends Sprite
 	////
 	public function new() {
 		super();
+		instance = this;
 
 		////
 		#if sys
@@ -120,9 +122,6 @@ class Main extends Sprite
 		}
 		#end
 
-		final screenWidth = Capabilities.screenResolutionX;
-		final screenHeight = Capabilities.screenResolutionY;
-
 		#if sys
 		if (sys.FileSystem.exists("gameSize.txt")) {
 			var d = sys.io.File.getContent("gameSize.txt").split(" ");
@@ -130,25 +129,6 @@ class Main extends Sprite
 			gameHeight = Std.parseInt(d[1]);
 		}
 		#end
-
-		if (adjustGameSize) {
-			//// Readjust the game size for smaller screens
-			if (!(screenWidth > gameWidth || screenHeight > gameWidth)){
-				var ratioX:Float = screenWidth / gameWidth;
-				var ratioY:Float = screenHeight / gameHeight;
-				
-				var zoom = Math.min(ratioX, ratioY);
-				gameWidth = Math.ceil(screenWidth / zoom);
-				gameHeight = Math.ceil(screenHeight / zoom);
-			}
-		}
-
-		//// Readjust the window size for larger screens 
-		var scaleFactor:Int = Math.floor((screenWidth > screenHeight) ? (screenHeight / gameHeight) : (screenWidth / gameWidth));
-		if (scaleFactor < 1) scaleFactor = 1;
-
-		resizeWindow(gameWidth * scaleFactor, gameHeight * scaleFactor);
-		centerWindow();
 
 		////
 		@:privateAccess
@@ -217,6 +197,29 @@ class Main extends Sprite
 			Std.int((Application.current.window.display.bounds.width - Application.current.window.width) / 2),
 			Std.int((Application.current.window.display.bounds.height - Application.current.window.height) / 2)
 		);
+	}
+
+	public function resizeGame() {
+		final screenWidth = Capabilities.screenResolutionX;
+		final screenHeight = Capabilities.screenResolutionY;
+		if (adjustGameSize) {
+			//// Readjust the game size for smaller screens
+			if (!(screenWidth > gameWidth || screenHeight > gameWidth)){
+				var ratioX:Float = screenWidth / gameWidth;
+				var ratioY:Float = screenHeight / gameHeight;
+				
+				var zoom = Math.min(ratioX, ratioY);
+				gameWidth = Math.ceil(screenWidth / zoom);
+				gameHeight = Math.ceil(screenHeight / zoom);
+			}
+		}
+
+		//// Readjust the window size for larger screens 
+		var scaleFactor:Int = Math.floor((screenWidth > screenHeight) ? (screenHeight / gameHeight) : (screenWidth / gameWidth));
+		if (scaleFactor < 1) scaleFactor = 1;
+
+		resizeWindow(gameWidth * scaleFactor, gameHeight * scaleFactor);
+		centerWindow();
 	}
 
 	public static function resetSpriteCache(sprite:Sprite):Void {

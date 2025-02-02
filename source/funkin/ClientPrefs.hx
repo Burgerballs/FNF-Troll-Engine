@@ -68,6 +68,13 @@ class ClientPrefs
 				value: false,
 				data: []
 			},
+			"indicateNear" => {
+				display: "Indicate Near Notes",
+				desc: "When toggled, notes of supported skins and types will get brighter to indicate if the player is able to hit them.\nMuch like FPS+!",
+				type: Toggle,
+				value: false,
+				data: []
+			},
 			"ghostTapping" => {
 				display: "Ghost Tapping",
 				desc: "When toggled, you won't get penalised for inputs which don't hit notes.",
@@ -352,6 +359,20 @@ class ClientPrefs
 			"scoreZoom" => {
 				display: "Zoom On Hit",
 				desc: "When toggled, the HUD zooms when you hit a note.",
+				type: Toggle,
+				value: true,
+				data: []
+			},
+			"styledNoteSkins" => {
+				display: "Stylized Note Skins",
+				desc: "When untoggled, supported mods will switch to a more \"traditional\" noteskin.",
+				type: Toggle,
+				value: true,
+				data: []
+			},
+			"scaleGame" => {
+				display: "Scale Game Window",
+				desc: "When toggled, the game window is scaled to fit your horizontal screen resolution upon loading, this only takes effect if you restart it.",
 				type: Toggle,
 				value: true,
 				data: []
