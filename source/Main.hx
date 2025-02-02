@@ -2,10 +2,8 @@ package;
 
 import flixel.FlxG;
 import flixel.FlxState;
-import openfl.Lib;
 import openfl.display.FPS;
 import openfl.display.Sprite;
-import openfl.system.Capabilities;
 import lime.app.Application;
 
 import funkin.*;
@@ -14,24 +12,13 @@ import funkin.macros.Sowy;
 import funkin.data.SemanticVersion;
 import funkin.objects.Bread;
 
-using StringTools;
-
-#if DISCORD_ALLOWED
-import funkin.api.Discord.DiscordClient;
-#end
-
-#if CRASH_HANDLER
-import openfl.events.UncaughtErrorEvent;
-import haxe.CallStack;
-
 #if sys
-import sys.io.File;
+import sys.FileSystem;
+import sys.io.Process;
+import haxe.io.BytesOutput;
 #end
 
-#if (windows && cpp)
-import funkin.api.Windows;
-#end
-#end
+using StringTools;
 
 final class Version
 {
@@ -56,13 +43,13 @@ class Main extends Sprite
 	var nextState:Class<FlxState> = funkin.states.TitleState; 
 	var framerate:Int = 60; // How many frames per second the game should run at.
 	var skipSplash:Bool = true; // Whether to skip the flixel splash screen that appears in release mode.
-	var startFullscreen:Bool = false; // Whether to start the game in fullscreen on desktop targets
+	var startFullscreen:Null<Bool> = null; // Whether to start the game in fullscreen on desktop targets
 
 	public static final UserAgent:String = 'TrollEngine/${Version.engineVersion}'; // used for http requests. if you end up forking the engine and making your own then make sure to change this!!
 	
 	//// You can pretty much ignore everything from here on - your code should go in your states.
 
-	public static var showDebugTraces:Bool = #if (debug || SHOW_DEBUG_TRACES) true #else false #end;
+	public static var showDebugTraces:Bool = true; // #if (debug || SHOW_DEBUG_TRACES) true #else false #end;
 	public static var downloadBetas:Bool = Version.isBeta;
 	public static var outOfDate:Bool = false;
 	public static var recentRelease:Release;
@@ -87,7 +74,10 @@ class Main extends Sprite
 		var args = Sys.args();
 		trace(args);
 		for (arg in args) {
-			switch(arg){
+			switch(arg) {
+				case "traceSowy":
+					trace("sowy");
+
 				case "troll":
 					#if tgt
 					initialState = funkin.tgt.SinnerState;
@@ -98,32 +88,16 @@ class Main extends Sprite
 
 				case "debug":
 					funkin.states.PlayState.chartingMode = true;
+					Main.showDebugTraces = true;
 
 				case "showdebugtraces":
 					Main.showDebugTraces = true;
-
-				default:
-					/*
-					if (arg.startsWith('song:')) {
-						var split = arg.split(':');
-						var metadata = new funkin.data.Song.SongMetadata(split[1], split[2]);
-						var playSongFunc = funkin.data.Song.playSong.bind(metadata, split[3], Std.parseInt(split[4]));
-
-						trace("starting w song: "+split);
-
-						initialState = flixel.FlxState;
-						FlxG.signals.postStateSwitch.add(()->{
-							StartupState.load();
-							playSongFunc();			
-						});
-					}
-					*/
 			}
 		}
 		#end
 
 		#if sys
-		if (sys.FileSystem.exists("gameSize.txt")) {
+		if (FileSystem.exists("gameSize.txt")) {
 			var d = sys.io.File.getContent("gameSize.txt").split(" ");
 			gameWidth = Std.parseInt(d[0]);
 			gameHeight = Std.parseInt(d[1]);
@@ -139,10 +113,6 @@ class Main extends Sprite
 
 		var game = new FNFGame(gameWidth, gameHeight, initialState, framerate, framerate, skipSplash, startFullscreen);
 		addChild(game);
-
-		FlxG.sound.volume = FlxG.save.data.volume;
-		FlxG.mouse.useSystemCursor = true;
-		FlxG.mouse.visible = false;
 
 		fpsVar = new FPS(10, 3, 0xFFFFFF);
 		fpsVar.visible = false;
@@ -227,81 +197,42 @@ class Main extends Sprite
 			sprite.__cacheBitmap = null;
 			sprite.__cacheBitmapData = null;
 		}
-
 	}
 
-	#if CRASH_HANDLER
-	private static function toMainMenu() @:privateAccess {
-		try{
-			if (FlxG.game._state != null) FlxG.game._state.destroy();
-			FlxG.game._state = null;
-		}catch(e){
-			print("Error destroying state: ", e);
-		}	
-		
-		FlxG.game._requestedState = new funkin.states.MainMenuState();
-		FlxG.game.switchState();
-	}
+	#if sys
+	// https://github.com/openfl/hxp/blob/master/src/hxp/System.hx
+	public static function runProcess(command:String, ?args:Array<String>):Null<String> {
+		var process = new Process(command, args);
+		var buffer = new BytesOutput();
+		var waiting = true;
 
-	//private static var lastCallstack:String;
-	private static function saveCallStack(callstack) {
-		//lastCallstack = callstack;
-		File.saveContent("crash.txt", callstack);
-	}
+		while (waiting) {
+			try {
+				var current = process.stdout.readAll(1024);
+				buffer.write(current);
 
-	inline static function closeProgram() {
-		#if DISCORD_ALLOWED
-		DiscordClient.shutdown(true);
-		#end
-
-		Sys.exit(1);
-	}
-
-	private static function onCrash(errorName:String):Void {
-		print("\nCall stack starts below");
-
-		var callstack:String = "";
-
-		for (stackItem in CallStack.exceptionStack(true)) {
-			switch (stackItem) {
-				case FilePos(s, file, line, column):
-					callstack += '$file:$line\n';
-				default:
+				if (current.length == 0)
+					waiting = false;
+			} catch (e) {
+				waiting = false;
 			}
 		}
 
-		callstack += '\n$errorName';
-		print('\n$callstack\n');
+		var result = process.exitCode();
+		var output = buffer.getBytes().toString();
+		var retVal:Null<String> = output;
 
-		#if (windows && cpp)
-		/*if (lastCallstack == callstack) {
-			lastCallstack = null;
-			return toMainMenu();
-		}*/
-		
-		var boxMessage:String = callstack;
-		boxMessage += "\n";
-		boxMessage += "\nCall stack will be saved as crash.txt";
-		boxMessage += "\nWould you like to goto the main menu?";
+		if (output == "") {
+			var error = process.stderr.readAll().toString();
+			process.close();
 
-		var ret = Windows.msgBox(boxMessage, errorName, ERROR | MessageBoxOptions.YESNOCANCEL | MessageBoxDefaultButton.BUTTON3);
-		
-		switch(ret) {
-			case YES: // Return to Main Menu.
-				saveCallStack(callstack);
-				toMainMenu();
-
-			default: // Close program.
-				saveCallStack(callstack);
-				closeProgram();
-
-			case CANCEL: // Continue with a possibly unstable state
-				saveCallStack(callstack);
+			if (result != 0 || error != "")
+				retVal = null;
+		} else {
+			process.close();
 		}
-		#else
-		Application.current.window.alert(callstack, errorName);
-		closeProgram();
-		#end
+		
+		return retVal;
 	}
 	#end
 }
