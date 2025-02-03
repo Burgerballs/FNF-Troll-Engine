@@ -645,7 +645,7 @@ class Note extends NoteObject
 			holdMult = FlxMath.lerp(0.3, 1, parent.tripProgress);
 		
 		colorSwap.daAlpha = alphaMod * alphaMod2 * holdMult;
-		if (canIndicateNear && canBeHit) {
+		if (!inEditor && canIndicateNear && canBeHit && !isSustainNote) {
 			canIndicateNear = false;
 			indicated = true;
 			colorSwap.brightness += 2;
