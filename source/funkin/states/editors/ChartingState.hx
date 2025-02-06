@@ -113,6 +113,10 @@ class ChartingState extends MusicBeatState
 		[
 			"Interpolated Mult SV", 
 			"Exact same function as Mult SV, but tweened.\nValue 1: New Speed\nValue 2: Duration in steps\nIf you wish to add other easings, you must add the easing name to the end of the duration value,\nseparated by commas.\nEg; \"16,sineOut\""
+		],
+		[
+			"Set Character Alt",
+			"Alternative to the Alt Animation checkbox, also affects idle animation.\n\nVal1: Character\nVal2: Alt Suffix Name (set blank for default)"
 		]
 	];
 
@@ -1850,6 +1854,8 @@ class ChartingState extends MusicBeatState
 		return false;
 	}
 
+	var hitsound:FlxSound;
+
 	override function update(elapsed:Float)
 	{
 		if (tracksCompleted){
@@ -2061,8 +2067,11 @@ class ChartingState extends MusicBeatState
 								var soundToPlay = 'hitsound';
 								if(_song.player1 == 'gf') // Easter egg
 									soundToPlay = 'GF_${data + 1}';
-	
-								FlxG.sound.play(Paths.sound(soundToPlay)).pan = (note.column < 4) ? -0.3 : 0.3; //would be coolio
+								if (hitsound != null) {
+									hitsound.stop();
+								}
+								hitsound = FlxG.sound.play(Paths.sound(soundToPlay));
+								hitsound.pan = (note.column < 4) ? -0.3 : 0.3; //would be coolio
 								playedSound[data] = true;
 							}
 							
