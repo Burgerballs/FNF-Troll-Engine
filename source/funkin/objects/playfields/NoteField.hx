@@ -237,18 +237,9 @@ class NoteField extends FieldBase
 
 		// draw tap notes
 		for (note in taps)
-			{
-				var pos = notePos.get(note);
-				var object = drawNote(note, pos);
-				if (object == null)
-					continue;
-				object.zIndex = pos.z + note.zIndex;
-				lookupMap.set(note, object);
-				drawQueue.push(object);
-			}
 		{
 			var pos = notePos.get(note);
-			var object = drawNote(note, pos, nextNotePos.get(note));
+			var object = drawNote(note, pos);
 			if (object == null)
 				continue;
 			object.zIndex = pos.z + note.zIndex;
