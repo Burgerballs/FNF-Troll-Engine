@@ -52,7 +52,7 @@ class OptionsSubstate extends MusicBeatSubstate
 					"downScroll",
 					"midScroll",
 					"ghostTapping", 
-					"directionalCam", 
+					"directionalCam",
 					"noteOffset", 
 					"ratingOffset",
 				]
@@ -63,8 +63,9 @@ class OptionsSubstate extends MusicBeatSubstate
 					"masterVolume",
 					"songVolume",
 					'sfxVolume',
-					"hitsoundVolume", 
+					"hitsoundVolume",
 					"missVolume",
+					"hitsoundBehaviour",
 					#if tgt "ruin", #end
 				]
 			],

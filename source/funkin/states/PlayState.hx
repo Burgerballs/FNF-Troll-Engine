@@ -3549,6 +3549,13 @@ class PlayState extends MusicBeatState
 		if (callOnScripts("onKeyPress", [column]) == Globals.Function_Stop)
 			return;
 
+		if (ClientPrefs.hitsoundVolume > 0 && ClientPrefs.hitsoundBehaviour == 'Key Press') {
+			if (hitsound != null)
+				hitsound.stop();
+			hitsound = FlxG.sound.play(Paths.sound('hitsound'), ClientPrefs.hitsoundVolume );
+			hitsound.pitch = 1 + FlxG.random.float(-0.1, 0.1);
+		}
+
 		var hitNotes:Array<Note> = []; // what could scripts possibly do with this information
 		var controlledFields:Array<PlayField> = [];
 		
@@ -3916,10 +3923,11 @@ class PlayState extends MusicBeatState
 			stats.noteDiffs.push(note.hitResult.hitDiff + ClientPrefs.ratingOffset); // used for stat saving (i.e viewing song stats after you beaten it)
 		}
 
-		if (!note.hitsoundDisabled && ClientPrefs.hitsoundVolume > 0) {
+		if (!note.hitsoundDisabled && ClientPrefs.hitsoundVolume > 0 && ClientPrefs.hitsoundBehaviour == 'Note Hit') {
 			if (hitsound != null)
 				hitsound.stop();
 			hitsound = FlxG.sound.play(Paths.sound('hitsound'), ClientPrefs.hitsoundVolume );
+			hitsound.pitch = 1 + FlxG.random.float(-0.1, 0.1);
 		}
 
 		if (note.ratingDisabled) {

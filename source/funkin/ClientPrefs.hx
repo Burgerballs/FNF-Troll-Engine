@@ -96,6 +96,7 @@ class ClientPrefs
 				value: false,
 				data: []
 			},
+			
 			"judgePreset" => {
 				display: "Judgement Preset",
 				desc: "Preset for the judgement windows.",
@@ -112,6 +113,18 @@ class ClientPrefs
 						"Standard", 
 						"ITG",
 						"Custom"
+					]
+				]
+			},
+			"hitsoundBehaviour" => {
+				display: "Hitsound Behaviour",
+				desc: "How hitsounds are handled by the game.",
+				type: Dropdown,
+				value: "Note Hit",
+				data: [
+					"options" => [
+						"Note Hit",
+						"Key Press"
 					]
 				]
 			},
