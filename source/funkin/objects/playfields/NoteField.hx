@@ -333,7 +333,6 @@ class NoteField extends FieldBase
 		var glowR = modManager.getValue("flashR", modNumber);
 		var glowG = modManager.getValue("flashG", modNumber);
 		var glowB = modManager.getValue("flashB", modNumber);
-		
 		// actually draws everything
 		if (drawQueue.length > 0)
 		{
@@ -536,13 +535,14 @@ class NoteField extends FieldBase
 
 			var top = lastMe ?? getPoints(hold, topWidth, speed, (visualDiff + (strumOff * 0.45)), strumDiff + strumOff, lookAheadTime);
 			var bot = getPoints(hold, botWidth, speed, (visualDiff + ((strumOff + strumSub) * 0.45)), strumDiff + strumOff + strumSub, lookAheadTime);
-			if (!hold.copyY) {
-				if (lastMe == null) {
-					top[0].y -= FlxMath.lerp(0, (crotchet + 1) * 0.45 * speed, prog);
-					top[1].y -= FlxMath.lerp(0, (crotchet + 1) * 0.45 * speed, prog);
+			var offset:Float = FlxMath.lerp(0, (crotchet + 1) * 0.45 * speed, prog);
+			if(!hold.copyY){
+				if(lastMe == null){
+					top[0].y -= offset;
+					top[1].y -= offset;
 				}
-				bot[0].y -= FlxMath.lerp(0, (crotchet + 1) * 0.45 * speed, nextProg);
-				bot[1].y -= FlxMath.lerp(0, (crotchet + 1) * 0.45 * speed, nextProg);
+				bot[0].y -= offset;
+				bot[1].y -= offset;
 			}
 			lastMe = bot;
 
