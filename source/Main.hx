@@ -1,5 +1,9 @@
 package;
 
+import haxe.CallStack;
+import openfl.display.Sprite;
+import openfl.display.FPS;
+import lime.app.Application;
 import flixel.FlxG;
 import flixel.FlxState;
 import openfl.display.FPS;
@@ -199,6 +203,18 @@ class Main extends Sprite
 			sprite.__cacheBitmap = null;
 			sprite.__cacheBitmapData = null;
 		}
+	}
+
+	public static function callstackToString(callstack:Array<StackItem>):String {
+		var str:String = "";
+		for (stackItem in callstack) {
+			switch (stackItem) {
+				case FilePos(s, file, line, column):
+					str += '$file:$line\n';
+				default:
+			}
+		}
+		return str;
 	}
 
 	#if sys

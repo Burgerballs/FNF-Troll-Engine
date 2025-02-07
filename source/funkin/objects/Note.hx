@@ -135,7 +135,7 @@ class Note extends NoteObject
 	public var parent:Note;
 	public var sustainLength:Float = 0;
 	public var holdingTime:Float = 0;
-	public var tripProgress:Float = 0;
+	public var tripProgress:Float = 1;
 	public var tail:Array<Note> = []; 
 	public var unhitTail:Array<Note> = [];
 
@@ -638,13 +638,8 @@ class Note extends NoteObject
 	public var indicated = false;
 
 	override function draw()
-	{
-		var holdMult:Float = baseAlpha;
-
-		if (isSustainNote && parent.wasGoodHit && holdGlow)
-			holdMult = FlxMath.lerp(0.3, 1, parent.tripProgress);
-		
-		colorSwap.daAlpha = alphaMod * alphaMod2 * holdMult;
+	{		
+		colorSwap.daAlpha = alphaMod * alphaMod2;
 		if (!inEditor && canIndicateNear && canBeHit && !isSustainNote) {
 			canIndicateNear = false;
 			indicated = true;
