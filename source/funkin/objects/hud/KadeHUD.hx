@@ -6,6 +6,9 @@ import flixel.ui.FlxBar;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import funkin.states.PlayState;
+import funkin.objects.hud.FNFHealthBar.ShittyBar;
+using StringTools;
+using funkin.CoolerStringTools;
 
 /**
 	Joke. Taken from Kade Engine 1.6
@@ -31,7 +34,7 @@ class KadeHUD extends BaseHUD
 
 	var scoreString = Paths.getString("score");
 	var hiscoreString = Paths.getString("highscore");
-	var ratingString = Paths.getString("rating");
+	var ratingString = Paths.getString("accuracy");
 	var cbString = Paths.getString("cbplural");
 	var npsString = Paths.getString("nps");
 
@@ -57,7 +60,7 @@ class KadeHUD extends BaseHUD
 		songWifeHighscore = songRecord.accuracyScore;
 	
 		//// Health bar
-		healthBar = new FNFHealthBar(iP1, iP2);
+		healthBar = new ShittyBar(iP1, iP2);
 		healthBarBG = healthBar.healthBarBG;
 		iconP1 = healthBar.iconP1;
 		iconP2 = healthBar.iconP2;
@@ -72,10 +75,10 @@ class KadeHUD extends BaseHUD
 		);
 		watermark.setFormat(Paths.font("vcr.ttf"), 16, 0xFFFFFFFF, RIGHT, FlxTextBorderStyle.OUTLINE, 0xFF000000);
 		watermark.scrollFactor.set();
+		watermark.cameras = [FlxG.camera];
 		add(watermark);
 		
 		scoreTxt = new FlxText(FlxG.width / 2 - 235, healthBarBG.y + 50, 0, "", 20);
-		scoreTxt.screenCenter(X);
 		originalX = scoreTxt.x;
 		scoreTxt.scrollFactor.set();
 		scoreTxt.setFormat(Paths.font("vcr.ttf"), 16, 0xFFFFFFFF, FlxTextAlign.CENTER, FlxTextBorderStyle.OUTLINE, 0xFF000000);
@@ -168,10 +171,20 @@ class KadeHUD extends BaseHUD
 				watermark.text = engineStringShort;
 		}else{
 			timeTxt.text = "";
-			watermark.text = '$songName | $engineStringLong';
+			var id = PlayState.difficultyName;
+			if (id == '')
+				id = 'normal';
+
+			var _dStrId:String = 'difficultyName_${id.toLowerCase()}';
+
+			var diffName:String = Paths.getString(_dStrId, id);
+
+			var sognNaim = songName.replace("-", " ").capitalize() + " " + diffName;
+
+			watermark.text = '$sognNaim | $engineStringLong';
 
 			if (watermark.x + watermark.width >= healthBarBG.x)
-				watermark.text = '$songName | $engineStringShort';
+				watermark.text = '$sognNaim | $engineStringShort';
 		}
 
 		timeTxt.x = timeBarBG.x + (timeBarBG.width / 2) - (timeTxt.text.length * 5);
@@ -221,18 +234,26 @@ class KadeHUD extends BaseHUD
 		}
 
 		if (isUpdating){
-			scoreTxt.text = 
-				(isHighscore ? '$hiscoreString: ' : '$scoreString: ') + shownScore +
-				' | $cbString: ' + comboBreaks + 
-				' | $ratingString: '
-				+ (grade == '?' ? grade : Highscore.floorDecimal(ratingPercent * 100, 2)
-					+ '% / $grade [${(ratingFC == stats.gfc && stats.accuracySystem == WIFE3) ? stats.fc : ratingFC}]');
+			var scareText = isHighscore ? hiscoreString : scoreString;
+			
+			var text = '';
 			if (ClientPrefs.npsDisplay)
-				scoreTxt.text += ' | $npsString: ${nps} / ${npsPeak}';
+				text = '$npsString: ${nps} (Max ${npsPeak}) | ';
+
+			text += '$scareText: $shownScore | ' +
+			'$cbString: $comboBreaks | ' +
+			'$ratingString: ${grade == '?' ? 0 : Highscore.floorDecimal(ratingPercent * 100, 2)}% | ';
+			if(grade == '?')
+				text += "N/A";
+			else
+				text += '($ratingFC) $grade';
+
+			scoreTxt.text = text; // because i wanna be able to use multi line in code but not display it in the text lol!
 		}
 
-		var lengthInPx = scoreTxt.textField.length * scoreTxt.frameHeight; // bad way but does more or less a better job
-		scoreTxt.x = (originalX - (lengthInPx / 2)) + 335;
+		scoreTxt.x = originalX;
+/* 		var lengthInPx = scoreTxt.textField.length * scoreTxt.frameHeight; // bad way but does more or less a better job
+		scoreTxt.x = (originalX - (lengthInPx / 2)) + 335; */
 
 		////
 		if (updateTime)

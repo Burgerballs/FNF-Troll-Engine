@@ -202,6 +202,8 @@ class PlayState extends MusicBeatState
 	public var inst:FlxSound;
 	public var vocals:FlxSound;
 	
+	public var hitsound:FlxSound;
+
 	var sndFilter:ALFilter = AL.createFilter();
 	var sndEffect:ALEffect = AL.createEffect();
 
@@ -884,8 +886,8 @@ class PlayState extends MusicBeatState
 			switch(ClientPrefs.etternaHUD){
 				case 'Advanced': hud = new AdvancedHUD(boyfriend.healthIcon, dad.healthIcon, SONG.song, stats);
 				case 'Kade': hud = new KadeHUD(boyfriend.healthIcon, dad.healthIcon, SONG.song, stats);
-				case 'Psych': hud = new PsychHUD(boyfriend.healthIcon, dad.healthIcon, SONG.song, stats);
-				default: hud = new PsychHUD(boyfriend.healthIcon, dad.healthIcon, SONG.song, stats); // To be set by scripts instead of me.
+				case 'Classic': hud = new ClassicHUD(boyfriend.healthIcon, dad.healthIcon, SONG.song, stats);
+				default: hud = new PsychHUD(boyfriend.healthIcon, dad.healthIcon, SONG.song, stats);
 			}
 		}
 		hud.cameras = [camHUD];
@@ -1727,6 +1729,10 @@ class PlayState extends MusicBeatState
 		playerTracks = getTrackInstances(SONG.tracks.player);
 		opponentTracks = getTrackInstances(SONG.tracks.opponent);
 
+		hitsound = new FlxSound().loadEmbedded(Paths.sound("hitsound"));
+		hitsound.exists = true;
+		FlxG.sound.list.add(hitsound);
+
 		playerField.tracks = playerTracks;
 		dadField.tracks = opponentTracks;
 
@@ -2410,7 +2416,6 @@ class PlayState extends MusicBeatState
 		}
 
 		Conductor.lastSongPos = Conductor.songPosition;
-		lastMixTimer2 = Main.getTime();
 		
 		updateSongDiscordPresence();
 	}
@@ -2420,7 +2425,6 @@ class PlayState extends MusicBeatState
 	var startedCountdown:Bool = false;
 	var canPause:Bool = true;
 	var lastMixTimer:Float = 0;
-	var lastMixTimer2:Float = 0;
 	var prevNoteCount:Int = 0;
 
 	private var svIndex:Int =0;
@@ -2545,8 +2549,6 @@ class PlayState extends MusicBeatState
 			}
 			else if (Conductor.songPosition >= 0) 
 			{
-				var instTime = inst.time;
-
 				switch(ClientPrefs.songSyncMode ){
 					case "Direct":
 						// Ludem Dare sync
@@ -2566,7 +2568,7 @@ class PlayState extends MusicBeatState
 						if (timeDiff > 1000)
 							Conductor.songPosition = Conductor.songPosition + 1000 * FlxMath.signOf(timeDiff);
 					
-					case "Last Mix":
+					default: //case "Last Mix":
 						// Stepmania method
 						// Works for most people it seems??
 						if (Conductor.lastSongPos != inst.time) {
@@ -2577,18 +2579,6 @@ class PlayState extends MusicBeatState
 						
 						Conductor.songPosition = inst.time + lastMixTimer;
 
-					case "Sys Last Mix":
-						// Last Mix but using Sys.time() instead of elapsed as it's slightly less precise
-						var offset:Float = 0;
-
-						if (Conductor.lastSongPos != inst.time) {
-							Conductor.lastSongPos = inst.time;
-							lastMixTimer2 = Main.getTime();
-						}else{
-							offset = (Main.getTime() - lastMixTimer2);
-						}
-
-						Conductor.songPosition = inst.time + offset;
 				}
 			}
 		}
@@ -3549,13 +3539,9 @@ class PlayState extends MusicBeatState
 		if (callOnScripts("onKeyPress", [column]) == Globals.Function_Stop)
 			return;
 
-		if (ClientPrefs.hitsoundVolume > 0 && ClientPrefs.hitsoundBehaviour == 'Key Press') {
-			if (hitsound != null)
-				hitsound.stop();
-			hitsound = FlxG.sound.play(Paths.sound('hitsound'), ClientPrefs.hitsoundVolume );
-			hitsound.pitch = 1 + FlxG.random.float(-0.1, 0.1);
-		}
-
+		if(ClientPrefs.hitsoundBehav == 'Key Press' && !cpuControlled)
+			playShithound();
+		
 		var hitNotes:Array<Note> = []; // what could scripts possibly do with this information
 		var controlledFields:Array<PlayField> = [];
 		
@@ -3907,7 +3893,13 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	var hitsound:FlxSound;
+	inline function playShithound(){
+		hitsound.volume = ClientPrefs.hitsoundVolume;
+		if(ClientPrefs.hitsoundVolume > 0){
+			hitsound.time = 0;
+			hitsound.play();
+		}
+	}
 	function goodNoteHit(note:Note, field:PlayField):Void
 	{	
 		if (note.wasGoodHit || (field.autoPlayed && (note.ignoreNote || note.breaksCombo)))
@@ -3923,11 +3915,8 @@ class PlayState extends MusicBeatState
 			stats.noteDiffs.push(note.hitResult.hitDiff + ClientPrefs.ratingOffset); // used for stat saving (i.e viewing song stats after you beaten it)
 		}
 
-		if (!note.hitsoundDisabled && ClientPrefs.hitsoundVolume > 0 && ClientPrefs.hitsoundBehaviour == 'Note Hit') {
-			if (hitsound != null)
-				hitsound.stop();
-			hitsound = FlxG.sound.play(Paths.sound('hitsound'), ClientPrefs.hitsoundVolume );
-			hitsound.pitch = 1 + FlxG.random.float(-0.1, 0.1);
+		if (!note.hitsoundDisabled && (ClientPrefs.hitsoundBehav == 'Note Hit' || cpuControlled)){
+			playShithound();
 		}
 
 		if (note.ratingDisabled) {
