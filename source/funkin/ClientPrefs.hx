@@ -539,7 +539,7 @@ class ClientPrefs
 				value: "Default",
 				data: [
 					"recommendsRestart" => true,
-					"options" => ["Default", "Psych", "Advanced", "Kade"]
+					"options" => ["Default", "Psych", "Advanced", "Kade", "Classic"]
 				]
 			},
 

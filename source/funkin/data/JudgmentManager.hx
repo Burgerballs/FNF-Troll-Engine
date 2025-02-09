@@ -26,6 +26,7 @@ typedef JudgmentData = {
 	accuracy:Float, // how much accuracy is added by this judge. unused by wife3
 	health:Float, // % of health to add/remove
 	noteSplash:Bool, // whether this judge should cause a note splash
+	level:Float, // For SuperBBE2Complex
 	// var frame:Int; // where in the judgment sheet this judgment lies
 
 	?wifePoints:Float, // if this isn't null, then Wife3 wont do any calculations and will instead just add these to the wife score/accuracy
@@ -71,6 +72,7 @@ class JudgmentManager {
 			accuracy: 100,
 			health: 1.15, // maybe change to 1, to match V-Slice?
 			noteSplash: true,
+			level: 0
 		},
 		#end
 		TIER4 => {
@@ -81,6 +83,7 @@ class JudgmentManager {
 			accuracy: 90,
 			health: 1.15, // maybe change to 0.75, to match V-Slice?
 			noteSplash: true,
+			level:0.4
 		},
 		TIER3 => {
 			internalName: "good",
@@ -90,6 +93,7 @@ class JudgmentManager {
 			accuracy: 10,
 			health: 0, // maybe change to 0.375 to match V-Slice?
 			noteSplash: false,
+			level:0.8
 		},
 		TIER2 => {
 			internalName: "bad",
@@ -100,6 +104,7 @@ class JudgmentManager {
 			health: -1.15, // I think we could make this less punishing, just to be closer to V-Slice, but I think shit should stay where it is
 			comboBehaviour: BREAK,
 			noteSplash: false,
+			level:1
 		},
 		TIER1 => {
 			internalName: "shit",
@@ -110,6 +115,7 @@ class JudgmentManager {
 			health: -2.375,
 			comboBehaviour: BREAK,
 			noteSplash: false,
+			level:2
 		},
 		MISS => {
 			internalName: "miss",
@@ -122,6 +128,7 @@ class JudgmentManager {
 			health: -5,
 			comboBehaviour: BREAK,
 			noteSplash: false,
+			level:5
 		},
 		DROPPED_HOLD => {
 			internalName: "miss",
@@ -134,7 +141,8 @@ class JudgmentManager {
 			health: -2.5,
 			comboBehaviour: BREAK,
 			noteSplash: false,
-			countAsHit: false
+			countAsHit: false,
+			level:5
 		},
 		DAMAGELESS_MISS => {
 			internalName: "miss",
@@ -147,6 +155,7 @@ class JudgmentManager {
 			health: 0, //-5,
 			comboBehaviour: BREAK,
 			noteSplash: false,
+			level:5
 		},
 		HIT_MINE => {
 			internalName: "mine",
@@ -160,7 +169,8 @@ class JudgmentManager {
 			badJudgment: true,
 			comboBehaviour: IGNORE,
 			noteSplash: false,
-			hideJudge: true
+			hideJudge: true,
+			level:5
 		},
 		MISS_MINE => { // for legacy reasons
 			internalName: "miss",
@@ -174,7 +184,8 @@ class JudgmentManager {
 			badJudgment: true,
 			comboBehaviour: BREAK,
 			noteSplash: true,
-			hideJudge: true
+			hideJudge: true,
+			level:5
 		},
 		CUSTOM_MINE => {
 			internalName: "customMine",
@@ -188,7 +199,8 @@ class JudgmentManager {
 			badJudgment: true,
 			comboBehaviour: IGNORE,
 			noteSplash: false,
-			hideJudge: true
+			hideJudge: true,
+			level:5
 		}
 	];
 	// these are judgments that you can *actually* hit and arent caused by special notes (i.e Mines) // should be from highest to lowest
@@ -210,6 +222,8 @@ class JudgmentManager {
 		this.useEpics = false;
 		hittableJudgments = [TIER4, TIER3, TIER2, TIER1];
 		judgmentData.get(TIER4).accuracy = 100;
+		judgmentData.get(TIER4).level = 0;
+
 		judgmentData.get(TIER2).comboBehaviour = INCREMENT;
 		instance = this;
 	}

@@ -255,6 +255,17 @@ class Stats {
 		return diff > highDiff ? highDiff / diff : 1;
 	}
 
+	// credit to CrowPlexus for this neat piece of code
+	var calcWeight = 30;
+	function SuperBBE2ComplexCalcMaxPoints(data:JudgmentData, time:Float):Float {
+		final tierLevel:Float = data.level ?? 5;
+		if (tierLevel >= 5) return -5.0;
+		var maxPoints: Float = 100.0 - (tierLevel * calcWeight);
+		if (tierLevel == 0) maxPoints = 100.0;
+		var points: Float = (data.window / time) * maxPoints;
+		return Math.min(points, maxPoints) / 100;
+	}
+
 	public function calculateAccuracy(data:JudgmentData, diff:Float, ?incrementPlayed:Bool = true) {
 		switch(accuracySystem)
 		{
@@ -289,10 +300,7 @@ class Stats {
 				if (data.countAsHit != false)
 					totalPlayed += 1;
 			case SUPERBBE2COMPLEX:
-				var shit = BBE2ComplexGetAccuracy(Math.abs(diff));
-				shit = Math.pow(shit, 5.22);
-				if (shit > 1)
-					shit = 1;
+				var shit = SuperBBE2ComplexCalcMaxPoints(data, Math.abs(diff));
 				totalNotesHit += shit;
 				if (data.countAsHit != false)
 					totalPlayed += 1;
