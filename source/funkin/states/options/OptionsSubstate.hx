@@ -502,8 +502,8 @@ class OptionsSubstate extends MusicBeatSubstate
 		ignoreVolumeChange = false;
 	}
 
-	var color1 = FlxColor.fromRGB(22, 22, 22);
-	var color2 = FlxColor.fromRGB(70, 70, 70);
+	var color1 = 0xFF000000;
+	var color2 = 0xFF000000;
 
 	override function create()
 	{
@@ -551,7 +551,7 @@ class OptionsSubstate extends MusicBeatSubstate
 
 		////
 		var optionMenu = new FlxSprite(80, 80, CoolUtil.makeOutlinedGraphic(
-			FlxMath.minInt(920, FlxG.width), 
+			FlxMath.minInt(980, FlxG.width), 
 			FlxG.height-140, 
 			color1, 
 			2, 
@@ -574,9 +574,10 @@ class OptionsSubstate extends MusicBeatSubstate
 		////
 		final backdropGraphic = Paths.image("optionsMenu/backdrop");
 		final backdropSlice = [22, 22, 89, 89];
-		final tabButtonHeight = 44;
+		final tabButtonHeight = 32;
 
 		var lastX:Float = optionMenu.x;
+		var tLength = (optionMenu.width + 2) / optionOrder.length;
 		for (idx in 0...optionOrder.length)
 		{
 			var tabName = optionOrder[idx];
@@ -585,21 +586,21 @@ class OptionsSubstate extends MusicBeatSubstate
 			var text = new FlxText(0, 0, 0, Paths.getString(strKey, tabName).toUpperCase(), 16);
 			text.applyFormat(TextFormats.TAB_NAME);
 
-			var button = new FlxSprite(lastX, optionMenu.y - 3 - tabButtonHeight, whitePixel);
+			var button = new FlxSprite(lastX, optionMenu.y - 2 - tabButtonHeight, whitePixel);
 			button.ID = idx;
 			button.alpha = 0.75;
 			
-			button.scale.set(Math.max(86, text.fieldWidth) + 8, tabButtonHeight);
+			button.scale.set(tLength - 2, tabButtonHeight);
 			button.updateHitbox();
 
 			text.setPosition(
-				button.x,
+				button.x + 2,
 				button.y + ((button.height - text.height) / 2)
 			);
 			text.fieldWidth = button.width;
 			text.updateHitbox();
 
-			lastX += button.width + 3;
+			lastX = button.x + button.width + 2;
 			add(button);
 			add(text);
 			buttons.push(button);
@@ -793,7 +794,7 @@ class OptionsSubstate extends MusicBeatSubstate
 				var daW:Float = 100;
 
 				var ddCamera = new FlxCamera();
-				ddCamera.bgColor = FlxColor.GRAY;
+				ddCamera.bgColor = color1;
 				ddCamera.bgColor.alpha = 204;
 				camerasToRemove.push(ddCamera);
 
@@ -1792,13 +1793,13 @@ class Checkbox extends WidgetSprite
 
 class TextFormats {
 	public static final TAB_NAME:FlxTextFormatData = {
-		font: "vcr.ttf",
+		font: "quantico.ttf",
 		pixelPerfectRender: true,
 		antialiasing: false,
 	
-		size: 32,
+		size: 24,
 		color: 0xFFFFFFFF,
-		alignment: CENTER
+		alignment: LEFT
 	};
 	
 	public static final OPT_LABEL:FlxTextFormatData = {
@@ -1834,7 +1835,7 @@ class TextFormats {
 	};
 
 	public static final OPT_DESC:FlxTextFormatData = {
-		font: "vcr.ttf",
+		font: "quantico.ttf",
 		pixelPerfectRender: true,
 		antialiasing: false,
 	

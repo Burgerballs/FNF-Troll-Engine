@@ -3,6 +3,8 @@
 Hello guys this is me burgerballs, this here is the fork i use for my fnf mods.
 As troll engine is already perfect i kinda only needed to change small tiny things to make it easier for me.
 
+As this is my own personal fork, expect bloat, this is meant to be used by nobody aside from me!
+
 I've modified the `install_haxelibs` files, before building you should check them out.
 
 # Added features

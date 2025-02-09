@@ -148,6 +148,17 @@
 	-->
 	<haxedef name="BBTE_BURGERBALLS_SIGNATURE" />
 
+	<!-- 
+	Used for mods with V-Slice visuals.
+
+	Includes:
+	- V-Slice Volume Stuff
+	- Sticker Transitions
+	
+	NOTE: BY DEFAULT ALL OTHER V-SLICE STUFF, SUCH AS CHARACTER SUPPORT AND CAMERA EVENTS ARE SUPPORTED OR WILL BE SUPPORTED IN THE FUTURE!
+	-->
+	<haxedef name="VSLICE_VISUALS" />
+
 	<!-- NOTE TO SELF: DISABLE THIS IF ISSUES ARE FOUND -->
 	<haxedef name="LINC_LUA_RELATIVE_DYNAMIC_LIB" if="LUA_ALLOWED" /> <!-- stable luas PUT AFTER FIRST LINE WITH APP NAME AND ETC -->
 	<define name="NO_PRECOMPILED_HEADERS" if="LUA_ALLOWED linux" />

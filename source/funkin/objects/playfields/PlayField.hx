@@ -228,7 +228,7 @@ class PlayField extends FlxTypedGroup<FlxBasic>
 	}
 
 	// destroys a note
-	public function removeNote(daNote:Note){
+	inline public function removeNote(daNote:Note){
 		daNote.active = false;
 		daNote.visible = false;
 		daNote.kill();
@@ -652,30 +652,20 @@ class PlayField extends FlxTypedGroup<FlxBasic>
 		if (tapsByData[dir] == null)
 			return [];
 
-		var collected:Array<Note> = [];
-		for (note in tapsByData[dir]) {
-			if (note.alive && note.column == dir) {
-				if (filter == null || filter(note))
-					collected.push(note);
-			}
+		function tapFilter(note:Note):Bool {
+			return (note.alive && note.column == dir) && (filter == null || filter(note));
 		}
-		return collected;
+		return tapsByData[dir].filter(tapFilter);
 	}
 
 	// gets all living TAP notes before a certain time w/ optional filter
 	public function getTapNotesWithEnd(dir:Int, end:Float, ?filter:Note->Bool):Array<Note> {
 		if (tapsByData[dir] == null)
 			return [];
-		var collected:Array<Note> = [];
-		for (note in tapsByData[dir]) {
-			if (note.strumTime > end)
-				break;
-			if (note.alive && note.column == dir && !note.wasGoodHit && !note.tooLate) {
-				if (filter == null || filter(note))
-					collected.push(note);
-			}
+		function tapFilter(note:Note):Bool {
+			return (note.alive && note.column == dir && !note.wasGoodHit && !note.tooLate) && (filter == null || filter(note));
 		}
-		return collected;
+		return tapsByData[dir].filter(tapFilter);
 	}
 
 	// gets all living notes before a certain time w/ optional filter
