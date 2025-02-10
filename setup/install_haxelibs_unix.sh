@@ -5,7 +5,6 @@ haxelib --always --quiet git funkin.vis https://github.com/FunkinCrew/funkVis
 haxelib --always --quiet git grig.audio https://gitlab.com/haxe-grig/grig.audio.git
 haxelib --always --quiet install flixel 5.5.0
 haxelib --always --quiet install openfl 9.3.4
-
 haxelib --always --quiet install flixel 5.6.2
 haxelib --always --quiet install flixel-ui 2.6.1
 haxelib --always --quiet install flixel-addons 3.2.3
