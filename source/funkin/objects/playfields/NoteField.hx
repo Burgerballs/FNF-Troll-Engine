@@ -1,5 +1,6 @@
 package funkin.objects.playfields;
 
+import funkin.modchart.modifiers.ReverseModifier;
 import funkin.modchart.Modifier;
 import flixel.math.FlxMath;
 import flixel.math.FlxAngle;
@@ -47,6 +48,8 @@ class NoteField extends FieldBase
 		0, 2, 3
 	]);
 	var HOLD_INDICES:Vector<Int> = new Vector<Int>(0, false);
+
+	public var tryForceHoldsBehind:Bool = true; // Field tries to push holds behind receptors and notes
 
 	public var holdSubdivisions(default, set):Int;
 	public var optimizeHolds = ClientPrefs.optimizeHolds;
@@ -126,19 +129,9 @@ class NoteField extends FieldBase
 		drawQueue = [];
 		if (field == null) return;
 		if (!active || !exists) return;
-		if ((FlxG.state is MusicBeatState))
-		{
-			var state:MusicBeatState = cast FlxG.state;
-			@:privateAccess
-			curDecStep = state.curDecStep;
-		}
-		else
-		{
-			var lastChange = Conductor.getBPMFromSeconds(Conductor.songPosition);
-			var shit = ((Conductor.songPosition - ClientPrefs.noteOffset) - lastChange.songTime) / lastChange.stepCrochet;
-			curDecStep = lastChange.stepTime + shit;
-		}
-		curDecBeat = (Std.int(curDecStep * 1000) >> 4) / 1000;
+		
+		curDecStep = Conductor.curDecStep;
+		curDecBeat = Conductor.curDecBeat;
 
 		zoom = modManager.getFieldZoom(baseZoom, curDecBeat, (Conductor.songPosition - ClientPrefs.noteOffset), modNumber, this);
 		var notePos:Map<Note, Vector3> = [];
@@ -193,8 +186,6 @@ class NoteField extends FieldBase
 						pos.y = daNote.y;
 
 					if (modManager.getValue("orient", modNumber) != 0){
-		
-
 						var nextPos = modManager.getPos(visPos + lookAheadTime, diff + lookAheadTime, curDecBeat, daNote.column, modNumber, daNote, this, perspectiveArrDontUse); // perspectiveDONTUSE is excluded because its code is done in the modifyVert function
 						nextNotePos.set(daNote, nextPos);
 					}
@@ -242,7 +233,7 @@ class NoteField extends FieldBase
 			var object = drawNote(note, pos);
 			if (object == null)
 				continue;
-			object.zIndex = pos.z + note.zIndex;
+			object.zIndex = pos.z + note.zIndex + 0.01; // a little zindex bump to try to put notes always above holds because it looks weird having holds ontop of notes
 			lookupMap.set(note, object);
 			drawQueue.push(object);
 		}
@@ -253,7 +244,10 @@ class NoteField extends FieldBase
 			var object = drawHold(note);
 			if (object == null)
 				continue;
-			object.zIndex -= 1;
+			
+			if (tryForceHoldsBehind)
+				object.zIndex -= 1;
+
 			lookupMap.set(note, object);
 			drawQueue.push(object);
 		}
@@ -374,7 +368,7 @@ class NoteField extends FieldBase
 						for(shit in transforms)
 							shit.alphaMultiplier *= camera.alpha;
 						getScreenPosition(point, camera);
-						var drawItem = camera.startTrianglesBatch(graphic, shader.bitmap.filter == LINEAR, true, null, true, shader);
+						var drawItem = camera.startTrianglesBatch(graphic, object.antialiasing, true, null, true, shader);
 
 						@:privateAccess
 						{
@@ -594,7 +588,8 @@ class NoteField extends FieldBase
 			vertices: vertices,
 			indices: HOLD_INDICES,
 			zIndex: zIndex,
-			colorSwap: hold.colorSwap
+			colorSwap: hold.colorSwap,
+			antialiasing: hold.antialiasing
 		}
 	}
 
@@ -732,7 +727,8 @@ class NoteField extends FieldBase
 				var orient = modManager.getValue("orient", modNumber);
 
 				radAngles += Math.atan2(diffY, diffX) * orient;
-				angle -= 90 * orient;
+				var reverse:ReverseModifier = cast modManager.register.get("reverse");
+				angle -= 90 * orient * FlxMath.lerp(1, -1, reverse.getReverseValue(sprite.column, modNumber));
 			}
 
 			if(isNote)
@@ -807,9 +803,6 @@ class NoteField extends FieldBase
 
 		var graphic:FlxGraphic = sprite.frame == null ? sprite.graphic : sprite.frame.parent;
 
-		shader.bitmap.input = graphic.bitmap;
-		shader.bitmap.filter = sprite.antialiasing ? LINEAR : NEAREST;
-
 		final totalTriangles = Std.int(vertices.length / 2);
 		var alphas = new FastVector<Float>(totalTriangles);
 		var glows = new FastVector<Float>(totalTriangles);
@@ -828,7 +821,8 @@ class NoteField extends FieldBase
 			vertices: vertices,
 			indices: NOTE_INDICES,
 			zIndex: pos.z,
-			colorSwap: sprite.colorSwap
+			colorSwap: sprite.colorSwap,
+			antialiasing: sprite.antialiasing
 		}
 	}
 

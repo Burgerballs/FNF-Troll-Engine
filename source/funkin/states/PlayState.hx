@@ -54,6 +54,7 @@ import openfl.filters.BitmapFilter;
 import openfl.filters.ShaderFilter;
 
 using StringTools;
+using funkin.CoolerStringTools;
 
 #if DISCORD_ALLOWED
 import funkin.api.Discord.DiscordClient;
@@ -633,11 +634,10 @@ class PlayState extends MusicBeatState
 			SONG = Song.loadFromJson('tutorial', 'tutorial');
 		}
 
-		lastBeatHit = -5;
 		offset = SONG.offset ?? 0.0;
 		Conductor.mapBPMChanges(SONG);
 		Conductor.changeBPM(SONG.bpm);
-		Conductor.songPosition = Conductor.crochet * lastBeatHit;
+		Conductor.songPosition = Conductor.crochet * -5;
 
 		songName = Paths.formatToSongPath(SONG.song);
 		songHighscore = Highscore.getScore(SONG.song, difficultyName);
@@ -1024,9 +1024,9 @@ class PlayState extends MusicBeatState
 		generateSong(SONG.song);
 
 		var stringId:String = 'difficultyName_$difficultyName';
-		displayedDifficulty = Paths.getString(stringId, CoolerStringTools.capitalize(difficultyName));
+		displayedDifficulty = Paths.getString(stringId, difficultyName.replace("-"," ").capitalize());
 		
-		displayedSong = SONG.song;
+		displayedSong = SONG.song.replace("-"," ").capitalize();
 
 		#if DISCORD_ALLOWED
 		// Discord RPC texts
@@ -1519,7 +1519,7 @@ class PlayState extends MusicBeatState
 
 	function checkCharacterDance(character:Character, ?beat:Float, ignoreBeat:Bool = false){
 		if (character.danceEveryNumBeats == 0) return;
-		if (beat == null) beat = this.curDecBeat;
+		beat ??= this.curDecBeat;
 		
 		var shouldBop = beat >= character.nextDanceBeat;
 		if (shouldBop || ignoreBeat){
@@ -1533,11 +1533,10 @@ class PlayState extends MusicBeatState
 
 	function danceCharacters(?curBeat:Float)
 	{
-		final curBeat = curBeat==null ? this.curDecBeat : curBeat;
+		curBeat ??= this.curDecBeat;
 
 		if (gf != null)
-			checkCharacterDance(gf, curBeat);
-		
+			checkCharacterDance(gf, curBeat);	
 
 		for (field in playfields)
 		{
@@ -2429,13 +2428,18 @@ class PlayState extends MusicBeatState
 
 	private var svIndex:Int =0;
 	private inline function updateVisualPosition() {
-		var event:SpeedEvent = speedChanges[svIndex];
-		if (svIndex < speedChanges.length - 1){
-			while (speedChanges[svIndex + 1] != null && speedChanges[svIndex + 1].startTime <= Conductor.songPosition){
-				event = speedChanges[svIndex + 1];
-				svIndex++;
-			}
+		var event:SpeedEvent = null;
+
+		for (i in svIndex+1...speedChanges.length) {
+			var nextEvent = speedChanges[i];
+			if (nextEvent.startTime > Conductor.songPosition)
+				break;
+
+			svIndex = i;
+			event = nextEvent;
 		}
+		event ??= speedChanges[svIndex];
+		
 		Conductor.visualPosition = getTimeFromSV(Conductor.songPosition, event);
 		FlxG.watch.addQuick("visualPos", Conductor.visualPosition);
 	}
@@ -3137,7 +3141,8 @@ class PlayState extends MusicBeatState
 		transitioning = true;
 
 		// Save song score and rating.
-		if (saveScore && SONG.validScore && ratingFC != 'Fail')
+
+		if (saveScore && SONG.validScore && ratingFC != stats.fail)
 			Highscore.saveScoreRecord(SONG.song, difficultyName, stats.getScoreRecord());
 
 		var gotoNextThing:Void -> Void = gotoMenus;
@@ -4067,7 +4072,6 @@ class PlayState extends MusicBeatState
 	}
 	#end
 
-	var lastStepHit:Int = -9999;
 	override function stepHit()
 	{
 		super.stepHit();
@@ -4084,40 +4088,35 @@ class PlayState extends MusicBeatState
 				resyncVocals();
 		}
 		
-		if (curStep < lastStepHit) 
-			return;
-		
 		hud.stepHit(curStep);
-		lastStepHit = curStep;
 		setOnScripts('curStep', curStep);
 		callOnScripts('onStepHit');
 	}
 
 	public function cameraBump(camZoom:Float = 0.015, hudZoom:Float = 0.03)
 	{
-		if(FlxG.camera.zoom < (defaultCamZoom * 1.35))
-			FlxG.camera.zoom += camZoom * camZoomingMult * ClientPrefs.camZoomP;
-		camHUD.zoom += hudZoom * camZoomingMult * ClientPrefs.camZoomP;
+		var zoomMult = camZoomingMult * ClientPrefs.camZoomP;
+		if (FlxG.camera.zoom < (defaultCamZoom * 1.35))
+			FlxG.camera.zoom += camZoom * zoomMult;
+		camHUD.zoom += hudZoom * zoomMult;
 	}
 
-	public var zoomEveryBeat:Int = 4;
+	// -1 = zoom every section
+	// 0 = dont zoom
+	public var zoomEveryBeat:Int = -1;
 	public var beatToZoom:Int = 0;
 		
-	var lastBeatHit:Int;
 	override function beatHit()
 	{
 		super.beatHit();
-		if (curBeat < lastBeatHit) 
-			return;
 		
 		hud.beatHit(curBeat);
 
-		if (camZooming && ClientPrefs.camZoomP>0 && zoomEveryBeat > 0 && curBeat % zoomEveryBeat == beatToZoom)
+		if (camZooming && zoomEveryBeat > 0 && curBeat % zoomEveryBeat == beatToZoom)
 		{
 			cameraBump();
 		}
 
-		lastBeatHit = curBeat;
 
 		setOnScripts('curBeat', curBeat);
 		callOnScripts('onBeatHit');
@@ -4130,6 +4129,11 @@ class PlayState extends MusicBeatState
 
 		if (curSection == null)
 			return;
+
+		if (camZooming && zoomEveryBeat < 0) 
+		{
+			cameraBump();
+		}
 
 		if (curSection.changeBPM)
 		{

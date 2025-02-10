@@ -5,6 +5,8 @@ import flixel.ui.FlxBar;
 
 // TODO: think abt this
 class FNFHealthBar extends FlxBar{
+	public var autoPositionIcons:Bool = true;
+	
 	public var healthBarBG:FlxSprite;
 
 	public var iconP1:HealthIcon;
@@ -170,13 +172,16 @@ class FNFHealthBar extends FlxBar{
 
 	override function updateBar() {
 		super.updateBar();
-		updateIconPos();
+		if (autoPositionIcons)
+			updateIconPos();
 
 		var p1Percent = isOpponentMode ? 100 - percent : percent;
 		var p2Percent = isOpponentMode ? percent : 100 - percent;
-
-		iconP1.updateState(p1Percent);
-		iconP2.updateState(p2Percent);
+		
+		// Icon behavioural code should be done via extending HealthIcon or turning off icon.autoUpdatesAnims
+		
+		iconP1.relativePercent = p1Percent;
+		iconP2.relativePercent = p2Percent;
 	}
 
 	override function update(elapsed:Float)
@@ -208,8 +213,18 @@ class ShittyBar extends FNFHealthBar {
 		iconP2.centerOffsets();
 
 		var iconOffset:Int = 26;
+		var percent = flipX ? 100 - percent : percent;
+		
+		switch (fillDirection) {
+			case RIGHT_TO_LEFT:
+				iconP1.x = x + (width * (FlxMath.remapToRange(percent, 0, 100, 100, 0) * 0.01) - iconOffset);
+				iconP2.x = x + (width * (FlxMath.remapToRange(percent, 0, 100, 100, 0) * 0.01)) - (iconP2.width - iconOffset);
 
-		iconP1.x = x + (width * (FlxMath.remapToRange(percent, 0, 100, 100, 0) * 0.01) - iconOffset);
-		iconP2.x = x + (width * (FlxMath.remapToRange(percent, 0, 100, 100, 0) * 0.01)) - (iconP2.width - iconOffset);
+			case LEFT_TO_RIGHT:
+				iconP1.x = x + (width * (percent * 0.01) - iconOffset);
+				iconP2.x = x + (width * (percent * 0.01)) - (iconP2.width - iconOffset);
+			default:
+			
+		}
 	}
 }
