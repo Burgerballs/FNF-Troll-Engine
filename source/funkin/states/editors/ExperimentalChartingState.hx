@@ -2590,7 +2590,6 @@ class ExperimentalChartingState extends MusicBeatState
 		}
 
 		curStep = lastChange.stepTime + Math.floor((Conductor.songPosition - lastChange.songTime + add) / Conductor.stepCrochet);
-		updateBeat();
 
 		return curStep;
 	}
@@ -2599,7 +2598,6 @@ class ExperimentalChartingState extends MusicBeatState
 	function resetSection():Void {
 		Conductor.songPosition = sectionStartTime();
 		pauseTracks();
-		updateCurStep();
 
 		updateGrid();
 		updateSectionUI();
@@ -2614,7 +2612,6 @@ class ExperimentalChartingState extends MusicBeatState
 			if (updateMusic) {
 				Conductor.songPosition = sectionStartTime();
 				pauseTracks();
-				updateCurStep();
 			}
 
 			var blah1:Float = getSectionBeats();

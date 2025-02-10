@@ -33,6 +33,7 @@ typedef RenderObject = {
 	vertices:Vector<Float>,
 	indices:Vector<Int>,
 	zIndex:Float,
+	antialiasing:Bool,
 	colorSwap:NoteColorSwap
 }
 
