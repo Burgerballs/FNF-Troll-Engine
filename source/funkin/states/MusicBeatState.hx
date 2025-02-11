@@ -49,7 +49,7 @@ class MusicBeatState extends FlxUIState
 
 	private var controls(get, never):Controls;
 
-	public var canBeScripted(get, default):Bool = false;
+	public var canBeScripted(get, default):Bool = true;
 	@:noCompletion function get_canBeScripted() return canBeScripted;
 
 	//// To be defined by the scripting macro
