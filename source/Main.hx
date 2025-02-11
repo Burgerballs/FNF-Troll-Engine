@@ -124,28 +124,10 @@ class Main extends Sprite
 		fpsVar.visible = false;
 		addChild(fpsVar);
 
+		#if BREAD_ALLOWED
 		bread = new Bread();
 		bread.visible = false;
 		addChild(bread);
-
-
-		// #if CRASH_HANDLER
-		// Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(
-		// 	UncaughtErrorEvent.UNCAUGHT_ERROR, 
-		// 	(event:UncaughtErrorEvent) -> {
-		// 		// one of these oughta do it
-		// 		event.stopImmediatePropagation();
-		// 		event.stopPropagation();
-		// 		event.preventDefault();
-		// 		onCrash(event.error);
-		// 	}
-		// );
-
-		// #if cpp
-		// // Thank you EliteMasterEric, very cool!
-		// untyped __global__.__hxcpp_set_critical_error_handler(onCrash);
-		// #end
-		// #end
 	}
 
 	public static function getTime():Float {
