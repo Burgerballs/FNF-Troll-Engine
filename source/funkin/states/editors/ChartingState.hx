@@ -1884,8 +1884,6 @@ class ChartingState extends MusicBeatState
 		return false;
 	}
 
-	var hitsound:FlxSound;
-
 	override function update(elapsed:Float)
 	{
 		if (tracksCompleted){
@@ -2095,11 +2093,8 @@ class ChartingState extends MusicBeatState
 						
 							if (!note.hitsoundDisabled && playedSound[data] != true && (note.mustPress ? playSoundBf.checked : playSoundDad.checked))
 							{
-								var soundToPlay = 'hitsound';
-								if(_song.player1 == 'gf') // Easter egg
-									soundToPlay = 'GF_${data + 1}';
-	
-								FlxG.sound.play(Paths.sound(soundToPlay)).pan = (note.column < 4) ? -0.3 : 0.3; //would be coolio
+								hitsound.stop();
+								hitsound.play();
 								playedSound[data] = true;
 							}
 							
@@ -2107,8 +2102,10 @@ class ChartingState extends MusicBeatState
 					}else{
 						// This is an event.
 
-						if (playSoundEvents.checked)
+						if (playSoundEvents.checked) {
+							hitsound.stop();
 							hitsound.play();
+						}
 					}
 				}
 
