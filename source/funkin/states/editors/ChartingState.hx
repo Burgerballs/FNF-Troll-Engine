@@ -56,6 +56,10 @@ using Lambda;
 
 class ChartingState extends MusicBeatState
 {
+	var oppHitsound:FlxSound;
+	var plrHitsound:FlxSound;
+	var hitsound:FlxSound;
+
 	public static var instance:ChartingState;
 	
 	public var offset:Float = 0;
@@ -236,6 +240,15 @@ class ChartingState extends MusicBeatState
 		96,
 		192
 	];
+	
+	public var hitsoundVolume(default, set):Float = 1.0;
+	@:noCompletion function set_hitsoundVolume(val:Float){
+		plrHitsound.volume = val;
+		oppHitsound.volume = val;
+		hitsound.volume = val;
+		return hitsoundVolume = val;
+	}
+
 
 	public var playbackSpeed(default, set):Float = 1.0;
 	@:noCompletion function set_playbackSpeed(val:Float){
@@ -353,6 +366,19 @@ class ChartingState extends MusicBeatState
 		loadTracks();
 		fixEvents();
 
+		plrHitsound = new FlxSound().loadEmbedded(Paths.sound("monoHitsound"));
+		plrHitsound.pan = -0.75;
+		plrHitsound.exists = true;
+		FlxG.sound.list.add(plrHitsound);
+
+		oppHitsound = new FlxSound().loadEmbedded(Paths.sound("monoHitsound"));
+		oppHitsound.pan = 0.75;
+		oppHitsound.exists = true;
+		FlxG.sound.list.add(oppHitsound);
+
+		hitsound = new FlxSound().loadEmbedded(Paths.sound("hitsound"));
+		hitsound.exists = true;
+		FlxG.sound.list.add(hitsound);
 		// Paths.clearMemory();
 
 		vortex = FlxG.save.data.chart_vortex;
@@ -1578,11 +1604,16 @@ class ChartingState extends MusicBeatState
 		);
 		disableAutoScrolling.checked = FlxG.save.data.chart_noAutoScroll == true;
 
-		var sliderRate = new FlxUISlider(this, 'playbackSpeed', 68, 300, 0.5, 3, 150, null, 5, FlxColor.WHITE, FlxColor.BLACK);
+		var sliderRate = new FlxUISlider(this, 'playbackSpeed', 68, 275, 0.5, 3, 150, null, 5, FlxColor.WHITE, FlxColor.BLACK);
 		sliderRate.nameLabel.text = 'Playback Rate';
 		sliderRate.value = playbackSpeed;
 
+		var sliderHitVol = new FlxUISlider(this, 'hitsoundVolume', 68, 325, 0, 1, 150, null, 5, FlxColor.WHITE, FlxColor.BLACK);
+		sliderHitVol.nameLabel.text = 'Hitsound Volume';
+		sliderHitVol.value = hitsoundVolume;
+
 		tab_group_chart.add(sliderRate);
+		tab_group_chart.add(sliderHitVol);
 
 		tab_group_chart.add(mouseScrollingQuant);
 		tab_group_chart.add(check_vortex);
@@ -2062,16 +2093,13 @@ class ChartingState extends MusicBeatState
 							strum.playAnim('confirm', true, note);
 							strum.resetAnim = (note.sustainLength / 1000) + 0.15;
 						
-							if (!note.hitsoundDisabled && playedSound[data]!=true && (note.mustPress ? playSoundBf.checked : playSoundDad.checked))
+							if (!note.hitsoundDisabled && playedSound[data] != true && (note.mustPress ? playSoundBf.checked : playSoundDad.checked))
 							{
 								var soundToPlay = 'hitsound';
 								if(_song.player1 == 'gf') // Easter egg
 									soundToPlay = 'GF_${data + 1}';
-								if (hitsound != null) {
-									hitsound.stop();
-								}
-								hitsound = FlxG.sound.play(Paths.sound(soundToPlay));
-								hitsound.pan = (note.column < 4) ? -0.3 : 0.3; //would be coolio
+	
+								FlxG.sound.play(Paths.sound(soundToPlay)).pan = (note.column < 4) ? -0.3 : 0.3; //would be coolio
 								playedSound[data] = true;
 							}
 							
@@ -2080,7 +2108,7 @@ class ChartingState extends MusicBeatState
 						// This is an event.
 
 						if (playSoundEvents.checked)
-							FlxG.sound.play(Paths.sound('hitsound'));
+							hitsound.play();
 					}
 				}
 
@@ -2914,7 +2942,8 @@ class ChartingState extends MusicBeatState
 		final tailOffset:Float = GRID_SIZE * 0.5;
 		final stepLength = (Conductor.getBPMFromSeconds(note.strumTime).stepCrochet);
 		final tailSteps:Float = note.sustainLength / stepLength;
-		var height:Float = tailSteps * GRID_SIZE * zoomList[curZoom] - tailOffset;
+		var height:Float = (tailSteps * GRID_SIZE * zoomList[curZoom] - tailOffset) + GRID_SIZE / 2; // Adding the gridsize / 2 to visualise the head/cap/end of the tail
+		// because these looked WAY too short
 		if (height <= 0) return null;
 		
 		var spr:FlxSprite = new FlxSprite(
