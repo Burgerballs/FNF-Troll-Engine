@@ -565,7 +565,7 @@ class Song
 		return resultArray;
 	}
 
-	static public function loadSong(toPlay:Song, ?difficulty:String, ?difficultyIdx:Int = 1):SwagSong {
+	static public function loadSong(toPlay:SongMetadata, ?difficulty:String, ?difficultyIdx:Int = 1):SwagSong {
 		Paths.currentModDirectory = toPlay.folder;
 
 		var songLowercase:String = Paths.formatToSongPath(toPlay.songName);
