@@ -114,7 +114,7 @@ class PlayState extends MusicBeatState
 	public static var instance:PlayState;
 
 	public static var SONG:SwagSong = null;
-	public static var songPlaylist:Array<SongMetadata> = [];
+	public static var songPlaylist:Array<Song> = [];
 	public static var songPlaylistIdx = 0;
 
 	public static var difficulty:Int = 1; // for psych mod shit
@@ -186,7 +186,7 @@ class PlayState extends MusicBeatState
 	////
 	public var displayedSong:String;
 	public var displayedDifficulty:String;
-	public var metadata:SongCreditdata; // metadata for the songs (artist, etc)
+	public var metadata:SongMetadata; // metadata for the songs (artist, etc)
 
 	public var stats:Stats;
 	public var ratingStuff:Array<Array<Dynamic>>;
@@ -283,7 +283,7 @@ class PlayState extends MusicBeatState
 	public var judgeManager:JudgmentManager;
 
 	public var modManager:ModManager;
-	public var notefields = new NotefieldManager();
+	public var notefields = new NotefieldRenderer();
 	public var playfields = new FlxTypedGroup<PlayField>();
 	public var grpNoteSplashes = new FlxTypedGroup<NoteSplash>();
 
@@ -797,8 +797,10 @@ class PlayState extends MusicBeatState
 		}
 
 		for (character in characters) {
-			for (data in CharacterData.returnCharacterPreload(character))
-				shitToLoad.push(data);
+			if (character != null) {
+				for (data in CharacterData.returnCharacterPreload(character))
+					shitToLoad.push(data);
+			}
 		}
 
 		for (track in songTrackNames){
@@ -822,33 +824,37 @@ class PlayState extends MusicBeatState
 
 		//// Characters
 
-		dad = new Character(0, 0, SONG.player2);
-		dadMap.set(dad.curCharacter, dad);
-		dadGroup.add(dad);
-
-		dad.setDefaultVar("used", true);
-		startCharacter(dad, true);
-
-		if (stageData.camera_opponent != null) {
-			dad.cameraPosition[0] += stageData.camera_opponent[0];
-			dad.cameraPosition[1] += stageData.camera_opponent[1];
+		if (SONG.player2 != null) {
+			dad = new Character(0, 0, SONG.player2);
+			dadMap.set(dad.curCharacter, dad);
+			dadGroup.add(dad);
+	
+			dad.setDefaultVar("used", true);
+			startCharacter(dad, true);
+	
+			if (stageData.camera_opponent != null) {
+				dad.cameraPosition[0] += stageData.camera_opponent[0];
+				dad.cameraPosition[1] += stageData.camera_opponent[1];
+			}		
 		}
 
 		////
-		boyfriend = new Character(0, 0, SONG.player1, true);
-		boyfriendMap.set(boyfriend.curCharacter, boyfriend);
-		boyfriendGroup.add(boyfriend);
-
-		boyfriend.setDefaultVar("used", true);
-		startCharacter(boyfriend);
-
-		if (stageData.camera_boyfriend != null) {
-			boyfriend.cameraPosition[0] += stageData.camera_boyfriend[0];
-			boyfriend.cameraPosition[1] += stageData.camera_boyfriend[1];
+		if (SONG.player1 != null) {
+			boyfriend = new Character(0, 0, SONG.player1, true);
+			boyfriendMap.set(boyfriend.curCharacter, boyfriend);
+			boyfriendGroup.add(boyfriend);
+	
+			boyfriend.setDefaultVar("used", true);
+			startCharacter(boyfriend);
+	
+			if (stageData.camera_boyfriend != null) {
+				boyfriend.cameraPosition[0] += stageData.camera_boyfriend[0];
+				boyfriend.cameraPosition[1] += stageData.camera_boyfriend[1];
+			}
 		}
 
 		////
-		if (stageData.hide_girlfriend != true) {
+		if (SONG.gfVersion != null && stageData.hide_girlfriend != true) {
 			gf = new Character(0, 0, SONG.gfVersion);
 			gfMap.set(gf.curCharacter, gf);
 			gfGroup.add(gf);
@@ -882,12 +888,17 @@ class PlayState extends MusicBeatState
 			add(stage.foreground);
 		}
 
-		if (hud == null){
+		if (hud == null) {
+			// TODO: make these not be obligatory values
+			// initial icons should be loaded by changeCharacter instead idk
+			var iP1:String = boyfriend?.healthIcon ?? "face";
+			var iP2:String = dad?.healthIcon ?? "face";
+
 			switch(ClientPrefs.etternaHUD){
-				case 'Advanced': hud = new AdvancedHUD(boyfriend.healthIcon, dad.healthIcon, SONG.song, stats);
-				case 'Kade': hud = new KadeHUD(boyfriend.healthIcon, dad.healthIcon, SONG.song, stats);
-				case 'Classic': hud = new ClassicHUD(boyfriend.healthIcon, dad.healthIcon, SONG.song, stats);
-				default: hud = new PsychHUD(boyfriend.healthIcon, dad.healthIcon, SONG.song, stats);
+				case 'Advanced': hud = new AdvancedHUD(iP1, iP2, SONG.song, stats);
+				case 'Kade': hud = new KadeHUD(iP1, iP2, SONG.song, stats);
+				case 'Classic': hud = new ClassicHUD(iP1, iP2, SONG.song, stats);
+				default: hud = new PsychHUD(iP1, iP2, SONG.song, stats);
 			}
 		}
 		hud.cameras = [camHUD];
@@ -1030,7 +1041,7 @@ class PlayState extends MusicBeatState
 
 		#if DISCORD_ALLOWED
 		// Discord RPC texts
-		stateText = '${displayedSong} ($displayedDifficulty)';
+		stateText = '${displayedSong} [$displayedDifficulty]';
 		
 		detailsText = isStoryMode ? "Story Mode" : "Freeplay";
 		detailsPausedText = "Paused - " + detailsText;
@@ -1056,31 +1067,40 @@ class PlayState extends MusicBeatState
 
 		////
 		#if !tgt
-		if (prevCamFollowPos != null){
-			// do nothing
-		}else if(SONG.notes[0].mustHitSection)
+		if (prevCamFollowPos != null)
 		{
-			var cam = dad.getCamera();
-			camFollow.set(cam[0], cam[1]);
-
-			var cam = boyfriend.getCamera();
-			sectionCamera.set(cam[0], cam[1]); 
+			// do nothing
+		}
+		else if(SONG.notes[0].mustHitSection)
+		{
+			if (boyfriend != null) {
+				var cam = (dad ?? boyfriend).getCamera();
+				camFollow.set(cam[0], cam[1]);
+	
+				var cam = boyfriend.getCamera();
+				sectionCamera.set(cam[0], cam[1]); 
+			}
 		}
 		else if(SONG.notes[0].gfSection && gf != null)
 		{
-			var cam = boyfriend.getCamera();
-			sectionCamera.set(cam[0], cam[1]); 
-			
-			var cam = gf.getCamera();
-			sectionCamera.set(cam[0], cam[1]); 
+			if (gf != null) {
+				var cam = (boyfriend ?? gf).getCamera();
+				camFollow.set(cam[0], cam[1]); 
+				
+				var cam = gf.getCamera();
+				sectionCamera.set(cam[0], cam[1]); 
+			}
 		}
 		else
 		{
-			var cam = boyfriend.getCamera();
-			camFollow.set(cam[0], cam[1]);
+			if (dad != null) {
+				var cam = (boyfriend ?? dad).getCamera();
+				camFollow.set(cam[0], cam[1]);
+	
+				var cam = dad.getCamera();
+				sectionCamera.set(cam[0], cam[1]); 
+			}
 
-			var cam = dad.getCamera();
-			sectionCamera.set(cam[0], cam[1]); 
 		}
 		camFollowPos.setPosition(camFollow.x, camFollow.y);
 		#end
@@ -1111,8 +1131,8 @@ class PlayState extends MusicBeatState
 
 		if(gf!=null) gf.callOnScripts("onAdded", [gf, null]); // if you can come up w/ a better name for this callback then change it lol
 		// (this also gets called for the characters changed in changeCharacter)
-		boyfriend.callOnScripts("onAdded", [boyfriend, null]);
-		dad.callOnScripts("onAdded", [dad, null]); 
+		if(boyfriend!=null) boyfriend.callOnScripts("onAdded", [boyfriend, null]);
+		if(dad!=null) dad.callOnScripts("onAdded", [dad, null]); 
 
 		super.create();
 
@@ -1223,8 +1243,12 @@ class PlayState extends MusicBeatState
 	}
 
 	public function reloadHealthBarColors() {
-		var dadColor:FlxColor = FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]);
-		var bfColor:FlxColor = FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]);
+		// TODO: fuck this move it to hud.changedCharacter
+		var dadArray = dad?.healthColorArray;
+		var bfArray = boyfriend?.healthColorArray;
+		var dadColor:FlxColor = (dadArray==null) ? 0xFFFF0000 : FlxColor.fromRGB(dadArray[0], dadArray[1], dadArray[2]);
+		var bfColor:FlxColor = (bfArray==null) ? 0xFF00FF00 : FlxColor.fromRGB(bfArray[0], bfArray[1], bfArray[2]);
+		
 		if(callOnHScripts('reloadHealthBarColors', [hud, dadColor, bfColor]) == Globals.Function_Stop)
 			return;
 
@@ -2170,7 +2194,7 @@ class PlayState extends MusicBeatState
 		if (hudSkinScript != null) callScript(hudSkinScript, "optionsChanged", [options]);
 		
 		for(field in playfields){
-			field.noteField.optimizeHolds = ClientPrefs.optimizeHolds;
+/* 			field.noteField.optimizeHolds = ClientPrefs.optimizeHolds; */
 			field.noteField.drawDistMod = ClientPrefs.drawDistanceModifier;
 			field.noteField.holdSubdivisions = Std.int(ClientPrefs.holdSubdivs) + 1;
 		}
@@ -2883,8 +2907,8 @@ class PlayState extends MusicBeatState
 				var time:Float = Std.parseFloat(value2);
 				if(Math.isNaN(time) || time <= 0) time = 0.6;
 
-				if(value != 0) {
-					if(dad.curCharacter.startsWith('gf')) { //Tutorial GF is actually Dad! The GF is an imposter!! ding ding ding ding ding ding ding, dindinding, end my suffering
+				if (value != 0) {
+					if (dad != null && dad.curCharacter.startsWith('gf')) { //Tutorial GF is actually Dad! The GF is an imposter!! ding ding ding ding ding ding ding, dindinding, end my suffering
 						dad.playAnim('cheer', true);
 						dad.specialAnim = true;
 						dad.heyTimer = time;
@@ -2894,7 +2918,7 @@ class PlayState extends MusicBeatState
 						gf.heyTimer = time;
 					}
 				}
-				if(value != 1) {
+				if (value != 1 && boyfriend != null) {
 					boyfriend.playAnim('hey', true);
 					boyfriend.specialAnim = true;
 					boyfriend.heyTimer = time;
@@ -2975,6 +2999,8 @@ class PlayState extends MusicBeatState
 				if(Math.isNaN(val2)) val2 = 0.0;
 
 				var newValue:Float = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1.0) * val1;
+				if (songSpeedTween != null)
+					songSpeedTween.cancel();
 
 				// value should never be negative as that should be handled and changed prior to this
 				if (val2 == 0.0)
@@ -3146,7 +3172,7 @@ class PlayState extends MusicBeatState
 			Highscore.saveScoreRecord(SONG.song, difficultyName, stats.getScoreRecord());
 
 		var gotoNextThing:Void -> Void = gotoMenus;
-		var nextSong:SongMetadata = null;
+		var nextSong:Song = null;
 
 		if (chartingMode) {
 			gotoNextThing = null;
@@ -4252,6 +4278,11 @@ class PlayState extends MusicBeatState
 		return Globals.Function_Continue;
 	}
 
+	public function setDefaultLuas(variable:String, arg:Dynamic){
+		FunkinLua.defaultVars.set(variable, arg);
+		return setOnScripts(variable, arg, luaArray);
+	}
+
 	#if HSCRIPT_ALLOWED
 	public function callOnHScripts(event:String, ?args:Array<Dynamic>, ?vars:Map<String, Dynamic>, ignoreStops = false, ?exclusions:Array<String>):Dynamic
 		return callOnScripts(event, args, ignoreStops, exclusions, hscriptArray, vars);
@@ -4425,6 +4456,7 @@ class PlayState extends MusicBeatState
 		removeKeyboardEvents();
 
 		FunkinHScript.defaultVars.clear();
+		FunkinLua.defaultVars.clear();
 		
 		FlxG.timeScale = 1.0;
 		ClientPrefs.gameplaySettings.set('botplay', cpuControlled);
@@ -4461,6 +4493,7 @@ class PlayState extends MusicBeatState
 
 		Note.quantShitCache.clear();
 		FunkinHScript.defaultVars.clear();
+		FunkinLua.defaultVars.clear();
 
 		notetypeScripts.clear();
 		hudSkinScripts.clear();		

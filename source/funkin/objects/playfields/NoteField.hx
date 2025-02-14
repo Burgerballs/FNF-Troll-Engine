@@ -21,20 +21,22 @@ import funkin.objects.shaders.NoteColorSwap;
 import funkin.states.PlayState;
 import funkin.states.MusicBeatState;
 import haxe.ds.Vector as FastVector;
+import funkin.objects.playfields.FieldBase;
 
 using StringTools;
 
-typedef RenderObject = {
-	graphic:FlxGraphic,
-	shader:FlxShader,
-	alphas:Array<Float>,
-	glows:Array<Float>,
-	uvData:Vector<Float>,
-	vertices:Vector<Float>,
-	indices:Vector<Int>,
-	zIndex:Float,
-	antialiasing:Bool,
-	colorSwap:NoteColorSwap
+@:structInit
+class RenderObject {
+	public var graphic:FlxGraphic;
+	public var shader:FlxShader;
+	public var alphas:Array<Float>;
+	public var glows:Array<Float>;
+	public var uvData:Vector<Float>;
+	public var vertices:Vector<Float>;
+	public var indices:Vector<Int>;
+	public var zIndex:Float;
+	public var colorSwap:NoteColorSwap;
+	public var antialiasing:Bool;
 }
 
 final scalePoint = new FlxPoint(1, 1);
@@ -53,7 +55,7 @@ class NoteField extends FieldBase
 	public var tryForceHoldsBehind:Bool = true; // Field tries to push holds behind receptors and notes
 
 	public var holdSubdivisions(default, set):Int;
-	public var optimizeHolds = ClientPrefs.optimizeHolds;
+	public var optimizeHolds = false; //ClientPrefs.optimizeHolds;
 	public var defaultShader:FlxShader = new FlxShader();
 
 	public function new(field:PlayField, modManager:ModManager)
@@ -102,11 +104,6 @@ class NoteField extends FieldBase
 	 */
 	public var strumPositions:Array<Vector3> = [];
 	
-	/**
-	 * Used by preDraw to store RenderObjects to be drawn
-	*/
-	@:allow(funkin.objects.proxies.ProxyField)
-	private var drawQueue:Array<RenderObject> = [];
 	/**
 	 * How zoomed this NoteField is without taking modifiers into account. 2 is 2x zoomed, 0.5 is half zoomed.
 	 * If you want to modify a NoteField's zoom in code, you should use this!
@@ -223,7 +220,6 @@ class NoteField extends FieldBase
 			var object = drawNote(note, pos);
 			if (object == null)
 				continue;
-			object.zIndex = pos.z + note.zIndex + 0.01; // a little zindex bump to try to put notes always above holds because it looks weird having holds ontop of notes
 			lookupMap.set(note, object);
 			drawQueue.push(object);
 		}
@@ -252,7 +248,7 @@ class NoteField extends FieldBase
 			var object = drawNote(obj, pos);
 			if (object == null)
 				continue;
-			object.zIndex += 2;
+			object.zIndex += 0.5;
 			lookupMap.set(obj, object);
 			drawQueue.push(object);
 		}
@@ -266,7 +262,7 @@ class NoteField extends FieldBase
 			var object = drawNote(obj, pos);
 			if (object == null)
 				continue;
-			object.zIndex += 2;
+			object.zIndex += 0.5;
 			lookupMap.set(obj, object);
 			drawQueue.push(object);
 		}
@@ -277,8 +273,6 @@ class NoteField extends FieldBase
 		// one example would be reimplementing Die Batsards' original bullet mechanic
 		// if you need an example on how this all works just look at the tap note drawing portion
 
-		// No need to sort dude, its already in order!
-		// no riconuts ur wrong the opponent notes are over the player's thats not how it works - burgerballs
 		drawQueue.sort(drawQueueSort);
 
 		if(zoom != 1){
@@ -301,7 +295,6 @@ class NoteField extends FieldBase
 
 	}
 
-	var point:FlxPoint = FlxPoint.get(0, 0);
 	var matrix:FlxMatrix = new FlxMatrix();
 	
 	override function draw()
@@ -317,6 +310,7 @@ class NoteField extends FieldBase
 		var glowR = modManager.getValue("flashR", modNumber);
 		var glowG = modManager.getValue("flashG", modNumber);
 		var glowB = modManager.getValue("flashB", modNumber);
+		
 		// actually draws everything
 		if (drawQueue.length > 0)
 		{
@@ -372,7 +366,7 @@ class NoteField extends FieldBase
 		}
 	}
 
-	function getPoints(hold:Note, ?wid:Float, speed:Float, vDiff:Float, diff:Float, ?lookAhead:Float = 1):Array<Vector3>
+	function getPoints(hold:Note, ?wid:Float, speed:Float, vDiff:Float, diff:Float, spiralHolds:Bool = false, ?lookAhead:Float = 1):Array<Vector3>
 	{ // stolen from schmovin'
 		if (hold.frame == null)
 			return [Vector3.ZERO, Vector3.ZERO];
@@ -390,7 +384,6 @@ class NoteField extends FieldBase
 		if(!hold.copyY)
 			p1.y = hold.y;
 		
-
 		if (simpleDraw)
 			p1.z = 0;
 
@@ -402,7 +395,7 @@ class NoteField extends FieldBase
 		var quad1 = new Vector3(wid);
 		var scale:Float = (z!=0.0) ? (1.0 / z) : 1.0;
 
-		if (optimizeHolds || simpleDraw) {
+		if (spiralHolds || simpleDraw) {
 			// less accurate, but higher FPS
 			quad0.scaleBy(scale);
 			quad1.scaleBy(scale);
@@ -456,24 +449,34 @@ class NoteField extends FieldBase
 		);
 
 		
-	
-		var basePos = simpleDraw ? hold.vec3Cache : modManager.getPos(0, 0, curDecBeat, hold.column, modNumber, hold, this, perspectiveArrDontUse, hold.vec3Cache);
-
-		if(!hold.copyX)
-			basePos.x = hold.x;
-
-		if(!hold.copyY)
-			basePos.y = hold.y;
-
-		if (simpleDraw)
-			basePos.z = 0;
 		
 		var strumDiff = (Conductor.songPosition - hold.strumTime);
 		var visualDiff = (Conductor.visualPosition - hold.visualTime); // TODO: get the start and end visualDiff and interpolate so that changing speeds mid-hold will look better
-		var zIndex:Float = basePos.z + hold.zIndex;
 		var sv = PlayState.instance.getSV(hold.strumTime).speed;
 
+
+/* 		var basePos = simpleDraw ? hold.vec3Cache : modManager.getPos(visualDiff, strumDiff, curDecBeat, hold.column, modNumber, hold, this,
+			perspectiveArrDontUse, hold.vec3Cache);
+
+		// basePos been doing nothing for like 100 years time to mak eit do something
+		var zIndex:Float = basePos.z;
+
+		if (!hold.copyX)
+			basePos.x = hold.x;
+
+		if (!hold.copyY)
+			basePos.y = hold.y;
+
+		if (simpleDraw)
+			basePos.z = 0; */
+		// ^^ dOESNT WORK!!
+
+		var zIndex:Float = 0;
+
+
 		var lookAheadTime = modManager.getValue("lookAheadTime", modNumber);
+		var useSpiralHolds = modManager.getValue("spiralHolds", modNumber) != 0;
+
 
 		for (sub in 0...subDivs)
 		{
@@ -519,11 +522,10 @@ class NoteField extends FieldBase
 
 			var top = lastMe ?? getPoints(hold, topWidth, speed, (visualDiff + (strumOff * 0.45)), strumDiff + strumOff, lookAheadTime);
 			var bot = getPoints(hold, botWidth, speed, (visualDiff + ((strumOff + strumSub) * 0.45)), strumDiff + strumOff + strumSub, lookAheadTime);
-			var offset:Float = FlxMath.lerp(0, (crotchet + 1) * 0.45 * speed, prog);
-			if(!hold.copyY){
-				if(lastMe == null){
-					top[0].y -= offset;
-					top[1].y -= offset;
+			if (!hold.copyY) {
+				if (lastMe == null) {
+					top[0].y -= FlxMath.lerp(0, (crotchet + 1) * 0.45 * speed, prog);
+					top[1].y -= FlxMath.lerp(0, (crotchet + 1) * 0.45 * speed, prog);
 				}
 				bot[0].y -= offset;
 				bot[1].y -= offset;
@@ -565,9 +567,6 @@ class NoteField extends FieldBase
 
 		var graphic:FlxGraphic = hold.frame == null ? hold.graphic : hold.frame.parent;
 
-		shader.bitmap.input = graphic.bitmap;
-		shader.bitmap.wrap = REPEAT;
-		shader.bitmap.filter = hold.antialiasing ? LINEAR : NEAREST;
 
 		return {
 			graphic: graphic,
@@ -577,7 +576,7 @@ class NoteField extends FieldBase
 			uvData: uvData,
 			vertices: vertices,
 			indices: HOLD_INDICES,
-			zIndex: zIndex,
+			zIndex: zIndex + hold.zIndex,
 			colorSwap: hold.colorSwap,
 			antialiasing: hold.antialiasing
 		}
@@ -810,16 +809,10 @@ class NoteField extends FieldBase
 			uvData: uvData,
 			vertices: vertices,
 			indices: NOTE_INDICES,
-			zIndex: pos.z,
+			zIndex: pos.z + sprite.zIndex,
 			colorSwap: sprite.colorSwap,
 			antialiasing: sprite.antialiasing
 		}
-	}
-
-	override function destroy()
-	{
-		point = FlxDestroyUtil.put(point);
-		super.destroy();
 	}
 
 	function set_holdSubdivisions(to:Int)
