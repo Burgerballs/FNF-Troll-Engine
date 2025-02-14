@@ -268,7 +268,7 @@ class ExperimentalChartingState extends MusicBeatState
 
 		if (PlayState.SONG != null){
 			_song = PlayState.SONG;
-			offset = _song.offset == null ? 0 : _song.offset;
+			offset = _song.offset == 0 ? 0 : _song.offset;
 		
 		}else {
 			PlayState.SONG = _song = {

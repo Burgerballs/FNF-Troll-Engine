@@ -16,9 +16,6 @@ class BeatModifier extends NoteModifier {
 		}
 	}
 
-	inline function trunc(num:Float)
-		return num < 0 ? Math.ceil(num) : Math.floor(num); 
-
 	function updateBeat(axis:Int, beat:Float, pn:Int, offset:Float, mult:Float){
 		if (beatFactors[pn] == null)
 			beatFactors[pn] = [];
@@ -32,9 +29,9 @@ class BeatModifier extends NoteModifier {
 		if (beat < 0)
 			return;
 
-		beat -= trunc(beat);
+		beat -= Math.floor(beat);
 		beat += 1;
-		beat -= trunc(beat);
+		beat -= Math.floor(beat);
 		
 		if (beat >= totalTime)
 			return;
@@ -50,11 +47,9 @@ class BeatModifier extends NoteModifier {
 			amount = CoolUtil.scale(beat, accelTime, totalTime, 1, 0);
 			amount = 1 - (1 - amount) * (1 - amount);
 		}
+
 		if (evenBeat)
 			amount *= -1;
-
-		if(Math.abs(amount) <= 0.01)
-			amount = 0;
 
 		beatFactors[pn][axis] = 40 * amount;
 
