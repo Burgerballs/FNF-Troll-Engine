@@ -1,5 +1,6 @@
 #!/bin/sh
-haxelib --always --quiet git lime https://github.com/lavycat/lime
+haxelib --always --quiet git lime https://github.com/swordcubes-grave-of-shite/lime
+haxelib --always --quiet git hxcpp https://github.com/HaxeFoundation/hxcpp
 haxelib --always --quiet install openfl 9.2.2
 haxelib --always --quiet git funkin.vis https://github.com/FunkinCrew/funkVis
 haxelib --always --quiet git grig.audio https://gitlab.com/haxe-grig/grig.audio.git

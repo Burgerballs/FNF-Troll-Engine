@@ -199,17 +199,6 @@ class NoteField extends FieldBase
 
 		var lookupMap = new haxe.ds.ObjectMap<Dynamic, RenderObject>();
 
-		// draw hold notes (credit to 4mbr0s3 2)
-		for (note in holds)
-		{
-			var object = drawHold(note);
-			if (object == null)
-				continue;
-			object.zIndex -= 1;
-			lookupMap.set(note, object);
-			drawQueue.push(object);
-		}
-
 		// draw the receptors
 		for (obj in field.strumNotes)
 		{

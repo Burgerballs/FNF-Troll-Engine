@@ -1,5 +1,6 @@
 package funkin.states;
 
+import funkin.data.DiffCalc;
 import funkin.data.Highscore;
 import flixel.math.FlxMath;
 import funkin.states.SongSelectState.SongChartSelec;
@@ -17,6 +18,7 @@ class FreeplayState extends MusicBeatState
 {
 	public static var comingFromPlayState:Bool = false;
 
+	var msd:Float = 0;
 	var menu = new AlphabetMenu();
 	var songMeta:Array<SongMetadata> = [];
 
@@ -31,6 +33,7 @@ class FreeplayState extends MusicBeatState
 
 	var scoreBG:FlxSprite;
 	var scoreText:FlxText;
+	var msdText:FlxText;
 	var diffText:FlxText;
 
 	static var lastSelected:Int = 0;
@@ -93,7 +96,7 @@ class FreeplayState extends MusicBeatState
 		scoreText = new FlxText(FlxG.width * 0.7, 5, 0, 'PERSONAL BEST: 0', 32);
 		scoreText.setFormat(Paths.font("vcr.ttf"), 32, 0xFFFFFFFF, RIGHT);
 
-		scoreBG = CoolUtil.blankSprite(FlxG.width * 0.3, 66, 0xFF999999);
+		scoreBG = CoolUtil.blankSprite(FlxG.width * 0.3, 92, 0xFF999999);
 		scoreBG.setPosition(scoreText.x - 6, 0);
 		scoreBG.blend = MULTIPLY;
 		add(scoreBG);
@@ -102,6 +105,11 @@ class FreeplayState extends MusicBeatState
 		diffText.alignment = CENTER;
 		diffText.font = scoreText.font;
 		add(diffText);
+
+		msdText = new FlxText(diffText.x, diffText.y + 24, 100, "Rating: 10.0pts", 24);
+		msdText.alignment = LEFT;
+		msdText.font = scoreText.font;
+		add(msdText);
 
 		add(scoreText);
 
@@ -171,6 +179,15 @@ class FreeplayState extends MusicBeatState
 		menu.controls = null;
 	}
 
+	public function updateMSD():Float {
+		if (selectedSongCharts.length == 0) return 0;
+		var song = Song.loadSong(selectedSongData, curDiffStr, curDiffIdx);
+		if (song != null) {
+			return DiffCalc.CalculateDiff(song, .98) * 1000;
+		}
+		return 0;
+	}
+
 	override public function update(elapsed:Float)
 	{
 		if (stunned){
@@ -180,9 +197,11 @@ class FreeplayState extends MusicBeatState
 
 		if (controls.UI_LEFT_P){
 			changeDifficulty(-1);
+			msd = updateMSD();
 		}
 		if (controls.UI_RIGHT_P){
 			changeDifficulty(1);
+			msd = updateMSD();
 		}
 
 		if (FlxG.keys.justPressed.SPACE){
@@ -224,6 +243,8 @@ class FreeplayState extends MusicBeatState
 		Paths.currentModDirectory = data.folder;
 
 		changeDifficulty(CoolUtil.updateDifficultyIndex(curDiffIdx, curDiffStr, selectedSongCharts), true);
+
+		msd = updateMSD();
 
 		var modBgGraphic = Paths.image('menuBGBlue');
 		reloadFont();
@@ -302,6 +323,7 @@ class FreeplayState extends MusicBeatState
 
 		scoreText.text = 'PERSONAL BEST: $score ($rating%)';
 		positionHighscore();
+		msdText.text = 'Rating: ' + '${msd}pts';
 
 		super.draw();
 	}
@@ -329,8 +351,10 @@ class FreeplayState extends MusicBeatState
 		scoreBG.updateHitbox();
 
 		diffText.x = scoreText.x = scoreBG.x + 3;
+		msdText.x = scoreText.x = scoreBG.x + 3;
 
 		diffText.fieldWidth = bgWidth;
+		msdText.fieldWidth = bgWidth;
 	}
 
 	override public function destroy()

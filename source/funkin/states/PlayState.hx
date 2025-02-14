@@ -2534,7 +2534,7 @@ class PlayState extends MusicBeatState
 
 		////
 		if (noteHits.length > 0){
-			while (noteHits.length > 0 && (noteHits[0] + 2000) < Conductor.songPosition)
+			while (noteHits.length > 0 && (noteHits[0] + (2000 * playbackRate)) < Conductor.songPosition)
 				noteHits.shift();
 		}
 

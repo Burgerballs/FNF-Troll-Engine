@@ -538,7 +538,7 @@ class Song
 		return resultArray;
 	}
 
-	static public function loadSong(toPlay:SongMetadata, ?difficulty:String, ?difficultyIdx:Int = 1) {
+	static public function loadSong(toPlay:SongMetadata, ?difficulty:String, ?difficultyIdx:Int = 1):SwagSong {
 		Paths.currentModDirectory = toPlay.folder;
 
 		var songLowercase:String = Paths.formatToSongPath(toPlay.songName);
@@ -658,7 +658,7 @@ class Song
 			
 			// Find a better way to show the error to the user
 			trace("No file format found for the chart!");
-			return;
+			return null;
 		}
 		#else
 		var SONG:SwagSong = Song.loadFromJson(songLowercase + diffSuffix, songLowercase);
@@ -668,6 +668,7 @@ class Song
 		PlayState.difficulty = difficultyIdx;
 		PlayState.difficultyName = difficulty;
 		PlayState.isStoryMode = false;	
+		return SONG;
 	}
 
 	static public function switchToPlayState()
