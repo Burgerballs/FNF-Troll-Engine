@@ -42,8 +42,6 @@ private typedef State = Dynamic;
 
 class FunkinLua extends FunkinScript
 {
-	public static final defaultVars:Map<String, Dynamic> = new Map<String, Dynamic>();
-	
 	public static var haxeScript:FunkinHScript;
 	
 	#if LUA_ALLOWED
@@ -1903,9 +1901,6 @@ class FunkinLua extends FunkinScript
 		Lua.init_callbacks(lua);
 
 		setDefaultVars();
-
-		for (variable => arg in defaultVars)
-			set(variable, arg);
 
 		if (vars != null){
 			for(key => val in vars)

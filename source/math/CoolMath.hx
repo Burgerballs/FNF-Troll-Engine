@@ -3,7 +3,7 @@ package math;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 
-class CoolMath/*Games*/{
+class CoolMath {
 	inline public static function coolLerp(current:Float, target:Float, elapsed:Float):Float
 		return FlxMath.lerp(target, current, Math.exp(-elapsed));
 
@@ -49,8 +49,14 @@ class CoolMath/*Games*/{
 	inline public static function boundTo(value:Float, min:Float, max:Float):Float
 		return Math.max(min, Math.min(max, value));
 
-	inline public static function clamp(n:Float, lower:Float, higher:Float)
-		return boundTo(n, lower, higher);
+	inline public static function clamp(n:Float, lower:Float, higher:Float):Float {
+		if (n > higher)
+			n = higher;
+		if (n < lower)
+			n = lower;
+
+		return n;
+	}
 
 	public static function floorDecimal(value:Float, decimals:Int):Float {
 		if (decimals < 1)
@@ -64,20 +70,10 @@ class CoolMath/*Games*/{
 	}
 
 	public static function rotate(x:Float, y:Float, radians:Float, ?point:FlxPoint):FlxPoint {
-		var s:Float = Math.sin(radians);
-		var c:Float = Math.cos(radians);
-		// because HAXE* sucks
-		if (Math.abs(s) < 0.001)
-			s = 0;
-
-		if (Math.abs(c) < 0.001)
-			c = 0;
-
+		var s = FlxMath.fastSin(radians);
+		var c = FlxMath.fastCos(radians);
 		var p = point ?? FlxPoint.weak();
-		p.set((x * c) - (y * s), (x * s) + (y * c));
-
-
-		return p;
+		return p.set((x * c) - (y * s), (x * s) + (y * c));
 	}
 
 	// Returns an array containing a designated amount of values between X and Y, including X and Y as well.

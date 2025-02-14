@@ -30,7 +30,7 @@ class AlphaModifier extends NoteModifier
 		return (FlxG.height* 0.5) + fadeDistY * CoolUtil.scale(getHiddenSudden(player),0,1,0,0.25) + (FlxG.height* 0.5) * getSubmodValue("suddenOffset",player);
 	}
 
-	function getVisibility(yPos:Float,player:Int):Float{
+	function getVisibility(yPos:Float,player:Int,note:Note):Float{
 		var distFromCenter = yPos - (FlxG.height * 0.5);
 		var alpha:Float = 0;
 
@@ -84,11 +84,12 @@ class AlphaModifier extends NoteModifier
 	{
 		var alpha:Float = info.alpha;
 		if (obj.objType == NOTE){
+			var note:Note = cast obj;
 			var yPos:Float = 50 + diff;
 
 			var alphaMod = 
-			(1 - getSubmodValue("alpha",player)) * (1 - getSubmodValue('alpha${obj.column}',player)) * (1 - getSubmodValue("noteAlpha", player))* (1 - getSubmodValue('noteAlpha${obj.column}', player));
-			var vis = getVisibility(yPos, player);
+			(1 - getSubmodValue("alpha",player)) * (1 - getSubmodValue('alpha${note.column}',player)) * (1 - getSubmodValue("noteAlpha", player))* (1 - getSubmodValue('noteAlpha${note.column}', player));
+			var vis = getVisibility(yPos, player, note);
 
 			if (getSubmodValue("hideStealthGlow", player) == 0)
 			{
@@ -99,20 +100,24 @@ class AlphaModifier extends NoteModifier
 				alpha *= vis;
 
 			alpha *= alphaMod;	
-		}else{
-			alpha *= (1 - getSubmodValue("alpha", player)) * (1 - getSubmodValue('alpha${obj.column}', player));
-			if (obj.objType == STRUM || getSubmodValue("darkSplashes", player) != 0){
-				if (getSubmodValue("dark", player) != 0 || getSubmodValue('dark${obj.column}', player) != 0) {
-					var vis = (1 - getSubmodValue("dark", player)) * (1 - getSubmodValue('dark${obj.column}', player));
-
-					if (getSubmodValue("hideDarkGlow", player) == 0) {
-						alpha *= getRealAlpha(vis);
-						info.glow = getGlow(vis);
-					} else
-						alpha *= vis;
-				}
-			}
 		}
+		else if (obj.objType == STRUM){
+			var receptor:StrumNote = cast obj;
+			alpha *= (1 - getSubmodValue("alpha", player)) * (1 - getSubmodValue('alpha${receptor.column}', player));
+
+			if (getSubmodValue("dark", player) != 0 || getSubmodValue('dark${receptor.column}', player) != 0)
+			{
+				var vis = (1 - getSubmodValue("dark", player)) * (1 - getSubmodValue('dark${receptor.column}', player));
+				if (getSubmodValue("hideDarkGlow", player) == 0)
+				{
+					alpha *= getRealAlpha(vis);
+					info.glow = getGlow(vis);
+				}else
+					alpha *= vis;
+			}
+		}else
+			alpha *= (1 - getSubmodValue("alpha", player)) * (1 - getSubmodValue('alpha${obj.column}', player));
+		
 		
 
 		info.alpha = alpha;
@@ -121,13 +126,12 @@ class AlphaModifier extends NoteModifier
 	}
 
 	override function getSubmods(){
-		var subMods:Array<String> = ["darkSplashes", "noteAlpha", "alpha", "hidden", "hiddenOffset", "sudden", "suddenOffset", "blink", "vanish", "dark", "hideDarkGlow", "hideStealthGlow", "stealthPastReceptors"];
+		var subMods:Array<String> = ["noteAlpha", "alpha", "hidden", "hiddenOffset", "sudden", "suddenOffset", "blink", "vanish", "dark", "hideDarkGlow", "hideStealthGlow", "stealthPastReceptors"];
 		for(i in 0...PlayState.keyCount){
 			subMods.push('noteAlpha$i');
 			subMods.push('alpha$i');
 			subMods.push('dark$i');
 		}
-
 		return subMods;
 	}
 }

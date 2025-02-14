@@ -32,6 +32,8 @@ class StrumNote extends NoteObject
 
 	////
 	public var z:Float = 0;
+	public var zIndex:Float = 0;
+	public var desiredZIndex:Float = 0;
 
 	private var field:PlayField;
 

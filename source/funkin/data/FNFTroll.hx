@@ -25,7 +25,7 @@ typedef TrollJSONFormat = FNFLegacyFormat & {
 	// Troll-specific
 	?hudSkin:String,
 	?info:Array<String>,
-	?metadata:Song.SongMetadata,
+	?metadata:Song.SongCreditdata,
 	?offset:Float,
 
 	// deprecated
