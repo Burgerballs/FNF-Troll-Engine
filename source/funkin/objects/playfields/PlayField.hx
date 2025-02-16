@@ -64,9 +64,14 @@ class PlayField extends FlxTypedGroup<FlxBasic>
 		return super.set_cameras(to);
 	}
 
+	function set_playerId(v) {
+		playerId = v;
+		setDefaultBaseXPositions();
+		return playerId;
+	}
 
 	public var tracks:Array<FlxSound> = []; // tracks managed by this field
-	public var playerId:Int = 0; // used to calculate the base position of the strums
+	public var playerId(default, set):Int = 0; // used to calculate the base position of the strums
 
 	public var spawnTime:Float = 1750; // spawn time for notes
 	public var spawnedNotes:Array<Note> = []; // spawned notes
@@ -129,6 +134,8 @@ class PlayField extends FlxTypedGroup<FlxBasic>
 				keysPressed.push(false);
 		}
 
+		setDefaultBaseXPositions();
+
 		return keyCount = cnt;
 	}
 
@@ -163,8 +170,13 @@ class PlayField extends FlxTypedGroup<FlxBasic>
 	public var keysPressed:Array<Bool> = [false,false,false,false]; // what keys are pressed rn
 	public var isHolding:Array<Bool> = [false,false,false,false];
 
+	public var baseXPositions:Array<Float> = [];
+	public function setDefaultBaseXPositions() {
+		for (i in 0...this.keyCount)
+			this.baseXPositions[i] = modManager.getBaseX(i, this.playerId, keyCount);
+	}
 	public inline function getBaseX(direction:Int)
-		return modManager.getBaseX(direction, playerId, keyCount);
+		return baseXPositions[direction];
 	
 	public function new(modMgr:ModManager){
 		super();
@@ -340,7 +352,7 @@ class PlayField extends FlxTypedGroup<FlxBasic>
 				var judge:Judgment = judgeManager.judgeNote(note);
 				if (judge != UNJUDGED){
 					note.hitResult.judgment = judge;
-					note.hitResult.hitDiff = note.strumTime - Conductor.songPosition;
+					note.hitResult.hitDiff = note.strumTime - Conductor.getAccPosition();
 					noteHitCallback(note, this);
 					return note;
 				}
@@ -357,7 +369,7 @@ class PlayField extends FlxTypedGroup<FlxBasic>
 			babyArrow.downScroll = ClientPrefs.downScroll;
 			babyArrow.alpha = 0;
 			insert(0, babyArrow);
-			babyArrow.x = modManager.getBaseX(i, playerId, keyCount);
+			babyArrow.x = getBaseX(i);
 			babyArrow.y = 50;
 			babyArrow.handleRendering = false; // NoteField handles rendering
 			babyArrow.cameras = cameras;

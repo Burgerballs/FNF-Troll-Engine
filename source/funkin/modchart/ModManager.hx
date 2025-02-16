@@ -549,19 +549,11 @@ class ModManager {
 			}
 		}
 		
-		if (obj.objType == NOTE){
-			obj.updateHitbox();
-
+		obj.updateHitbox();
+		if (obj.objType == NOTE) {
 			var cum:Note = cast obj;
-			if(!cum.isSustainNote){
-				obj.centerOrigin();
-				obj.centerOffsets();
-			}
 			cum.offset.x += cum.typeOffsetX;
 			cum.offset.y += cum.typeOffsetY;
-		}else{
-			obj.centerOrigin();
-			obj.centerOffsets();
 		}
 	}
 
@@ -584,7 +576,7 @@ class ModManager {
 		diff += getValue("centeredPath", player) * Note.swagWidth; // Each 100% moves the path by receptor size
 		
 		pos.setTo(
-			Note.halfWidth + getBaseX(data, player, field.field.keyCount),
+			Note.halfWidth + field.field.getBaseX(data),
 			Note.halfWidth + 50 + diff,
 			0
 		);
