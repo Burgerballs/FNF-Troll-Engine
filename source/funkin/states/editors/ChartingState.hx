@@ -1301,13 +1301,9 @@ class ChartingState extends MusicBeatState
 
 		var text:FlxText = new FlxText(20, 90, 0, "Value 1:");
 		tab_group_event.add(text);
-		value1InputText = new FlxUIInputText(20, 110, 100, "");
-		blockPressWhileTypingOn.push(value1InputText);
 
 		var text:FlxText = new FlxText(20, 130, 0, "Value 2:");
 		tab_group_event.add(text);
-		value2InputText = new FlxUIInputText(20, 150, 100, "");
-		blockPressWhileTypingOn.push(value2InputText);
 
 		// New event buttons
 		var removeButton:FlxButton = new FlxButton(eventDropDown.x + eventDropDown.width + 10, eventDropDown.y, '-', function()
@@ -1412,6 +1408,12 @@ class ChartingState extends MusicBeatState
 		selectedEventText = new FlxText(addButton.x - 100, addButton.y + addButton.height + 6, (moveRightButton.x - addButton.x) + 186, 'Selected Event: None');
 		selectedEventText.alignment = CENTER;
 		tab_group_event.add(selectedEventText);
+
+		value1InputText = new FlxUIInputText(20, 110, Std.int(moveRightButton.x - 20 + moveRightButton.width), "");
+		blockPressWhileTypingOn.push(value1InputText);
+
+		value2InputText = new FlxUIInputText(20, 150, Std.int(value1InputText.width), "");
+		blockPressWhileTypingOn.push(value2InputText);
 
 		tab_group_event.add(descText);
 		tab_group_event.add(value1InputText);
