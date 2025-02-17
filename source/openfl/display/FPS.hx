@@ -6,6 +6,7 @@ import flixel.FlxG;
 import flixel.math.FlxMath;
 
 import openfl.text.TextField;
+import external.memory.Memory;
 import openfl.text.TextFormat;
 import openfl.text.TextFormatAlign;
 import openfl.events.Event;
@@ -38,13 +39,11 @@ class FPS extends TextField
 	/** Whether to show a memory usage counter or not **/
 	public var showMemory:Bool = #if final false #else true #end;
 
-	inline static function getTotalMemory():Int {
-		#if (windows && cpp)
-		return openfl.system.System.totalMemory;
-		#else
-		return openfl.system.System.totalMemory;
-		#end
-	}
+	public static var gcMemoryInBytes(get, never):Float;
+	static function get_gcMemoryInBytes():Float return cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_USAGE);
+
+	public static var appMemoryInBytes(get, never):Float;
+	static function get_appMemoryInBytes():Float return Memory.getCurrentUsage();
 
 	public var align(default, set):TextFormatAlign;
 	function set_align(val) {		
@@ -161,8 +160,8 @@ class FPS extends TextField
 
 			text = 'FPS: $currentFPS';
 			
-			if (showMemory)
-				text += ' • Memory: ' + FlxStringUtil.formatBytes(getTotalMemory());
+			if (showMemory) // Credit to Rudyrue and Leather128 for this one
+				text += ' • Memory: [APP: ${FlxStringUtil.formatBytes(appMemoryInBytes)} | GC: ${FlxStringUtil.formatBytes(gcMemoryInBytes)}]';
 
 			#if (debug && false)
 			text += '\nState: $currentState';

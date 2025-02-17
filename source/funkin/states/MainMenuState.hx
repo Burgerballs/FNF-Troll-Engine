@@ -118,6 +118,14 @@ class MainMenuState extends MusicBeatState
 		versionShit.size = 22;
 		versionShit.scale.set(0.5,0.5);
 		versionShit.updateHitbox();
+
+		var keyHintUp = new KeyHint(14, FlxG.height - 96, 'Up', 'UI_UP', controls);
+		keyHintUp.scrollFactor.set();
+		add(keyHintUp);
+
+		var keyHintDown = new KeyHint(14, keyHintUp.y + 30, 'Down', 'UI_DOWN', controls);
+		add(keyHintDown);
+		keyHintDown.scrollFactor.set();
 		
 		changeItem();
 

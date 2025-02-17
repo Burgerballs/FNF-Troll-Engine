@@ -412,7 +412,7 @@ class Controls extends FlxActionSet
 		return getDialogueName(getActionFromControl(Control.createByName(token.toUpperCase())));
 	}
 
-	function getActionFromControl(control:Control):FlxActionDigital
+	public function getActionFromControl(control:Control):FlxActionDigital
 	{
 		return switch (control)
 		{

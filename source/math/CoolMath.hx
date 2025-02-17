@@ -92,7 +92,6 @@ class CoolMath/*Games*/{
 			}
 			ret.push(FlxMath.lerp(x,y,between));
 		}
-		ret.push(y);
 		return ret;
 	}
 	
