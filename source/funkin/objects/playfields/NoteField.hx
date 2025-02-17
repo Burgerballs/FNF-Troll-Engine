@@ -1,5 +1,7 @@
 package funkin.objects.playfields;
 
+import lime.math.Vector2;
+import math.CoolMath;
 import funkin.modchart.modifiers.ReverseModifier;
 import funkin.modchart.Modifier;
 import flixel.math.FlxMath;
@@ -329,6 +331,12 @@ class NoteField extends FieldBase
 		return [p1.add(off1, off1), p1.add(off2, off2), p1];
 	}
 
+
+	// Caching variables we might want.
+	var prevSubDivs:Int = 1;
+	var progs:Array<Float> = [0, 1];
+
+
 	var crotchet:Float = Conductor.getCrotchetAtTime(0.0) / 4.0;
 	function drawHold(hold:Note, ?prevAlpha:Float, ?prevGlow:Float):Null<RenderObject>
 	{
@@ -368,54 +376,39 @@ class NoteField extends FieldBase
 		var strumDiff = (Conductor.songPosition - hold.strumTime);
 		var visualDiff = (Conductor.visualPosition - hold.visualTime); // TODO: get the start and end visualDiff and interpolate so that changing speeds mid-hold will look better
 		var sv = PlayState.instance.getSV(hold.strumTime).speed;
-
-
-/* 		var basePos = simpleDraw ? hold.vec3Cache : modManager.getPos(visualDiff, strumDiff, curDecBeat, hold.column, modNumber, hold, this,
-			perspectiveArrDontUse, hold.vec3Cache);
-
-		// basePos been doing nothing for like 100 years time to mak eit do something
-		var zIndex:Float = basePos.z;
-
-		if (!hold.copyX)
-			basePos.x = hold.x;
-
-		if (!hold.copyY)
-			basePos.y = hold.y;
-
-		if (simpleDraw)
-			basePos.z = 0; */
-		// ^^ dOESNT WORK!!
-
 		var zIndex:Float = 0;
+		var holdOffset:Vector2 = new Vector2(hold.offsetX + hold.typeOffsetX, hold.offsetY + hold.typeOffsetY);
 
 
 		var lookAheadTime = modManager.getValue("lookAheadTime", modNumber);
 		var useSpiralHolds = modManager.getValue("spiralHolds", modNumber) != 0;
+		if (subDivs != prevSubDivs) {
+			trace('subdivisions changed, recalculating progress');
+			progs = CoolMath.interpolateMass(0, 1, subDivs);
+			
+		}
 
+		var strumSub = (crotchet / subDivs) * sv;
+		if ((hold.wasGoodHit || hold.parent.wasGoodHit) && !hold.tooLate) {
+			var scale:Float = 1 - ((strumDiff + crotchet) / crotchet);
+			if (scale <= 0.0) {
+				strumSub = 0;
+			}else if (scale < 1) {
+				strumSub *= scale;
+			}
+		}
+		
+		prevSubDivs = subDivs;
+		var speed:Float = modManager.getNoteSpeed(hold, modNumber, songSpeed);
 
 		for (sub in 0...subDivs)
 		{
-			var prog = sub / (subDivs + 1);
-			var nextProg = (sub + 1) / (subDivs + 1);
-			var strumSub = (crotchet / subDivs);
+			var prog = progs[sub];
+			var nextProg = progs[sub+1];
 			var strumOff = (strumSub * sub);
-			strumSub *= sv;
-			strumOff *= sv;
-			
-			if ((hold.wasGoodHit || hold.parent.wasGoodHit) && !hold.tooLate) {
-				var scale:Float = 1 - ((strumDiff + crotchet) / crotchet);
-				if (scale <= 0.0) {
-					strumSub = 0;
-					strumOff = 0;
-				}else if (scale < 1) {
-					strumSub *= scale;
-					strumOff *= scale;
-				}
-			}
 
 			scalePoint.set(1, 1);
 
-			var speed:Float = modManager.getNoteSpeed(hold, modNumber, songSpeed);
 			var info:RenderInfo = {
 				alpha: hold.alpha,
 				glow: 0,
@@ -453,15 +446,15 @@ class NoteField extends FieldBase
 				glows.push(info.glow);
 			}
 
-			top[0].x += hold.offsetX + hold.typeOffsetX;
-			top[1].x += hold.offsetX + hold.typeOffsetX;
-			bot[0].x += hold.offsetX + hold.typeOffsetX;
-			bot[1].x += hold.offsetX + hold.typeOffsetX;
+			top[0].x += holdOffset.x;
+			top[1].x += holdOffset.x;
+			bot[0].x += holdOffset.x;
+			bot[1].x += holdOffset.x;
 
-			top[0].y += hold.offsetY + hold.typeOffsetY;
-			top[1].y += hold.offsetY + hold.typeOffsetY;
-			bot[0].y += hold.offsetY + hold.typeOffsetY;
-			bot[1].y += hold.offsetY + hold.typeOffsetY;
+			top[0].y += holdOffset.y;
+			top[1].y += holdOffset.y;
+			bot[0].y += holdOffset.y;
+			bot[1].y += holdOffset.y;
 
 
 			var subIndex = sub * 8;
