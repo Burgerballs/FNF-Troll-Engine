@@ -108,15 +108,8 @@ class NotefieldRenderer extends FlxBasic {
 			var multAlpha = object.sourceField.alpha * ClientPrefs.noteOpacity;
 			for (n in 0...Std.int(vertices.length / 2)) {
 				var glow = glows[n];
-				var transfarm:ColorTransform = new ColorTransform();
-				transfarm.redMultiplier = 1 - glow;
-				transfarm.greenMultiplier = 1 - glow;
-				transfarm.blueMultiplier = 1 - glow;
-				transfarm.redOffset = object.glowColour.red * glow;
-				transfarm.greenOffset = object.glowColour.green * glow;
-				transfarm.blueOffset = object.glowColour.blue * glow;
-				transfarm.alphaMultiplier = alphas[n] * multAlpha;
-				transforms.push(transfarm);
+				transforms.push(new ColorTransform(1-glow, 1-glow, 1-glow, alphas[n] * multAlpha, 
+					object.glowColour.red * glow, object.glowColour.green * glow, object.glowColour.blue * glow));
 			}
 			for (camera in object.cameras) {
 				if (camera != null && camera.canvas != null && camera.canvas.graphics != null) {

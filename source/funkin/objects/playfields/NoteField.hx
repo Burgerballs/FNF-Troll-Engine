@@ -370,8 +370,6 @@ class NoteField extends FieldBase
 			else
 				tWid
 		);
-
-		
 		
 		var strumDiff = (Conductor.songPosition - hold.strumTime);
 		var visualDiff = (Conductor.visualPosition - hold.visualTime); // TODO: get the start and end visualDiff and interpolate so that changing speeds mid-hold will look better
@@ -383,7 +381,7 @@ class NoteField extends FieldBase
 		var lookAheadTime = modManager.getValue("lookAheadTime", modNumber);
 		var useSpiralHolds = modManager.getValue("spiralHolds", modNumber) != 0;
 		if (subDivs != prevSubDivs) {
-			trace('subdivisions changed, recalculating progress');
+			trace('subdivisions changed, recalculating sustain progress');
 			progs = CoolMath.interpolateMass(0, 1, subDivs);
 			
 		}
@@ -399,6 +397,12 @@ class NoteField extends FieldBase
 		}
 		
 		prevSubDivs = subDivs;
+
+		var alphaMult = hold.baseAlpha;
+
+		if (hold.parent.wasGoodHit && hold.holdGlow)
+			alphaMult = FlxMath.lerp(0.3, 1, hold.parent.tripProgress);
+
 		var speed:Float = modManager.getNoteSpeed(hold, modNumber, songSpeed);
 
 		for (sub in 0...subDivs)
@@ -420,11 +424,6 @@ class NoteField extends FieldBase
 
 			var topWidth = scalePoint.x * FlxMath.lerp(tWid, bWid, prog);
 			var botWidth = scalePoint.x * FlxMath.lerp(tWid, bWid, nextProg);
-
-			var alphaMult = hold.baseAlpha;
-
-			if (hold.parent.wasGoodHit && hold.holdGlow)
-				alphaMult = FlxMath.lerp(0.3, 1, hold.parent.tripProgress);
 			
 			info.alpha *= FlxMath.lerp(alphaMult, 1, info.glow);
 
