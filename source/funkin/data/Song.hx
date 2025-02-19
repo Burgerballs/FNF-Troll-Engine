@@ -357,7 +357,26 @@ class Song
 		while (!rawJson.endsWith("}"))
 			rawJson = rawJson.substr(0, rawJson.length - 1);
 
-		var songJson:JsonSong = cast Json.parse(rawJson).song;
+		var uncastedJson:Dynamic = Json.parse(rawJson);
+		var songJson:JsonSong;
+		if (uncastedJson.song is String){
+			// PSYCH 1.0 FUCKING DUMBSHIT FIX IT RETARD
+			// why did shadowmario make such a useless format change oh my god :sob:
+			
+			songJson = cast uncastedJson;
+			var stepCrotchet = Conductor.calculateStepCrochet(songJson.bpm);
+
+			for (section in songJson.notes){
+				for (note in section.sectionNotes){
+					note[1] = section.mustHitSection ? note[1] : (note[1] + 4) % 8;
+					note[2] -= stepCrotchet;
+					note[2] = note[2] > 0 ? note[2] : 0;
+				}
+			}
+
+		}else
+			songJson = cast uncastedJson.song;
+
 		songJson.path = fullPath;
 
 		return isSongJson ? onLoadJson(songJson) : onLoadEvents(songJson);
@@ -536,13 +555,17 @@ class Song
 		if (resultArray==null) resultArray = [];
 		
 		var eventsData:Array<Array<Dynamic>> = [];
+		
 		for (event in rawEventsData) {
-			var last = eventsData[eventsData.length-1];
+			// TODO: Probably just add a button in the chart editor to consolidate events, instead of automatically doing it
+			// As automatically doing this breaks some charts vv
+
+/* 			var last = eventsData[eventsData.length-1];
 			
 			if (last != null && Math.abs(last[0] - event[0]) <= Conductor.jackLimit){
 				var fuck:Array<Array<Dynamic>> = event[1];
 				for (shit in fuck) eventsData[eventsData.length - 1][1].push(shit);
-			}else
+			}else */
 				eventsData.push(event);
 		}
 
