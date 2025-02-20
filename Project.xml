@@ -107,9 +107,9 @@
 
 	<haxelib name="funkin.vis" />
 	<haxelib name="grig.audio" />
-    <haxelib name="flixel" version="5.6.2" />
-    <haxelib name="flixel-ui" version="2.6.1" />
-    <haxelib name="flixel-addons" version="3.2.3" />
+    <haxelib name="flixel" />
+	<haxelib name="flixel-addons" />
+	<haxelib name="flixel-ui" />
 
 	<section if="USING_FLXANIMATE">
 		<haxelib name="flxanimate" version="3.0.4"/>

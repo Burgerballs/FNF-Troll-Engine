@@ -31,7 +31,7 @@ import openfl.Lib;
 class FPS extends TextField
 {
 	/**Allows the FPS counter to lie about your framerate because Lime sucks and framerates goes above whats desired**/
-	public var canLie:Bool = true;
+	public var canLie:Bool = false;
 	/** The current frame rate, expressed using frames-per-second **/
 	public var currentFPS(default, null):Float = 0.0;
 	/** The current state class name **/
