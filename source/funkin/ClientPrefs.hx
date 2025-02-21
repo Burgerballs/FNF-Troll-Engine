@@ -107,7 +107,7 @@ class ClientPrefs
 					"requiresRestart" => true,
 					"options" => [
 						"Psych", 
-						"V-Slice",
+						"V-Slice", 
 						#if USE_EPIC_JUDGEMENT "PBot", #end
 						"Week 7", 
 						"Standard", 
