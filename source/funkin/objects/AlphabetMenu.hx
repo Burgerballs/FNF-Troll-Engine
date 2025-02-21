@@ -19,6 +19,8 @@ typedef MenuCallbacks = {
 
 class AlphabetMenu extends FlxTypedGroup<Alphabet>
 {
+	// The width limit for an alphabet object.
+	public var sizeLimit:Float = 716;
 	public var curSelected(default, set):Null<Int> = null;
 	public var curItem:Null<Alphabet> = null;
 	public var controls:Null<Controls>;
@@ -88,6 +90,11 @@ class AlphabetMenu extends FlxTypedGroup<Alphabet>
 		updateItemPos(item, index);
 		item.ID = index;
 		add(item);
+
+		if (item.width > sizeLimit) {
+			item.textSize = sizeLimit / item.width;
+			item.set_text(text);
+		}
 
 		itemCallbacks.set(item, callbacks);
 

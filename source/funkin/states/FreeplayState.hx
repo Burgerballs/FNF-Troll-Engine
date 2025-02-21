@@ -1,5 +1,9 @@
 package funkin.states;
 
+import flixel.util.FlxColor;
+import flixel.input.keyboard.FlxKey;
+import flixel.input.keyboard.FlxKeyList;
+import flixel.input.keyboard.FlxKeyboard;
 import funkin.data.DiffCalc;
 import funkin.data.Highscore;
 import flixel.math.FlxMath;
@@ -15,6 +19,25 @@ using StringTools;
 using funkin.CoolerStringTools;
 class FreeplayState extends MusicBeatState
 {
+	public static var difficultyColors:Array<Dynamic> = [
+		['easy', [0xFF00FF22, 0xFF000000]],
+		['normal', [0xFFFFFF00, 0xFF000000]],
+		['hard', [0xFFFF0000, 0xFFFFFFFF]],
+		['lunatic', [0xFF8800FF, 0xFFFFFFFF]]
+	];
+	
+	public static var defaultDiffColor = [0xFFFFFFFF, 0xFF000000];
+
+	public var curDiffColor(get, null):Array<FlxColor>;
+	function get_curDiffColor():Array<FlxColor> {
+		var ret:Array<FlxColor> = defaultDiffColor;
+		for (diffs in difficultyColors) {
+			if (curDiffStr == diffs[0])
+				ret = diffs[1];
+		}
+		return ret;
+	}
+
 	public static var comingFromPlayState:Bool = false;
 
 	var msd:Float = 0;
@@ -22,7 +45,9 @@ class FreeplayState extends MusicBeatState
 	var songMeta:Array<Song> = [];
 
 	var bgGrp = new FlxTypedGroup<FlxSprite>();
+	var diffGrp = new FlxTypedGroup<FlxText>();
 	var bg:FlxSprite;
+	var coverSprite:FlxSprite;
 
 	var targetHighscore:Float = 0.0;
 	var lerpHighscore:Float = 0.0;
@@ -33,7 +58,10 @@ class FreeplayState extends MusicBeatState
 	var scoreBG:FlxSprite;
 	var scoreText:FlxText;
 	var msdText:FlxText;
+	var bpmText:FlxText;
 	var diffText:FlxText;
+	
+	var selectedDiffBG:FlxSprite;
 
 	static var lastSelected:Int = 0;
 	static var curDiffStr:String = "normal";
@@ -42,6 +70,8 @@ class FreeplayState extends MusicBeatState
 	var selectedSongData:Song;
 	var selectedSongCharts:Array<String>;
 	
+	var tLength = (386 + 2) / 3;
+
 	var hintText:FlxText;
 	
 	override public function create()
@@ -80,37 +110,54 @@ class FreeplayState extends MusicBeatState
 		menu.callbacks.onSelect = (selectedIdx, _) -> onSelectSong(songMeta[selectedIdx]);
 		menu.callbacks.onAccept = (_, _) -> onAccept();
 
-		////
-		var hintBG = CoolUtil.blankSprite(FlxG.width, 26, 0xFF999999);
-		hintBG.y = FlxG.height - 26;
-		hintBG.blend = MULTIPLY;
-		add(hintBG);
 
-		hintText = new FlxText(hintBG.x, hintBG.y + 4, FlxG.width, Paths.getString("freeplayhint"));
-		hintText.setFormat(Paths.font("vcr.ttf"), 16, 0xFFFFFFFF, RIGHT);
-		hintText.scrollFactor.set();
-		add(hintText);
+		var keyHintGameplayChangers = new KeyHint(14, FlxG.height - 36, 'Gameplay Changers', [FlxKey.CONTROL #if mac , FlxKey.WINDOWS #end], controls);
+		keyHintGameplayChangers.scrollFactor.set();
+		add(keyHintGameplayChangers);
+
+		var keyHintDown = new KeyHint(14, FlxG.height - 72, 'Reset Score', [FlxKey.R], controls);
+		add(keyHintDown);
+		keyHintDown.scrollFactor.set();
 
 		////
-		scoreText = new FlxText(FlxG.width * 0.7, 5, 0, 'PERSONAL BEST: 0', 32);
+		scoreText = new FlxText(0, 5, 0, 'PERSONAL BEST: 0', 32);
 		scoreText.setFormat(Paths.font("vcr.ttf"), 32, 0xFFFFFFFF, RIGHT);
 
-		scoreBG = CoolUtil.blankSprite(FlxG.width * 0.3, 92, 0xFF999999);
-		scoreBG.setPosition(scoreText.x - 6, 0);
+		scoreBG = CoolUtil.blankSprite(386, 720, 0xFF999999);
+		scoreBG.setPosition(FlxG.width - 386, 0);
 		scoreBG.blend = MULTIPLY;
 		add(scoreBG);
 
-		diffText = new FlxText(scoreText.x, scoreText.y + 36, 100, "", 24);
-		diffText.alignment = CENTER;
-		diffText.font = scoreText.font;
-		add(diffText);
+		// diffText = new FlxText(scoreText.x, scoreText.y + 36, 100, "", 24);
+		// diffText.alignment = CENTER;
+		// diffText.font = scoreText.font;
+		// add(diffText);
 
-		msdText = new FlxText(diffText.x, diffText.y + 24, 100, "Rating: 10.0pts", 24);
+		selectedDiffBG = new FlxSprite(0,0).makeGraphic(1,1,0xFFFFFFFF);
+		add(selectedDiffBG);
+
+		add(diffGrp);
+		generateDiffGroup(['easy', 'normal', 'hard']);
+
+		msdText = new FlxText(scoreText.x, scoreText.y + 60, 100, "Rating: 10.0pts", 24);
 		msdText.alignment = LEFT;
 		msdText.font = scoreText.font;
 		add(msdText);
 
 		add(scoreText);
+
+		coverSprite = new FlxSprite(0,0);
+		add(coverSprite);
+
+		coverSprite.x = scoreBG.x;
+		coverSprite.y = 96;
+
+		coverSprite.visible = false;
+
+		bpmText = new FlxText(scoreBG.x + 2, coverSprite.y + 62, 386, "BPM: 120", 32);
+		bpmText.alignment = LEFT;
+		bpmText.font = scoreText.font;
+		add(bpmText);
 
 		////
 		menu.curSelected = lastSelected;
@@ -122,8 +169,41 @@ class FreeplayState extends MusicBeatState
 
 	function reloadFont(){
 		scoreText.font = Paths.font("vcr.ttf");
-		hintText.font = scoreText.font;
-		diffText.font = scoreText.font;
+	}
+
+	function generateDiffGroup(diffList:Array<String>) {
+		diffGrp.clear();
+		tLength = (scoreBG.width - 2) / diffList.length;
+		var xOffset = scoreBG.x + 2;
+		var yOffset = scoreText.y + 36;
+		for (idx in 0...diffList.length)
+		{
+			var tabName = diffList[idx];
+
+			var strKey = 'opt_tabName_$tabName';
+			var text = new FlxText(0, 0, 0, Paths.getString(strKey, tabName).toUpperCase(), 24);
+			text.alignment = CENTER;
+			text.font = scoreText.font;
+
+			var button = new FlxSprite(xOffset, yOffset).makeGraphic(1,1,difficultyColors[idx]);
+			button.ID = idx;
+			button.alpha = 1;
+			
+			button.scale.set(tLength - 2, 24);
+			button.updateHitbox();
+
+			text.setPosition(
+				button.x,
+				button.y + ((button.height - text.height) / 2)
+			);
+			text.fieldWidth = button.width;
+			text.updateHitbox();
+
+			xOffset = button.x + button.width + 2;
+			diffGrp.add(text);
+
+		}
+
 	}
 
 	var songLoaded:String = null;
@@ -227,7 +307,7 @@ class FreeplayState extends MusicBeatState
 			));
 			this.subStateClosed.addOnce((_) -> refreshScore());
 			
-		}else if (FlxG.keys.justPressed.CONTROL){
+		}else if (FlxG.keys.justPressed.CONTROL #if mac || FlxG.keys.justPressed.WINDOWS #end){
 			openSubState(new GameplayChangersSubstate());
 			this.subStateClosed.addOnce((_) -> refreshScore());
 		}
@@ -240,16 +320,30 @@ class FreeplayState extends MusicBeatState
 		selectedSongData = data;
 		selectedSongCharts = data.charts;
 		Paths.currentModDirectory = data.folder;
+		trace(data.songCover);
+		if (data.songCover != null) {
+			coverSprite.loadGraphic(data.songCover);
+			coverSprite.scale.x = 386 / coverSprite.frameWidth;
+			coverSprite.scale.y = 60 / coverSprite.frameHeight;
+			coverSprite.updateHitbox();
+			coverSprite.visible = true;
+			coverSprite.antialiasing = false;
+		}	
+		else {
+			coverSprite.visible = false;
+		}
 
 		changeDifficulty(CoolUtil.updateDifficultyIndex(curDiffIdx, curDiffStr, selectedSongCharts), true);
 
 		msd = updateMSD();
+		bpmText.text = 'BPM: ${selectedSongData.bpm}';
 
 		var modBgGraphic = Paths.image('menuBGBlue');
 		reloadFont();
 		if (bg == null || modBgGraphic != bg.graphic)
 			fadeToBg(modBgGraphic);
 	}
+
 
 	function refreshScore()
 	{
@@ -296,16 +390,36 @@ class FreeplayState extends MusicBeatState
 
 		switch (charts.length){
 			case 0:
-				diffText.text = "NO CHARTS AVAILABLE"; // fuck it
+				generateDiffGroup(['NO CHARTS AVAILABLE']);
+				curDiffStr = 'NONE';
+				//diffText.text = "NO CHARTS AVAILABLE";
 
 			case 1:
+				generateDiffGroup(charts);
 				curDiffStr = charts[0];
-				diffText.text = curDiffStr.toUpperCase();
+				curDiffIdx = 0;
 
 			default:
+				generateDiffGroup(charts);
+				selectedDiffBG.color = curDiffColor[0];
 				curDiffIdx = isAbs ? val : FlxMath.wrap(curDiffIdx + val, 0, charts.length - 1);
 				curDiffStr = charts[curDiffIdx];
-				diffText.text = "< " + curDiffStr.toUpperCase() + " >";
+		}
+
+		selectedDiffBG.x = diffGrp.members[curDiffIdx].x;
+		selectedDiffBG.y = diffGrp.members[curDiffIdx].y;
+		selectedDiffBG.scale.x = diffGrp.members[curDiffIdx].width;
+		selectedDiffBG.scale.y = diffGrp.members[curDiffIdx].height;
+		selectedDiffBG.color = curDiffColor[0];
+		selectedDiffBG.updateHitbox();
+
+		for (i in 0...diffGrp.members.length) {
+			if (i == curDiffIdx) {
+				diffGrp.members[i].color = curDiffColor[1];
+				continue;
+			}
+			diffGrp.members[i].color = 0xFFFFFFFF;
+
 		}
 
 		selectedSong = '$selectedSongData-$curDiffStr';
@@ -343,16 +457,12 @@ class FreeplayState extends MusicBeatState
 	}
 
 	private function positionHighscore() {
-		var bgWidth = scoreText.width + 6;
+		var bgWidth = 386;
 
-		scoreBG.x = FlxG.width - bgWidth; 
-		scoreBG.scale.x = bgWidth;
-		scoreBG.updateHitbox();
-
-		diffText.x = scoreText.x = scoreBG.x + 3;
+		scoreText.x = scoreBG.x;
+		scoreText.scale.x = scoreBG.width / scoreText.frameWidth;
+		scoreText.updateHitbox();
 		msdText.x = scoreText.x = scoreBG.x + 3;
-
-		diffText.fieldWidth = bgWidth;
 		msdText.fieldWidth = bgWidth;
 	}
 

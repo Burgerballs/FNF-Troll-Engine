@@ -1702,15 +1702,22 @@ class PlayState extends MusicBeatState
 		Conductor.pitch = this.playbackRate;
 		Conductor.useAccPosition = ClientPrefs.songSyncMode=="System Time";
 
-		////
+
 		songSpeedType = ClientPrefs.getGameplaySetting('scrolltype', songSpeedType);
 
 		switch(songSpeedType)
 		{
 			case "multiplicative":
-				songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1);
+				songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) / playbackRate;
 			case "constant":
-				songSpeed = ClientPrefs.getGameplaySetting('scrollspeed', SONG.speed);
+				songSpeed = ClientPrefs.getGameplaySetting('scrollspeed', SONG.speed) / playbackRate;
+			case "BPM":
+				songSpeed = (SONG.bpm / 100) * ClientPrefs.getGameplaySetting('scrollspeed', SONG.speed) / playbackRate / 0.45;
+			case "BPM Maximum":
+				songSpeed = FlxMath.bound((SONG.bpm / 100), 0, ClientPrefs.getGameplaySetting('scrollspeed', SONG.speed)) / playbackRate / 0.45;
+		}
+		if (songSpeed < 1 / playbackRate) {
+			songSpeed = 1;
 		}
 
 		////
@@ -2980,7 +2987,7 @@ class PlayState extends MusicBeatState
 				if (charType != -1) changeCharacter(value2, charType);
 
 			case 'Change Scroll Speed':
-				if (songSpeedType == "constant")
+				if (songSpeedType == "constant" || songSpeedType == "BPM" || songSpeedType == "BPM Maximum")
 					return;
 
 				var val1:Float = Std.parseFloat(value1);

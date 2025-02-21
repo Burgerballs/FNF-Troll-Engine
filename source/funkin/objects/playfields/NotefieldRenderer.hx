@@ -69,6 +69,7 @@ class NotefieldRenderer extends FlxBasic {
 
 			var queue:Array<RenderObject> = field.drawQueue;
 			for (object in queue){
+				object.shader.precisionHint = FAST;
 				finalDrawQueue.push({
 					graphic: object.graphic,
 					shader: object.shader,

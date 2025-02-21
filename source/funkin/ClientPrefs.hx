@@ -106,7 +106,7 @@ class ClientPrefs
 				data: [
 					"requiresRestart" => true,
 					"options" => [
-						"Psych", 
+						"Traditional", 
 						"V-Slice", 
 						#if USE_EPIC_JUDGEMENT "PBot", #end
 						"Week 7", 
@@ -539,7 +539,7 @@ class ClientPrefs
 				value: "Default",
 				data: [
 					"recommendsRestart" => true,
-					"options" => ["Default", "Psych", "Advanced", "Kade", "Classic"]
+					"options" => ["Default", "Traditional", "Advanced", "Kade", "Classic"]
 				]
 			},
 

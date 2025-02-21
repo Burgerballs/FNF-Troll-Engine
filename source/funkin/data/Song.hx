@@ -1,5 +1,6 @@
 package funkin.data;
 
+import flixel.graphics.FlxGraphic;
 #if USING_MOONCHART
 import funkin.data.FNFTroll as SupportedFormat;
 import moonchart.formats.BasicFormat;
@@ -88,6 +89,27 @@ class Song
 	public var songName:String = '';
 	public var folder:String = '';
 	public var difficulties:Array<String> = [];
+	public var songCover(get, null):Null<FlxGraphic>;
+
+	function get_songCover() {
+		var ret = Paths.image('covers/${Paths.formatToSongPath(songName)}');
+
+		if (ret == null) {
+			ret = Paths.image('covers/placeholder');
+		}
+		return ret;
+	}
+
+	public var bpm(get, null):Float;
+
+	function get_bpm() {
+		var song = Song.loadSong(this);
+		if (song != null) {
+			return song.bpm;
+		}
+		return 0;
+	}
+
 	public var charts(get, null):Array<String>;
 	function get_charts()
 		return (charts == null) ? charts = Song.getCharts(this) : charts;

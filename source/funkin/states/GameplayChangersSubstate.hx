@@ -30,11 +30,11 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		var scrollType:String = stypeoption.getValue();
 		
 		switch(scrollType) {
-			case "constant":
+			case "constant" | "BPM Maximum":
 				speedoption.displayFormat = "%v";
 				speedoption.maxValue = 6;
 
-			case "multiplicative":
+			case "multiplicative" | "BPM":
 				speedoption.displayFormat = "%vX";
 				speedoption.maxValue = 3;
 			
@@ -51,7 +51,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 	public function new() {
 		super();
 		
-		stypeoption = new StringGameplayOption('Scroll Type', 'scrolltype', ["multiplicative", "constant"], 'multiplicative');
+		stypeoption = new StringGameplayOption('Scroll Type', 'scrolltype', ["multiplicative", "constant", "BPM", "BPM Maximum"], 'multiplicative');
 		stypeoption.onChange = onChangeScrollType;
 		optionsArray.push(stypeoption);
 
