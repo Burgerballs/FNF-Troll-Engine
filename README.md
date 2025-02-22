@@ -15,22 +15,26 @@ Some questions might be asked about this fork in particular. So I might answer t
 
 Q: Why not just use base Troll?
 A:
-    Some features which I wish to be in base Troll simply isn't there because it doesn't fit the needs of the project, this fork specifically fits my own needs for my own projects.
+
+Some features which I wish to be in base Troll simply isn't there because it doesn't fit the needs of the project, this fork specifically fits my own needs for my own projects.
 
 Q: What about your V-Slice mods?
-A:
-    Big ones like song mods are currently being ported to this Troll fork right now, consider all the QOL mods obselete and no longer in active development.
 
-    V-Slice is not a reliable modding platform.
+A:
+
+Big ones like song mods are currently being ported to this Troll fork right now, consider all the QOL mods obselete and no longer in active development.
+
+V-Slice is not a reliable modding platform.
 
 Q: Why not use Psych, or other forks like "P-Slice", or NightmareVision?
+
 A: 
-    
-    Psych is dead, I do not want to use Psych Engine 1.0. "P-Slice" is just Psych with the menus swapped and that means nothing to me. 
 
-    I will not use NightmareVision as all of it's code is taken from an older and inferior version of what Troll Engine has. (see: Vs. EXE 2.5 Fork)
+Psych is dead, I do not want to use Psych Engine 1.0. "P-Slice" is just Psych with the menus swapped and that means nothing to me. 
 
-    NightmareVision only garners popularity because of Hit Single and other popular mods programmed by the engine's "authors" and is completely unremarkable on it's own (like a modern "Forever Engine"). I'm tired of non-programmers recommending it as it's toolset is all but outdated Andromeda Engine code forked over without permission or tangeble credit to an older version of Psych Engine.
+I will not use NightmareVision as all of it's code is taken from an older and inferior version of what Troll Engine has. (see: Vs. EXE 2.5 Fork)
+
+NightmareVision only garners popularity because of Hit Single and other popular mods programmed by the engine's "authors" and is completely unremarkable on it's own (like a modern "Forever Engine"). I'm tired of non-programmers recommending it as it's toolset is all but outdated Andromeda Engine code forked over without permission or tangeble credit to an older version of Psych Engine.
 
 # Added features
 
