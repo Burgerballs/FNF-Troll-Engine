@@ -406,13 +406,6 @@ class FreeplayState extends MusicBeatState
 				curDiffStr = charts[curDiffIdx];
 		}
 
-		selectedDiffBG.x = diffGrp.members[curDiffIdx].x;
-		selectedDiffBG.y = diffGrp.members[curDiffIdx].y;
-		selectedDiffBG.scale.x = diffGrp.members[curDiffIdx].width;
-		selectedDiffBG.scale.y = diffGrp.members[curDiffIdx].height;
-		selectedDiffBG.color = curDiffColor[0];
-		selectedDiffBG.updateHitbox();
-
 		for (i in 0...diffGrp.members.length) {
 			if (i == curDiffIdx) {
 				diffGrp.members[i].color = curDiffColor[1];
@@ -426,8 +419,12 @@ class FreeplayState extends MusicBeatState
 		refreshScore();
 	}
 
+	var sinus:Float = 0;
+
 	override function draw()
 	{
+		var elapsed = FlxG.elapsed;
+		sinus += elapsed;
 		lerpHighscore = CoolUtil.coolLerp(lerpHighscore, targetHighscore, FlxG.elapsed * 12);
 		lerpRating = CoolUtil.coolLerp(lerpRating, targetRating, FlxG.elapsed * 8);
 
@@ -438,8 +435,18 @@ class FreeplayState extends MusicBeatState
 		positionHighscore();
 		msdText.text = 'Rating: ' + '${msd}pts';
 
+		selectedDiffBG.x = CoolUtil.coolLerp(selectedDiffBG.x, diffGrp.members[curDiffIdx].x, elapsed*21);
+		selectedDiffBG.y = diffGrp.members[curDiffIdx].y;
+		selectedDiffBG.scale.x = CoolUtil.coolLerp(selectedDiffBG.scale.x, diffGrp.members[curDiffIdx].width, elapsed*21);
+		selectedDiffBG.scale.y = diffGrp.members[curDiffIdx].height;
+		selectedDiffBG.color =  FlxColor.interpolate(selectedDiffBG.color, curDiffColor[0], elapsed*21);
+		
+
+		selectedDiffBG.updateHitbox();
+
 		super.draw();
 	}
+
 
 	private static function formatRating(val:Float):String
 	{
