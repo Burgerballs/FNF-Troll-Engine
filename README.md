@@ -35,7 +35,7 @@ Psych is dead, I do not want to use Psych Engine 1.0. "P-Slice" is just Psych wi
 
 I will not use NightmareVision as all of it's code is taken from an older and inferior version of what Troll Engine has. (see: Vs. EXE 2.5 Fork)
 
-NightmareVision only garners popularity because of Hit Single and other popular mods programmed by the engine's "authors" and is completely unremarkable on it's own (like a modern "Forever Engine"). I'm tired of non-programmers recommending it as it's toolset is all but outdated Andromeda Engine code forked over without permission or tangeble credit to an older version of Psych Engine.
+NightmareVision only garners popularity because of Hit Single and other popular mods programmed by the engine's "authors" and is completely unremarkable on it's own (like a modern "Forever Engine"). I'm tired of non-programmers recommending it, all of it's features are all but outdated Andromeda Engine code taken without permission or tangeble credit patched onto a 3 year old version of Psych Engine. Even if this wasn't the case, I wouldn't use it because I do not support the EXE community and wish to see it wiped off the face of the earth
 
 # Added features
 
