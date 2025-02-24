@@ -81,6 +81,8 @@ typedef SongMetadata =
 	?charter:String,
 	?modcharter:String,
 	?extraInfo:Array<String>,
+	?hasModchart:Bool,
+	?hasSV:Bool
 }
 
 class Song
@@ -110,7 +112,7 @@ class Song
 	}
 
 	public var songPath(get, default):String;
-	public var charts(get, set):Array<String>;
+	public var charts(get, null):Array<String>;
 	private var metadataCache = new Map<String, SongMetadata>();
 
 	#if PE_MOD_COMPATIBILITY
@@ -281,6 +283,19 @@ class Song
 
 	////
 
+	public static function getFeatureList(metadata:SongMetadata):Array<String> {
+		var ret:Array<String> = [];
+		if (metadata != null) {
+			if (metadata.hasModchart != null && metadata.hasModchart == true) {
+				ret.push('Modchart');
+			}
+			if (metadata.hasSV != null && metadata.hasSV == true) {
+				ret.push('SV');
+			}
+		}
+
+		return ret;
+	}
 	public static function getMetadataInfo(metadata:SongMetadata):Array<String> {
 		var info:Array<String> = [];
 		
@@ -708,6 +723,9 @@ class Song
 
 		return swagJson;
 	}
+	
+	function get_charts() 
+		return charts ?? (charts = Song.getCharts(this));
 
 	public static function getEventNotes(rawEventsData:Array<Array<Dynamic>>, ?resultArray:Array<EventNote>):Array<EventNote>
 	{

@@ -1,5 +1,6 @@
 package funkin.states;
 
+import flixel.util.FlxGradient;
 import flixel.util.FlxColor;
 import flixel.input.keyboard.FlxKey;
 import flixel.input.keyboard.FlxKeyList;
@@ -56,10 +57,13 @@ class FreeplayState extends MusicBeatState
 	var lerpRating:Float = 0.0;
 
 	var scoreBG:FlxSprite;
+	var featuresBG:FlxSprite;
 	var scoreText:FlxText;
 	var msdText:FlxText;
 	var bpmText:FlxText;
+	var metaText:FlxText;
 	var diffText:FlxText;
+	var features:FlxText;
 	
 	var selectedDiffBG:FlxSprite;
 
@@ -159,6 +163,20 @@ class FreeplayState extends MusicBeatState
 		bpmText.alignment = LEFT;
 		bpmText.font = scoreText.font;
 		add(bpmText);
+
+		metaText = new FlxText(scoreBG.x + 2, bpmText.y + 32, 386, "BPM: 120", 24);
+		metaText.alignment = LEFT;
+		metaText.font = scoreText.font;
+		add(metaText);
+
+		featuresBG = FlxGradient.createGradientFlxSprite(386, 96, [0xFF000000, 0x00000000], 1, 270);
+		featuresBG.setPosition(FlxG.width - 386, FlxG.height - 96);
+		add(featuresBG);
+
+		features = new FlxText(scoreBG.x + 2, FlxG.height - 24, 386, "Features: SV, Modcharts", 16);
+		features.alignment = LEFT;
+		features.font = scoreText.font;
+		add(features);
 
 		////
 		menu.curSelected = lastSelected;
@@ -261,7 +279,7 @@ class FreeplayState extends MusicBeatState
 
 	public function updateMSD():Float {
 		if (selectedSongCharts.length == 0) return 0;
-		var song = Song.loadSong(selectedSongData, curDiffStr, curDiffIdx);
+		var song = Song.loadSong(selectedSongData, curDiffStr);
 		if (song != null) {
 			return DiffCalc.CalculateDiff(song, .98) * 1000;
 		}
@@ -316,6 +334,8 @@ class FreeplayState extends MusicBeatState
 		super.update(elapsed);
 	}
 
+	var curMeta:SongMetadata = null;
+
 	function onSelectSong(data:Song)
 	{	
 		selectedSongData = data;
@@ -338,6 +358,7 @@ class FreeplayState extends MusicBeatState
 
 		msd = updateMSD();
 		bpmText.text = 'BPM: ${selectedSongData.bpm}';
+		curMeta = data.getMetadata();
 
 		var modBgGraphic = Paths.image('menuBGBlue');
 		reloadFont();
@@ -435,6 +456,9 @@ class FreeplayState extends MusicBeatState
 		scoreText.text = 'PERSONAL BEST: $score ($rating%)';
 		positionHighscore();
 		msdText.text = 'Rating: ' + '${msd}pts';
+		metaText.text = Song.getMetadataInfo(curMeta).join('\n');
+		var featuresS:String = Song.getFeatureList(curMeta).join(', ');
+		features.text = featuresS != '' ? ('Features: ' + featuresS) : '';
 
 		selectedDiffBG.x = CoolUtil.coolLerp(selectedDiffBG.x, diffGrp.members[curDiffIdx].x, elapsed*21);
 		selectedDiffBG.y = diffGrp.members[curDiffIdx].y;
