@@ -1948,7 +1948,7 @@ class PlayState extends MusicBeatState
 				prevNote = swagNote;
 				
 				inline function makeSustain(susNote:Int, susPart:SustainPart) {
-					var sustainNote:Note = new Note(daStrumTime + Conductor.stepCrochet * (susNote + 1), daColumn, prevNote, gottaHitNote, susPart, false, hudSkin);
+					var sustainNote:Note = new Note(daStrumTime + Conductor.stepCrochet * (susNote + 1), daColumn, prevNote, gottaHitNote, susPart, false, hudSkin, swagNote);
 					#if ALLOW_DEPRECATION
 					sustainNote.realColumn = daNoteData;
 					#end
@@ -1965,7 +1965,6 @@ class PlayState extends MusicBeatState
 
 					swagNote.tail.push(sustainNote);
 					swagNote.unhitTail.push(sustainNote);
-					sustainNote.parent = swagNote;
 					sustainNote.fieldIndex = swagNote.fieldIndex;
 					sustainNote.field = swagNote.field;
 

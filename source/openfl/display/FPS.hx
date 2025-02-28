@@ -1,5 +1,6 @@
 package openfl.display;
 
+import funkin.Paths;
 import flixel.util.FlxStringUtil;
 import openfl.text.Font;
 import flixel.FlxG;
@@ -81,15 +82,12 @@ class FPS extends TextField
 
 		var textFormat = new TextFormat(null, 12, color);
 
-		#if tgt
 		embedFonts = true;
-		textFormat.size = 14;
-		textFormat.font = "Calibri";
-		#else
-		embedFonts = false;
-		textFormat.font = "_sans";
-		#end
+		textFormat.font = Paths.font('helvetica.ttf');
 		defaultTextFormat = textFormat;
+		// Condense font to conserve horizontal space.
+		scaleX = 0.95;
+
 
 		currentFPS = 0;
 		selectable = false;

@@ -424,7 +424,7 @@ class Note extends NoteObject
 		return '(column: $column | noteType: $noteType | strumTime: $strumTime | visible: $visible)';
 	}
 
-	public function new(strumTime:Float, column:Int, ?prevNote:Note, gottaHitNote:Bool = false, susPart:SustainPart = TAP, ?inEditor:Bool = false, ?noteMod:String = 'default')
+	public function new(strumTime:Float, column:Int, ?prevNote:Note, gottaHitNote:Bool = false, susPart:SustainPart = TAP, ?inEditor:Bool = false, ?noteMod:String = 'default', ?parent:Note = null)
 	{
 		super();
 		this.objType = NOTE;
@@ -437,6 +437,7 @@ class Note extends NoteObject
 		this.isSustainNote = susPart != HEAD && susPart != TAP; // susPart > HEAD
 		this.isSustainEnd = susPart == END;
 		this.inEditor = inEditor;
+		this.parent = parent;
 
 		this.beat = Conductor.getBeat(strumTime);
 		this.hitsoundDisabled = isSustainNote;

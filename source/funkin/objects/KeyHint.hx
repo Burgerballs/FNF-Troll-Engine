@@ -39,10 +39,10 @@ class KeyHint extends FlxTypedSpriteGroup<FlxSprite> {
         border = new Cooler9Slice(0,0, Paths.image('optionsMenu/backdrop'), new Rectangle(22, 22, 89, 89));
         add(border);
 
-        keyText = new FlxText(2,2,0,InputFormatter.getKeyName(keys[curKey]), 16);
+        keyText = new FlxText(2,5,0,InputFormatter.getKeyName(keys[curKey]), 16);
         add(keyText);
         keyText.color = 0xFF000000;
-        keyText.setFormat(Paths.font('cherry.otf'), 16, 0xFFFFFFFF, LEFT);
+        keyText.setFormat(Paths.font('helvetica.ttf'), 16, 0xFFFFFFFF, LEFT);
 
         border.resize(keyText.width + 4, keyText.height + 4);
         
