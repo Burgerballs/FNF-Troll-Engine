@@ -12,3 +12,7 @@ haxelib --always --quiet install hxvlc 1.6.1
 haxelib --always --quiet install hxdiscord_rpc 1.1.1
 haxelib --always --quiet git linc_luajit https://github.com/riconuts/linc_luajit
 haxelib --always --quiet install moonchart 0.4.0
+@echo off
+echo ---------
+echo Finished!
+pause
