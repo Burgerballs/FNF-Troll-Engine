@@ -60,7 +60,7 @@ class Alphabet extends FlxTypedSpriteGroup<AlphaCharacter>
 		return newText;
 	}
 		
-	private function updateText()
+	public function updateText()
 	{
 		for (obj in this.members)
 			obj.kill();

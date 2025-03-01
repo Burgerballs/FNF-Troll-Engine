@@ -1,5 +1,6 @@
 package funkin.objects;
 
+import flixel.math.FlxMath;
 import funkin.input.Controls;
 import funkin.objects.Alphabet;
 import flixel.group.FlxGroup.FlxTypedGroup;
@@ -92,8 +93,8 @@ class AlphabetMenu extends FlxTypedGroup<Alphabet>
 		add(item);
 
 		if (item.width > sizeLimit) {
-			item.textSize = sizeLimit / item.width;
-			item.set_text(text);
+			item.scale.set(sizeLimit / item.width, FlxMath.lerp((sizeLimit / item.width), 1, 0.8));
+			item.updateText();
 		}
 
 		itemCallbacks.set(item, callbacks);
