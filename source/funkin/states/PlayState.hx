@@ -139,6 +139,7 @@ class PlayState extends MusicBeatState
 	public static var arrowSkin:String = 'NOTE_assets'; // dont check for this being null, playstate should not let these be null or an empty string
 	public static var splashSkin:String = 'noteSplashes'; // dont check for this being null, playstate should not let these be null or an empty string
 	public static var keyCount:Int = 4;
+	public var noteOffset:Float = 0; // To be modified if songs are offsync and what not
 
 	////
 	public var showDebugTraces:Bool = #if debug true #else Main.showDebugTraces #end;
@@ -514,6 +515,7 @@ class PlayState extends MusicBeatState
 		ratingStuff = Highscore.grades.get(ClientPrefs.gradeSet);
 		stats = new Stats(ClientPrefs.accuracyCalc, ratingStuff);
 		stats.useFlags = ClientPrefs.gradeSet == 'Etterna';
+		noteOffset = ClientPrefs.noteOffset;
 
 		judgeManager = new JudgmentManager();
 		judgeManager.judgeTimescale = Wife3.timeScale;
@@ -2311,7 +2313,7 @@ class PlayState extends MusicBeatState
 	#if DISCORD_ALLOWED
 	function updateSongDiscordPresence(?detailsText:String)
 	{
-		final timeLeft:Float = (songLength - Conductor.songPosition - ClientPrefs.noteOffset);
+		final timeLeft:Float = (songLength - Conductor.songPosition - noteOffset);
 		final detailsText:String = (detailsText!=null) ? detailsText : this.detailsText;
 
 		if (timeLeft > 0.0)
@@ -3090,10 +3092,10 @@ class PlayState extends MusicBeatState
 		}
 
 		////
-		if(ClientPrefs.noteOffset <= 0 || ignoreNoteOffset) {
+		if(noteOffset <= 0 || ignoreNoteOffset) {
 			finishCallback();
 		}else {
-			finishTimer = new FlxTimer().start(ClientPrefs.noteOffset / 1000, (_) -> finishCallback());
+			finishTimer = new FlxTimer().start(noteOffset / 1000, (_) -> finishCallback());
 		}
 	}
 
