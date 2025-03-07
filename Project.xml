@@ -106,9 +106,6 @@
     <icon path="art/icon16.png" size='16' />
 
 	<!-- _______________________________ Libraries ______________________________ -->
-
-	<haxelib name="funkin.vis" />
-	<haxelib name="grig.audio" />
     <haxelib name="flixel" />
 	<haxelib name="flixel-addons" />
 	<haxelib name="flixel-ui" />
