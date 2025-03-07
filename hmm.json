@@ -4,14 +4,14 @@
 			"name": "openfl",
 			"type": "git",
 			"dir": null,
-			"ref": "master",
+			"ref": "",
 			"url": "https://github.com/swordcubes-grave-of-shite/openfl"
 		},
 		{
 			"name": "lime",
 			"type": "git",
 			"dir": null,
-			"ref": "master",
+			"ref": "",
 			"url": "https://github.com/swordcubes-grave-of-shite/lime"
 		},
 		{
