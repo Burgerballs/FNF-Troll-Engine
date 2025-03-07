@@ -256,7 +256,7 @@ class Stats {
 	}
 
 	// credit to CrowPlexus for this neat piece of code
-	var calcWeight = 30;
+	var calcWeight = 40;
 	function SuperBBE2ComplexCalcMaxPoints(data:JudgmentData, time:Float):Float {
 		final tierLevel:Float = data.level ?? 5;
 		if (tierLevel >= 5) return -5.0;

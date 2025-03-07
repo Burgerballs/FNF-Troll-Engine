@@ -460,11 +460,13 @@ class FreeplayState extends MusicBeatState
 		var featuresS:String = Song.getFeatureList(curMeta).join(', ');
 		features.text = featuresS != '' ? ('Features: ' + featuresS) : '';
 
-		selectedDiffBG.x = CoolUtil.coolLerp(selectedDiffBG.x, diffGrp.members[curDiffIdx].x, elapsed*21);
-		selectedDiffBG.y = diffGrp.members[curDiffIdx].y;
-		selectedDiffBG.scale.x = CoolUtil.coolLerp(selectedDiffBG.scale.x, diffGrp.members[curDiffIdx].width, elapsed*21);
-		selectedDiffBG.scale.y = diffGrp.members[curDiffIdx].height;
-		selectedDiffBG.color =  FlxColor.interpolate(selectedDiffBG.color, curDiffColor[0], elapsed*21);
+		if (diffGrp.members[curDiffIdx] != null) {
+			selectedDiffBG.x = CoolUtil.coolLerp(selectedDiffBG.x, diffGrp.members[curDiffIdx].x, elapsed*21);
+			selectedDiffBG.y = diffGrp.members[curDiffIdx].y;
+			selectedDiffBG.scale.x = CoolUtil.coolLerp(selectedDiffBG.scale.x, diffGrp.members[curDiffIdx].width, elapsed*21);
+			selectedDiffBG.scale.y = diffGrp.members[curDiffIdx].height;
+			selectedDiffBG.color =  FlxColor.interpolate(selectedDiffBG.color, curDiffColor[0], elapsed*21);	
+		}
 		
 
 		selectedDiffBG.updateHitbox();

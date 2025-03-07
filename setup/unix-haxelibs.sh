@@ -1,6 +1,5 @@
 #!/bin/sh
 haxelib --always --quiet git hxcpp https://github.com/HaxeFoundation/hxcpp
-haxelib --always --quiet git funkin.vis https://github.com/FunkinCrew/funkVis
 haxelib --always --quiet git grig.audio https://gitlab.com/haxe-grig/grig.audio.git
 haxelib --always --quiet install flixel-ui 5.6.2
 haxelib --always --quiet git lime https://github.com/swordcubes-grave-of-shite/lime

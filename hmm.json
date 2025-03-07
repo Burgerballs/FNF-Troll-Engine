@@ -2,13 +2,17 @@
 	"dependencies": [
 		{
 			"name": "openfl",
-			"type": "haxelib",
-			"version": "9.2.2"
+			"type": "git",
+			"dir": null,
+			"ref": "master",
+			"url": "https://github.com/swordcubes-grave-of-shite/openfl"
 		},
 		{
 			"name": "lime",
-			"type": "haxelib",
-			"version": "8.1.2"
+			"type": "git",
+			"dir": null,
+			"ref": "master",
+			"url": "https://github.com/swordcubes-grave-of-shite/lime"
 		},
 		{
 			"name": "flixel",

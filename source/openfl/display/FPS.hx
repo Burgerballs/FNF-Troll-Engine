@@ -1,5 +1,6 @@
 package openfl.display;
 
+import funkin.ClientPrefs;
 import funkin.Paths;
 import flixel.util.FlxStringUtil;
 import openfl.text.Font;
@@ -143,13 +144,13 @@ class FPS extends TextField
 	private #if !flash override #end function __enterFrame(deltaTime:Float):Void
 	{
 		currentTime += deltaTime;
+		alpha = ClientPrefs.fpsOpacity;
 		times.push(currentTime);
 
 		while (times[0] < currentTime - 1000)
 		{
 			times.shift();
 		}
-
 		var currentCount = times.length;
 		currentFPS = Math.ffloor((currentCount + cacheCount) * 0.5);
 		if (currentFPS > FlxG.drawFramerate && canLie)
