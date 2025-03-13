@@ -134,6 +134,7 @@ class Main extends Sprite
 		bread = new Bread();
 		bread.visible = false;
 		addChild(bread);
+		#end
 	}
 
 	public static function getTime():Float {

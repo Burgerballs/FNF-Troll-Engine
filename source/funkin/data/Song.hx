@@ -82,7 +82,8 @@ typedef SongMetadata =
 	?modcharter:String,
 	?extraInfo:Array<String>,
 	?hasModchart:Bool,
-	?hasSV:Bool
+	?hasSV:Bool,
+	?otherFeatures:Array<String>
 }
 
 class Song
@@ -291,6 +292,9 @@ class Song
 			}
 			if (metadata.hasSV != null && metadata.hasSV == true) {
 				ret.push('SV');
+			}
+			if (metadata.otherFeatures != null) {
+				ret = ret.concat(metadata.otherFeatures);
 			}
 		}
 
