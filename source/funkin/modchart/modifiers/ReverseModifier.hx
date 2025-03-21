@@ -44,11 +44,7 @@ class ReverseModifier extends NoteModifier
 
 	private inline function getCenterValue(player:Int){
 		var centerPercent = getSubmodValue("centered", player);
-		#if FUNNY_ALLOWED
-		return (ClientPrefs.middleScroll) ? 1 - centerPercent : centerPercent;
-		#else
 		return centerPercent;
-		#end
 	}
 
 	override function getPos(visualDiff:Float, timeDiff:Float, beat:Float, pos:Vector3, data:Int, player:Int, obj:NoteObject, field:NoteField)

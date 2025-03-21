@@ -74,7 +74,8 @@ abstract class FunkinScript
 		#end
 		
 		set('downscroll', ClientPrefs.downScroll);
-		set('middlescroll', ClientPrefs.centerNotefield);
+		set('middlescroll', ClientPrefs.midScroll);
+		set('centerNotefield', ClientPrefs.midScroll);
 		set('framerate', ClientPrefs.framerate);
 		set('ghostTapping', ClientPrefs.ghostTapping);
 		set('hideHud', ClientPrefs.hudOpacity > 0.0);
