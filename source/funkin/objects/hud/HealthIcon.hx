@@ -56,6 +56,17 @@ class HealthIcon extends FlxSprite
 	// Can also be used by scripts to do stuff w/ health icons
 	// I.e adding transitions between animations
 	
+	public function getWithTransitionables() {
+		// transition
+		if (getAnimation(previousPercent) != getAnimation(relativePercent)) {
+			isTransitioning = true;
+			return getAnimation(previousPercent) + 'To' + getAnimation(relativePercent);
+		} else {
+			isTransitioning = false;
+			return getAnimation(relativePercent);
+		}
+	}
+
 	public function getAnimation(relativePercent:Float){
 		if (relativePercent <= losingPercent)
 			return 'losing';
@@ -66,13 +77,30 @@ class HealthIcon extends FlxSprite
 
 	}
 	
+	// ignore abrupt animation playing during a transition!
+	var isTransitioning = false;
 	public function updateState(relativePercent:Float){
-		animation.play(getAnimation(relativePercent), true);
+		if (canTransition)
+			animation.play(getWithTransitionables(), true);
+		else
+			animation.play(getAnimation(relativePercent), true);
 	}
+
+	public function onAnimFinished(name:String) {
+		var toSplit = name.split('To');
+		if (isTransitioning) {
+			isTransitioning = false;
+			animation.play(toSplit[1], true);
+		}
+	}
+
+
 
 	public function new(char:String = 'bf', isPlayer:Bool = false)
 	{
 		super();
+
+		animation.finishCallback = onAnimFinished;
 
 		this.isPlayer = isPlayer;
 
@@ -90,7 +118,6 @@ class HealthIcon extends FlxSprite
 	}
 
 	var hasWinning:Bool = false;
-	var animationLogic:Bool = false;
 	function changeIconGraphic(graphic:FlxGraphic)
 	{
 		hasWinning = graphic.width >= (graphic.height * 3);
@@ -142,32 +169,32 @@ class HealthIcon extends FlxSprite
 		animation.addByPrefix("idle", IDLE_PREFIX, 24);
 		animation.addByPrefix("losing", LOSING_PREFIX, 24);
 		addIfExists('winning', WINNING_PREFIX, 24, IDLE_PREFIX);
-		var t:Bool = addIfExists('idleToLose', IDLE_TO_LOSE_PREFIX, 24);
-		var tw:Bool = addIfExists('idleToWin', IDLE_TO_WIN_PREFIX, 24);
-		var tr:Bool = addIfExists('loseToIdle', LOSE_TO_IDLE_PREFIX, 24);
-		var twr:Bool = addIfExists('winToIdle', WIN_TO_IDLE_PREFIX, 24);
+		var t:Bool = addIfExists('idleTolosing', IDLE_TO_LOSE_PREFIX, 24);
+		var tw:Bool = addIfExists('idleTowinning', IDLE_TO_WIN_PREFIX, 24);
+		var tr:Bool = addIfExists('losingToidle', LOSE_TO_IDLE_PREFIX, 24);
+		var twr:Bool = addIfExists('winningToIdle', WIN_TO_IDLE_PREFIX, 24);
 
 		// This is spaghetti ignore
 		if (t == false && tr == true) {
-			var aFrames = animation.getByName('loseToIdle').frames;
+			var aFrames = animation.getByName('losingToidle').frames;
 			aFrames.reverse();
-			animation.addByIndices('idleToLose', IDLE_TO_LOSE_PREFIX, aFrames, '', 24);
+			animation.addByIndices('idleTolosing', IDLE_TO_LOSE_PREFIX, aFrames, '', 24);
 			t = true;
 		} else if (t == true && tr == false) {
-			var aFrames = animation.getByName('idleToLose').frames;
+			var aFrames = animation.getByName('idleTolosing').frames;
 			aFrames.reverse();
-			animation.addByIndices('loseToIdle', LOSE_TO_IDLE_PREFIX, aFrames, '', 24);
+			animation.addByIndices('losingToidle', LOSE_TO_IDLE_PREFIX, aFrames, '', 24);
 			tr = true;
 		}
 		if (tw == false && twr == true) {
-			var aFrames = animation.getByName('winToIdle').frames;
+			var aFrames = animation.getByName('winningToIdle').frames;
 			aFrames.reverse();
-			animation.addByIndices('idleToWin', WIN_TO_IDLE_PREFIX, aFrames, '', 24);
+			animation.addByIndices('idleTowinning', WIN_TO_IDLE_PREFIX, aFrames, '', 24);
 			tw = true;
 		} else if (tw == true && twr == false) {
-			var aFrames = animation.getByName('idleToWin').frames;
+			var aFrames = animation.getByName('idleTowinning').frames;
 			aFrames.reverse();
-			animation.addByIndices('winToIdle', IDLE_TO_WIN_PREFIX, aFrames, '', 24);
+			animation.addByIndices('winningToIdle', IDLE_TO_WIN_PREFIX, aFrames, '', 24);
 			twr = true;
 		}
 
