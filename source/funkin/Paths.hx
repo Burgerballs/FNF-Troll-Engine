@@ -309,7 +309,6 @@ class Paths
 		var it = 0;
 		for (i in paths) {
 			calls.push(func(paths[it]));
-			trace(calls);
 			it++;
 		}
 		calls = calls.filter((a) -> {return a != null;});
