@@ -80,7 +80,7 @@ class HealthIcon extends FlxSprite
 	// ignore abrupt animation playing during a transition!
 	var isTransitioning = false;
 	public function updateState(relativePercent:Float){
-		if (canTransition)
+		if (canTransition && !isTransitioning)
 			animation.play(getWithTransitionables(), true);
 		else
 			animation.play(getAnimation(relativePercent), true);
