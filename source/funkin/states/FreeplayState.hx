@@ -341,7 +341,6 @@ class FreeplayState extends MusicBeatState
 		selectedSongData = data;
 		selectedSongCharts = data.charts;
 		Paths.currentModDirectory = data.folder;
-		trace(data.songCover);
 		if (data.songCover != null) {
 			coverSprite.loadGraphic(data.songCover);
 			coverSprite.scale.x = 386 / coverSprite.frameWidth;

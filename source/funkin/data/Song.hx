@@ -726,7 +726,6 @@ class Song
 
 			////
 			swagJson.tracks = {inst: instTracks, player: playerTracks, opponent: opponentTracks};
-			trace(swagJson.tracks);
 		}
 
 		return swagJson;

@@ -26,7 +26,6 @@ class HScriptOverridenState extends HScriptedState
 		for (filePath in Paths.getFolders("states"))
 		{
 			for(ext in Paths.HSCRIPT_EXTENSIONS){
-				trace(fullName);
 				var fileName = 'override/$fullName.$ext';
 				var fullPath = filePath + fileName;
 				if (Paths.exists(fullPath))
