@@ -50,8 +50,6 @@ class DiffCalc
 			}
 		}
 
-		trace('calcuilafjwaf ' + cleanedNotes.length);
-
 		var handOne:Array<SmallNote> = [];
 		var handTwo:Array<SmallNote> = [];
 

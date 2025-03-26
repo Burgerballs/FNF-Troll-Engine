@@ -88,9 +88,12 @@ class HealthIcon extends FlxSprite
 		super.update(elapsed);
 	}
 
+	var hasWinning:Bool = false;
+	var animationLogic:Bool = false;
 	function changeIconGraphic(graphic:FlxGraphic)
 	{
-		loadGraphic(graphic, true, Math.floor(graphic.width * 0.5), Math.floor(graphic.height));
+		hasWinning = graphic.width >= (graphic.height * 3);
+		loadGraphic(graphic, true, Math.floor(graphic.width / (hasWinning ? 2 : 3)), Math.floor(graphic.height));
 		iconOffsets[0] = (width - 150) * 0.5;
 		iconOffsets[1] = (width - 150) * 0.5;
 		updateHitbox();
@@ -98,7 +101,7 @@ class HealthIcon extends FlxSprite
 
 		animation.add("idle", [0], 0, false, isPlayer);
 		animation.add("losing", [1], 0, false, isPlayer);
-		animation.add("winning", [0], 0, false, isPlayer);
+		animation.add("winning", [hasWinning ? 2 : 0], 0, false, isPlayer);
 
 		animation.play('idle');
 	}
@@ -122,22 +125,41 @@ class HealthIcon extends FlxSprite
 		isOldIcon = false;
 	}
 
+	// Apologies for the rather unorthadox way of naming these prefixes
+	// bub's fruit salad is one drug!
+	public static final IDLE_PREFIX = 'N';
+	public static final LOSING_PREFIX = 'L';
+	public static final WINNING_PREFIX = 'W';
+	public static final IDLE_TO_LOSE_PREFIX = 'T';
+	public static final IDLE_TO_WIN_PREFIX = 'TW';
+
+	public function setupSparrow(char:String){
+		var file:Null<FlxGraphic> = Paths.getWithFallbacks(Paths.getSparrowAtlas, ['icons/$char','icons/icon-$char']);
+		animation.addByPrefix("idle", IDLE_PREFIX, 24);
+		animation.addByPrefix("losing", LOSING_PREFIX, 24);
+		final animFrames:Array<FlxFrame> = new Array<FlxFrame>();
+		@:privateAccess
+		animation.findByPrefix(animFrames, WINNING_PREFIX);
+		if (animFrames.length > 0)
+			animation.addByPrefix("winning", WINNING_PREFIX, 24);
+		else
+			animation.addByPrefix("winning", IDLE_PREFIX, 24);
+	}
+
 	private var iconOffsets:Array<Float> = [0, 0];
 	public function changeIcon(char:String) {
-		var file:Null<FlxGraphic> = Paths.image('icons/$char'); 
+		if (Paths.getWithFallbacks(Paths.getText, ['images/icons/$char.xml','images/icons/icon-$char.xml']) != null) {
+			setupSparrow(char);
+		} else {
+			var file:Null<FlxGraphic> = Paths.getWithFallbacks(Paths.image, ['icons/$char','icons/icon-$char', 'icons/face']);
+			trace(file);
 
-		if(file == null)
-			file = Paths.image('icons/icon-$char'); // base game compat
-		
-		if(file == null) 
-			file = Paths.image('icons/face'); // Prevents crash from missing icon
-
-		if (file != null){
-			//// TODO: sparrow atlas icons? would make the implementation of extra behaviour (ex: winning icons) way easier
-			changeIconGraphic(file);
-			this.char = char;
+			if (file != null){
+				//// TODO: sparrow atlas icons? would make the implementation of extra behaviour (ex: winning icons) way easier
+				changeIconGraphic(file);
+				this.char = char;
+			}
 		}
-
 		if (char.endsWith("-pixel")){
 			antialiasing = false;
 			useDefaultAntialiasing = false;

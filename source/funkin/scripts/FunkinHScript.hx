@@ -189,6 +189,7 @@ class FunkinHScript extends FunkinScript
 		
 		set("script", this);
 		set("global", Globals.variables);
+		set("persistGlobal", Globals.persistentVariables);
 		set("FunkinHScript", FunkinHScript);
 
 		setDefaultVars();

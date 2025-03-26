@@ -304,6 +304,17 @@ class Paths
 		return Assets.exists(path, type);
 		#end
 	}
+	inline public static function getWithFallbacks(func:Dynamic, paths:Array<String>):Dynamic {
+		var calls:Array<Dynamic> = [];
+		var it = 0;
+		for (i in paths) {
+			calls.push(func(paths[it]));
+			trace(calls);
+			it++;
+		}
+		calls = calls.filter((a) -> {return a != null;});
+		return calls.length != 0 ? calls[0] : null;
+	}
 	inline static public function getContent(path:String):Null<String> {
 		#if sys
 		return FileSystem.exists(path) ? File.getContent(path) : null;
