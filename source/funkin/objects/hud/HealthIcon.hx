@@ -39,12 +39,13 @@ class HealthIcon extends FlxSprite
 	private var isPlayer:Bool = false;
 	private var char:String = '';
 
+	public var previousPercent:Float = 0; // For transition calculating
 	public var relativePercent(default, set):Float = 0;
 
 	function set_relativePercent(percent:Float){
 		if (autoUpdatesAnims)
 			updateState(percent);
-		
+		previousPercent = relativePercent;
 		return relativePercent = percent;
 	}
 
@@ -93,7 +94,7 @@ class HealthIcon extends FlxSprite
 	function changeIconGraphic(graphic:FlxGraphic)
 	{
 		hasWinning = graphic.width >= (graphic.height * 3);
-		loadGraphic(graphic, true, Math.floor(graphic.width / (hasWinning ? 2 : 3)), Math.floor(graphic.height));
+		loadGraphic(graphic, true, Math.floor(graphic.width / (hasWinning ? 3 : 2)), Math.floor(graphic.height));
 		iconOffsets[0] = (width - 150) * 0.5;
 		iconOffsets[1] = (width - 150) * 0.5;
 		updateHitbox();
@@ -125,6 +126,7 @@ class HealthIcon extends FlxSprite
 		isOldIcon = false;
 	}
 
+	var canTransition = false;
 	// Apologies for the rather unorthadox way of naming these prefixes
 	// bub's fruit salad is one drug!
 	public static final IDLE_PREFIX = 'N';
@@ -132,18 +134,58 @@ class HealthIcon extends FlxSprite
 	public static final WINNING_PREFIX = 'W';
 	public static final IDLE_TO_LOSE_PREFIX = 'T';
 	public static final IDLE_TO_WIN_PREFIX = 'TW';
+	public static final LOSE_TO_IDLE_PREFIX = 'TR';
+	public static final WIN_TO_IDLE_PREFIX = 'TWR';
 
 	public function setupSparrow(char:String){
 		var file:Null<FlxGraphic> = Paths.getWithFallbacks(Paths.getSparrowAtlas, ['icons/$char','icons/icon-$char']);
 		animation.addByPrefix("idle", IDLE_PREFIX, 24);
 		animation.addByPrefix("losing", LOSING_PREFIX, 24);
+		addIfExists('winning', WINNING_PREFIX, 24, IDLE_PREFIX);
+		var t:Bool = addIfExists('idleToLose', IDLE_TO_LOSE_PREFIX, 24);
+		var tw:Bool = addIfExists('idleToWin', IDLE_TO_WIN_PREFIX, 24);
+		var tr:Bool = addIfExists('loseToIdle', LOSE_TO_IDLE_PREFIX, 24);
+		var twr:Bool = addIfExists('winToIdle', WIN_TO_IDLE_PREFIX, 24);
+
+		// This is spaghetti ignore
+		if (t == false && tr == true) {
+			var aFrames = animation.getByName('loseToIdle').frames;
+			aFrames.reverse();
+			animation.addByIndices('idleToLose', IDLE_TO_LOSE_PREFIX, aFrames, '', 24);
+			t = true;
+		} else if (t == true && tr == false) {
+			var aFrames = animation.getByName('idleToLose').frames;
+			aFrames.reverse();
+			animation.addByIndices('loseToIdle', LOSE_TO_IDLE_PREFIX, aFrames, '', 24);
+			tr = true;
+		}
+		if (tw == false && twr == true) {
+			var aFrames = animation.getByName('winToIdle').frames;
+			aFrames.reverse();
+			animation.addByIndices('idleToWin', WIN_TO_IDLE_PREFIX, aFrames, '', 24);
+			tw = true;
+		} else if (tw == true && twr == false) {
+			var aFrames = animation.getByName('idleToWin').frames;
+			aFrames.reverse();
+			animation.addByIndices('winToIdle', IDLE_TO_WIN_PREFIX, aFrames, '', 24);
+			twr = true;
+		}
+
+		canTransition = (t == tw == tr == twr == true);
+	}
+
+	public function addIfExists(name, prefix, framerate, ?fallback) {
+
 		final animFrames:Array<FlxFrame> = new Array<FlxFrame>();
 		@:privateAccess
-		animation.findByPrefix(animFrames, WINNING_PREFIX);
-		if (animFrames.length > 0)
-			animation.addByPrefix("winning", WINNING_PREFIX, 24);
-		else
-			animation.addByPrefix("winning", IDLE_PREFIX, 24);
+		animation.findByPrefix(animFrames, prefix);
+		if (animFrames.length > 0) {
+			animation.addByPrefix(name, prefix, 24);
+			return true;
+		} else if (fallback != null) {
+			animation.addByPrefix(name, fallback, 24);
+		}
+		return false;
 	}
 
 	private var iconOffsets:Array<Float> = [0, 0];
