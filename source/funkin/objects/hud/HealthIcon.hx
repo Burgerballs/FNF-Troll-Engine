@@ -6,30 +6,10 @@ import flixel.FlxSprite;
 
 using StringTools;
 
-// Should we incluide this?? Should we just have it as part of base HealthIcon if icon has an xml??
-/* class SparrowHealthIcon extends HealthIcon
-{
-	public static final IDLE_PREFIX = 'idle';
-	public static final LOSING_PREFIX = 'losing';
-	public static final WINNING_PREFIX = 'winning';
-	override function swapOldIcon()
-		trace("TODO");
-
-	// I am just trusting the user on this one that the icon is formatted correctly lol
-	// Maybe the prefix constants should be in the health icon instead???
-	
-	override function changeIcon(char:String){
-		frames = Paths.getSparrowAtlas('icons/$char');
-		animation.addByPrefix("idle", IDLE_PREFIX, 24);
-		animation.addByPrefix("losing", LOSING_PREFIX, 24);
-		final animFrames:Array<FlxFrame> = new Array<FlxFrame>();
-		animation.findByPrefix(animFrames, WINNING_PREFIX);
-		if (animFrames.length > 0)
-			animation.addByPrefix("winning", WINNING_PREFIX, 24);
-		else
-			animation.addByPrefix("winning", IDLE_PREFIX, 24);
-	}
-} */
+// Okay so this class contains
+// Mic'd Up style winning icon system
+// Kero Icon System 2025 Edition
+// canTransition
 class HealthIcon extends FlxSprite
 {
 	public var autoUpdatesAnims:Bool = true;
