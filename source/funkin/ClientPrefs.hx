@@ -664,11 +664,12 @@ class ClientPrefs
 				data: []
 			},
 			"framerate" => {
-				display: "Max Framerate",
-				desc: "The highest framerate the game can hit.",
-				type: Number,
-				value: #if (!macro && !linux) FlxG.stage!=null ? FlxG.stage.application.window.displayMode.refreshRate : #end 60,
-				data: ["suffix" => " FPS", "min" => 5, "max" => 360, "step" => 1,]
+				display:"Max Framerate",
+				desc:"The highest framerate the game can hit.",
+				type:Number,
+				value:#if !macro FlxG.stage != null ? FlxG.stage.application.window.displayMode.refreshRate : #end
+				60,
+				data:["suffix" => " FPS", "min" => 5, "max" => 360, "step" => 1,]
 			},
 			"lowQuality" => {
 				display: "Low Quality",
@@ -692,14 +693,14 @@ class ClientPrefs
 				data: []
 			},
 			/*
-			"modcharts" => {
-				display: "Modcharts",
-				desc: "When toggled, modcharts will be used on some songs.\nWARNING: Disabling modcharts on modcharted songs will disable scoring!",
-				type: Toggle,
-				value: true,
-				data: ["requiresRestart" => true]
-			},
-			*/
+				"modcharts" => {
+					display: "Modcharts",
+					desc: "When toggled, modcharts will be used on some songs.\nWARNING: Disabling modcharts on modcharted songs will disable scoring!",
+					type: Toggle,
+					value: true,
+					data: ["requiresRestart" => true]
+				},
+			 */
 			#if FUNNY_ALLOWED
 			"ruin" => {
 				display: "Ruin The Mod",
@@ -966,7 +967,7 @@ class ClientPrefs
 		if (Main.bread != null)
 			Main.bread.visible = ClientPrefs.bread;
 		#end
-		
+
 		FlxG.sound.volume = ClientPrefs.masterVolume;
 		FlxG.autoPause = ClientPrefs.autoPause;
 
