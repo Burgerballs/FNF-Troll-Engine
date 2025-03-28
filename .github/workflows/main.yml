@@ -118,6 +118,7 @@ jobs:
         run: |
           sudo apt-get install libvlc-dev
           sudo apt-get install libvlccore-dev
+          sudo apt install libxrandr-dev
           haxelib setup ~/haxelib
           haxelib --always --quiet git hxcpp https://github.com/HaxeFoundation/hxcpp
           haxelib --always --quiet git grig.audio https://gitlab.com/haxe-grig/grig.audio.git

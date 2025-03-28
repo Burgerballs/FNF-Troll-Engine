@@ -8,13 +8,6 @@ import lime.media.openal.ALAuxiliaryEffectSlot;
 import lime.media.openal.ALFilter;
 import lime.media.openal.AL;
 
-import openfl.events.Event;
-import openfl.events.IEventDispatcher;
-import openfl.media.Sound;
-import openfl.media.SoundChannel;
-import openfl.media.SoundTransform;
-import openfl.net.URLRequest;
-
 import flixel.FlxBasic;
 import flixel.FlxG;
 import flixel.math.FlxMath;
@@ -25,6 +18,12 @@ import flixel.util.FlxStringUtil;
 import flixel.sound.FlxSoundGroup;
 
 import openfl.Assets;
+import openfl.events.Event;
+import openfl.events.IEventDispatcher;
+import openfl.media.Sound;
+import openfl.media.SoundChannel;
+import openfl.media.SoundTransform;
+import openfl.net.URLRequest;
 #if flash11
 import flash.utils.ByteArray;
 #end
@@ -114,6 +113,9 @@ class FlxSound extends FlxBasic
 
 	/**
 	 * Pan amount. -1 = full left, 1 = full right. Proximity based panning overrides this.
+	 * 
+	 * Note: On desktop targets this only works with mono sounds, due to limitations of OpenAL.
+	 * More info: [OpenFL Forums - SoundTransform.pan does not work](https://community.openfl.org/t/windows-legacy-soundtransform-pan-does-not-work/6616/2?u=geokureli)
 	 */
 	public var pan(get, set):Float;
 
@@ -127,10 +129,12 @@ class FlxSound extends FlxBasic
 	 */
 	public var volume(get, set):Float;
 
+	#if FLX_PITCH
 	/**
 	 * Set pitch, which also alters the playback speed. Default is 1.
 	 */
 	public var pitch(get, set):Float;
+	#end
 
 	/**
 	 * The position in runtime of the music playback in milliseconds.
@@ -209,10 +213,12 @@ class FlxSound extends FlxBasic
 	 */
 	var _length:Float = 0;
 
+	#if FLX_PITCH
 	/**
 	 * Internal tracker for pitch.
 	 */
 	var _pitch:Float = defaultPitch;
+	#end
 
 	/**
 	 * Internal tracker for total volume adjustment.
@@ -464,6 +470,9 @@ class FlxSound extends FlxBasic
 		updateTransform();
 		exists = true;
 		onComplete = OnComplete;
+		#if FLX_PITCH
+		pitch = defaultPitch;
+		#end
 		_length = (_sound == null) ? 0 : _sound.length;
 		endTime = _length;
 		return this;
@@ -705,7 +714,9 @@ class FlxSound extends FlxBasic
 		_channel = _sound.play(_time, 0, _transform);
 		if (_channel != null)
 		{
+			#if FLX_PITCH
 			pitch = _pitch;
+			#end
 			updateFilter();
 			updateEffect();
 
@@ -833,6 +844,7 @@ class FlxSound extends FlxBasic
 		return Volume;
 	}
 
+	#if FLX_PITCH
 	inline function get_pitch():Float
 	{
 		return _pitch;
@@ -850,6 +862,7 @@ class FlxSound extends FlxBasic
 
 		return _pitch = v;
 	}
+	#end
 
 	inline function set_filter(v:ALFilter)
 	{
@@ -903,8 +916,7 @@ class FlxSound extends FlxBasic
 			LabelValuePair.weak("playing", playing),
 			LabelValuePair.weak("time", time),
 			LabelValuePair.weak("length", length),
-			LabelValuePair.weak("volume", volume),
-			LabelValuePair.weak("pitch", pitch)
+			LabelValuePair.weak("volume", volume)
 		]);
 	}
 }

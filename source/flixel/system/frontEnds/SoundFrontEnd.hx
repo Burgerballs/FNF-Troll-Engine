@@ -121,12 +121,12 @@ class SoundFrontEnd
 		{
 			music.stop();
 		}
-
+		
 		music.loadEmbedded(embeddedMusic, looped);
 		music.volume = volume;
 		music.persist = true;
+		music.context = MUSIC;
 		music.group = (group == null) ? defaultMusicGroup : group;
-        music.context = MUSIC;
 		music.play();
 	}
 
@@ -156,6 +156,7 @@ class SoundFrontEnd
 
 		var sound:FlxSound = list.recycle(FlxSound);
 		sound.context = SFX;
+
 		if (embeddedSound != null)
 		{
 			sound.loadEmbedded(embeddedSound, looped, autoDestroy, onComplete);
@@ -346,8 +347,10 @@ class SoundFrontEnd
 		muted = !muted;
 
 		if (volumeHandler != null)
+		{
 			volumeHandler(muted ? 0 : volume);
-		
+		}
+
 		onVolumeChange.dispatch(muted ? 0 : volume);
 
 		showSoundTray(true);
@@ -379,7 +382,9 @@ class SoundFrontEnd
 
 	function new()
 	{
+		#if FLX_SAVE
 		loadSavedPrefs();
+		#end
 	}
 
 	/**
@@ -438,6 +443,7 @@ class SoundFrontEnd
 		}
 	}
 
+	#if FLX_SAVE
 	/**
 	 * Loads saved sound preferences if they exist.
 	 */
@@ -456,15 +462,18 @@ class SoundFrontEnd
 			muted = FlxG.save.data.mute;
 		}
 	}
+	#end
 
 	@:haxe.warning("-WDeprecated")
 	function set_volume(Volume:Float):Float
 	{
 		Volume = FlxMath.bound(Volume, 0, 1);
-		
+
 		if (volumeHandler != null)
+		{
 			volumeHandler(muted ? 0 : Volume);
-		
+		}
+
 		onVolumeChange.dispatch(muted ? 0 : Volume);
 
 		return volume = Volume;
