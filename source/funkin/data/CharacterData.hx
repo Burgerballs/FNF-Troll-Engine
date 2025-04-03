@@ -269,7 +269,7 @@ class CharacterData {
 			"generatedBy": "TROLL ENGINE",
 			"version": "1.0.0",
 
-			"name": char.curCharacter,
+			"name": char.characterId,
 			"assetPath": char.imageFile,
 			"renderType": CharacterData.getImageFileType(char.characterFile),
 			"flipX": char.originalFlipX,

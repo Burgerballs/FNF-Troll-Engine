@@ -38,61 +38,64 @@ class Character extends FlxSprite
 	/**Whether the character is facing left or right. -1 means it's facing to the left, 1 means its facing to the right.**/
 	public var xFacing:Float = 1;
 
-	/**Name of the death character to be used. Can be used to share 1 game over character across multiple characters**/
-	public var deathName:String = DEFAULT_CHARACTER;
+	/**Id of the death character to be used. Can be used to share 1 game over character across multiple characters**/
+	public var deathId:String = DEFAULT_CHARACTER;
 
-	/**Name of the script to be ran. Can be used to share 1 script file across multiple characters**/
-	public var scriptName:String = DEFAULT_CHARACTER;
-
-	/**LEGACY. DO NOT USE.**/
-	public var characterScript(get, set):FunkinScript;
-	inline function get_characterScript()
-		return characterScripts[0];
-	function set_characterScript(script:FunkinScript){ // you REALLY shouldnt be setting characterScript, you should be using the removeScript and addScript functions though;
-		var oldScript = characterScripts.shift(); // removes the first script
-		stopScript(oldScript, true);
-		characterScripts.unshift(script); // and replaces it w/ the new one
-		startScript(script);
-		return script;
-	}
-		
-	/**Scripts running on the character. You should not modify this directly! Use pushScript/removeScript!
-	 * If you must modify it directly, atleast call character.startScript(script)/character.stopScript(script) after adding/removing it**/
+	/**
+	 * Scripts running on the character. 
+	 *
+	 * You should not modify this directly! Use `pushScript`/`removeScript`!
+	 *
+	 * If you must modify it directly, remember to call `startScript`/`stopScript` after adding/removing it
+	 */
 	public var characterScripts:Array<FunkinScript> = [];
 
-	/**for fleetway, mainly.
-		but whenever you need to play an anim that has to be manually interrupted, here you go.
-		
-	Stops note anims and idle from playing. Make sure to set this to false once the animation is done.**/
-	public var voicelining:Bool = false; 
+	/**
+	 * Stops note anims and idle from playing.
+	 * Make sure to set this to false once the animation is done.
+	 */
+	public var voicelining:Bool = false; // for fleetway, mainly
+	// but whenever you need to play an anim that has to be manually interrupted, here you go
 
 	/**The set of animations, in order, to be played for the character idling.**/
 	public var idleSequence:Array<String> = ['idle'];
+
 	/**How each animation offsets the character**/
 	public var animOffsets = new Map<String, Array<Dynamic>>();
+
 	/**How each animation offsets the camera**/
 	public var camOffsets:Map<String, Array<Float>> = [];
+
 	/**Used by the character editor. Disables most functions of the character besides animations**/
 	public var debugMode:Bool = false;
+
 	/**Camera horizontal offset from the animation**/
 	public var camOffX:Float = 0;
+
 	/**Camera vertical offset from the animation**/
 	public var camOffY:Float = 0;
+
 	/**Whether this character is playable. Not really used much anymore**/
 	public var isPlayer:Bool = false;
-	/**Name of the character**/
-	public var curCharacter:String = DEFAULT_CHARACTER;
+
+	/**Id of the character**/
+	public var characterId:String = DEFAULT_CHARACTER;
 
 	/**BLAMMED LIGHTS!! idk not used anymore**/
 	public var colorTween:FlxTween;
+
 	/**How long in seconds the current sing animation has been held for**/
 	public var holdTimer:Float = 0;
+
 	/**How long in seconds to hold the hey/cheer anim**/
 	public var heyTimer:Float = 0;
+
 	/**Automatically resets the character to idle once this hits 0 after being set to any value above 0**/
 	public var animTimer:Float = 0;
+
 	/**Disables dancing while the hey/cheer animations are playing**/
 	public var specialAnim:Bool = false;
+
 	/**Disables the ability for characters to manually reset to idle**/
 	public var stunned:Bool = false;
 	
@@ -101,8 +104,10 @@ class Character extends FlxSprite
 
 	/**String to be appended to idle animation names. For example, if this is -alt, then the animation used for idling will be idle-alt or danceLeft-alt/danceRight-alt**/
 	public var idleSuffix:String = '';
+
 	/**Character uses "danceLeft" and "danceRight" instead of "idle"**/
 	public var danceIdle:Bool = false;
+
 	/**Stops the idle from playing**/
 	public var skipDance:Bool = false;
 
@@ -111,11 +116,13 @@ class Character extends FlxSprite
 
 	/**Offsets the character on the stage**/
 	public var positionArray:Array<Float> = [0, 0];
+
 	/**Offsets the camera when its focused on the character**/
 	public var cameraPosition:Array<Float> = [0, 0];
 	
 	/**Set to true if the character has miss animations. Optimization mainly**/
 	public var hasMissAnimations:Bool = false;
+
 	/**Overlay color used for characters that don't have miss animations.**/
 	public var missOverlayColor:FlxColor = 0xFFC6A6FF;
 	
@@ -127,6 +134,33 @@ class Character extends FlxSprite
 	public var originalFlipX:Bool = false;
 	public var healthColorArray:Array<Int> = [255, 0, 0];
 	public var characterFile:CharacterFile;
+
+	#if ALLOW_DEPRECATION
+	@:deprecated("curCharacter is deprecated. Use characterId instead.")
+	public var curCharacter(get, set):String;
+	inline function get_curCharacter() return characterId;
+	inline function set_curCharacter(v:String) return characterId = v;
+	
+	@:deprecated("deathName is deprecated. Use deathId instead.")
+	public var deathName(get, set):String;
+	inline function get_deathName() return deathId;
+	inline function set_deathName(v:String) return deathId = v;
+
+	/**LEGACY. DO NOT USE.**/
+	@:deprecated("characterScript is deprecated. Use pushScript and removeScript instead.")
+	public var characterScript(get, set):FunkinScript;
+	@:noCompletion
+	inline function get_characterScript()
+		return characterScripts[0];
+	@:noCompletion
+	function set_characterScript(script:FunkinScript){ // you REALLY shouldnt be setting characterScript, you should be using the removeScript and addScript functions though;
+		var oldScript = characterScripts.shift(); // removes the first script
+		stopScript(oldScript, true);
+		characterScripts.unshift(script); // and replaces it w/ the new one
+		startScript(script);
+		return script;
+	}
+	#end
 
 	override function destroy()
 	{
@@ -152,8 +186,7 @@ class Character extends FlxSprite
 	{
 		//// some troll engine stuff
 
-		deathName = json.death_name != null ? json.death_name : curCharacter;
-		scriptName = json.script_name != null ? json.script_name : curCharacter;
+		deathId = json.death_name != null ? json.death_name : characterId;
 		
 		if (json.x_facing != null)
 			xFacing *= json.x_facing;
@@ -229,24 +262,24 @@ class Character extends FlxSprite
 		characterFile = json;
 	}
 
-	public function new(x:Float, y:Float, ?characterName:String = 'bf', ?isPlayer:Bool = false, ?debugMode:Bool = false)
+	public function new(x:Float, y:Float, ?characterId:String, ?isPlayer:Bool = false, ?debugMode:Bool = false)
 	{
-		super(x, y);		
+		super(x, y);
 
-		curCharacter = (characterName == null) ? DEFAULT_CHARACTER : characterName;
+		this.characterId = characterId ?? DEFAULT_CHARACTER;
 		this.isPlayer = isPlayer;
 		this.debugMode = debugMode;
 
-		xFacing = isPlayer ? -1 : 1;
-		controlled = isPlayer;
+		this.xFacing = this.isPlayer ? -1 : 1;
+		this.controlled = this.isPlayer;
 	}
 
 	function _setupCharacter() {
-		var json = getCharacterFile(curCharacter);
+		var json = getCharacterFile(characterId);
 		if (json == null) {
-			trace('Character file: $curCharacter not found.');
+			trace('Character file: $characterId not found.');
 			json = getCharacterFile(DEFAULT_CHARACTER);
-			curCharacter = DEFAULT_CHARACTER;
+			characterId = DEFAULT_CHARACTER;
 		}
 
 		loadFromPsychData(json);
@@ -264,6 +297,7 @@ class Character extends FlxSprite
 
 	public function setupCharacter()
 	{
+		var characterScript = characterScripts[0];
 		if (characterScript != null && characterScript.scriptType == HSCRIPT) {
 			var characterScript:FunkinHScript = cast characterScript;
 			if (characterScript.exists('setupCharacter')) {
@@ -421,7 +455,7 @@ class Character extends FlxSprite
 		}
 
 		////
-		if (curCharacter.startsWith('gf'))
+		if (characterId.startsWith('gf'))
 		{
 			if (AnimName == 'singLEFT')
 				danced = true;
@@ -630,7 +664,7 @@ class Character extends FlxSprite
 	{
 		setDefaultVar("this", this);
 
-		var key:String = 'characters/$curCharacter';
+		var key:String = 'characters/$characterId';
 
 		#if HSCRIPT_ALLOWED
 		var hscriptFile = Paths.getHScriptPath(key);

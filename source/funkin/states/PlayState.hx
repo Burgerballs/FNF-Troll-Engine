@@ -795,18 +795,16 @@ class PlayState extends MusicBeatState
 				shitToLoad.push(i);
 		}
 
-		var characters:Array<String> = [SONG.player1, SONG.player2];
-		if (!stageData.hide_girlfriend)
-		{
-			characters.push(SONG.gfVersion);
-		}
-
-		for (character in characters) {
+		inline function preloadCharacter(character:String):Void {
 			if (character != null) {
 				for (data in CharacterData.returnCharacterPreload(character))
 					shitToLoad.push(data);
 			}
 		}
+		preloadCharacter(SONG.player1);
+		preloadCharacter(SONG.player2);
+		if (!stageData.hide_girlfriend)
+			preloadCharacter(SONG.gfVersion);
 
 		for (track in songTrackNames){
 			shitToLoad.push({
@@ -831,7 +829,7 @@ class PlayState extends MusicBeatState
 
 		if (SONG.player2 != null) {
 			dad = new Character(0, 0, SONG.player2);
-			dadMap.set(dad.curCharacter, dad);
+			dadMap.set(dad.characterId, dad);
 			dadGroup.add(dad);
 	
 			dad.setDefaultVar("used", true);
@@ -846,7 +844,7 @@ class PlayState extends MusicBeatState
 		////
 		if (SONG.player1 != null) {
 			boyfriend = new Character(0, 0, SONG.player1, true);
-			boyfriendMap.set(boyfriend.curCharacter, boyfriend);
+			boyfriendMap.set(boyfriend.characterId, boyfriend);
 			boyfriendGroup.add(boyfriend);
 	
 			boyfriend.setDefaultVar("used", true);
@@ -861,7 +859,7 @@ class PlayState extends MusicBeatState
 		////
 		if (SONG.gfVersion != null && stageData.hide_girlfriend != true) {
 			gf = new Character(0, 0, SONG.gfVersion);
-			gfMap.set(gf.curCharacter, gf);
+			gfMap.set(gf.characterId, gf);
 			gfGroup.add(gf);
 
 			gf.setDefaultVar("used", true);
@@ -1301,7 +1299,7 @@ class PlayState extends MusicBeatState
 					dadField.characters.push(char);
 				
 			case GF:
-				if (gf == null || gfMap.exists(name)) 
+				if (gfMap.exists(name)) 
 					return;
 
 				var char = new Character(0, 0, name);
@@ -1345,7 +1343,7 @@ class PlayState extends MusicBeatState
 	}
 
 	function startCharacterPos(char:Character, ?gfCheck:Bool = false, ?startBopBeat:Float=-5) {
-		if (gfCheck && char.curCharacter.startsWith('gf')) { //IF DAD IS GIRLFRIEND, HE GOES TO HER POSITION
+		if (gfCheck && char.characterId.startsWith('gf')) { //IF DAD IS GIRLFRIEND, HE GOES TO HER POSITION
 			char.setPosition(GF_X, GF_Y);
 			char.scrollFactor.set(0.95, 0.95);
 			char.danceEveryNumBeats = 2;
@@ -2774,7 +2772,8 @@ class PlayState extends MusicBeatState
 			default: return;
 			
 			case BF:
-				if (boyfriend.curCharacter == name) return;
+				if (boyfriend != null && boyfriend.characterId == name)
+					return;
 				
 				if (!boyfriendMap.exists(name)) 
 					addCharacterToList(name, charType);
@@ -2784,7 +2783,8 @@ class PlayState extends MusicBeatState
 				varName = 'boyfriendName';
 
 			case DAD:
-				if (dad.curCharacter == name) return;
+				if (dad != null && dad.characterId == name)
+					return;
 
 				if (!dadMap.exists(name)) 
 					addCharacterToList(name, charType);
@@ -2794,15 +2794,15 @@ class PlayState extends MusicBeatState
 				varName = 'dadName';
 
 				if (gf != null) {
-					if (oldChar.curCharacter.startsWith('gf')) // if the old character was hiding gf, make her visible again.
+					if (oldChar != null && oldChar.characterId.startsWith('gf')) // if the old character was hiding gf, make her visible again.
 						gf.visible = true;
 
-					if (newChar.curCharacter.startsWith('gf')) // if the new character is a gf character, hide the actual gf as this will take it's position 
+					if (newChar != null && newChar.characterId.startsWith('gf')) // if the new character is a gf character, hide the actual gf as this will take it's position 
 						gf.visible = false; 
 				}
 
 			case GF:
-				if (gf == null || gf.curCharacter == name) 
+				if (gf != null && gf.characterId == name) 
 					return;
 
 				if (!gfMap.exists(name))
@@ -2818,22 +2818,15 @@ class PlayState extends MusicBeatState
 
 		setOnScripts(varName, name);
 
-		newChar.alpha = oldChar.alpha;
-		newChar.setOnScripts("used", true);
-		newChar.callOnScripts("onAdded", [newChar, oldChar]); // if you can come up w/ a better name for this callback then change it lol
-		// (this also gets called for the characters set by the chart's player1/player2)
+		if (oldChar != null) {
+			newChar.alpha = oldChar.alpha;
 
-		oldChar.alpha = 0.00001;
-		oldChar.setOnScripts("used", false);
-		oldChar.callOnScripts("changedOut", [oldChar, newChar]);
-
-		if (focusedChar == oldChar) focusedChar = newChar;
-		hud.changedCharacter(charType, newChar);
-
-		/////
-		if (name.startsWith(oldChar.curCharacter) || oldChar.curCharacter.startsWith(name)) {
-			if (oldChar.animation!=null && oldChar.animation.curAnim!=null) {
-				var anim:String = oldChar.animation.curAnim.name;
+			oldChar.alpha = 0.00001;
+			oldChar.setOnScripts("used", false);
+			oldChar.callOnScripts("changedOut", [oldChar, newChar]);
+		
+			if (name.startsWith(oldChar.characterId) || oldChar.characterId.startsWith(name)) {
+				var anim:String = oldChar.animation.name;
 				
 				if (newChar.animation.exists(anim)) {
 					var reversed:Bool = oldChar.animation.curAnim.reversed;
@@ -2842,8 +2835,16 @@ class PlayState extends MusicBeatState
 				}
 			}
 		}
+		else 
+			newChar.alpha = 1.0;
 
-		////
+		newChar.setOnScripts("used", true);
+		newChar.callOnScripts("onAdded", [newChar, oldChar]); // if you can come up w/ a better name for this callback then change it lol
+		// (this also gets called for the characters set by the chart's player1/player2)
+
+		if (focusedChar == oldChar) focusedChar = newChar;
+
+		hud.changedCharacter(charType, newChar);
 		reloadHealthBarColors();
 	}
 
@@ -2918,7 +2919,7 @@ class PlayState extends MusicBeatState
 				if(Math.isNaN(time) || time <= 0) time = 0.6;
 
 				if (value != 0) {
-					if (dad != null && dad.curCharacter.startsWith('gf')) { //Tutorial GF is actually Dad! The GF is an imposter!! ding ding ding ding ding ding ding, dindinding, end my suffering
+					if (dad != null && dad.characterId.startsWith('gf')) { //Tutorial GF is actually Dad! The GF is an imposter!! ding ding ding ding ding ding ding, dindinding, end my suffering
 						dad.playAnim('cheer', true);
 						dad.specialAnim = true;
 						dad.heyTimer = time;

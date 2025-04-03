@@ -1,5 +1,7 @@
 package funkin.states;
 
+import funkin.data.CreditsOption;
+
 import flixel.*;
 import flixel.math.*;
 import flixel.text.FlxText;
@@ -20,9 +22,6 @@ class CreditsState extends MusicBeatState
 {	
 	// Removed usehttp since engine no longer has credits baseline
 	// Maybe we could add it back some day w/ github contributors n shit tho
-	
-
-	var bg:FlxSprite;
 
 	var hintBg:FlxSprite;
 	var hintText:FlxText;
@@ -30,43 +29,56 @@ class CreditsState extends MusicBeatState
 	var camFollow = new FlxPoint(FlxG.width * 0.5, FlxG.height * 0.5);
 	var camFollowPos = new FlxObject();
 
-	var dataArray:Array<Array<String>> = [];
+	var dataArray:Array<CreditsOption> = [];
 	var titleArray:Array<Alphabet> = [];
 	var iconArray:Array<AttachedSprite> = [];
 
-	var curSelected(default, set):Int = 0;
-	
-	function set_curSelected(sowy:Int)
-	{
-		if (dataArray[sowy] == null){ // skip empty spaces and titles
-			sowy += (sowy < curSelected) ? -1 : 1;
-
-			// also skip any following spaces
-			if (sowy >= titleArray.length)
-				sowy = sowy - titleArray.length;
-			else if (sowy < 0)
-				sowy = titleArray.length + sowy;
-
-			return set_curSelected(sowy); 
-		}
-
-		if (sowy >= titleArray.length)
-			curSelected = sowy - titleArray.length;
-		else if (sowy < 0)
-			curSelected = titleArray.length + sowy;
-		
-		curSelected = sowy;
-		updateSelection();
-
-		return curSelected;
-	}
+	var curSelected:Int = 0;
 
 	override function startOutro(onOutroFinished:()->Void){
 		persistentUpdate = false;
 		return onOutroFinished();
 	}
-	
-	var backdrop:flixel.addons.display.FlxBackdrop;
+
+	public function new(?options:Array<CreditsOption>) {
+		super();
+
+		this.dataArray = options ?? {
+			var creditsPath = Paths.getPath('data/credits.txt');
+			var rawList = Paths.getContent(creditsPath);
+			listFromString(rawList);
+		}
+	}
+
+	public static function listFromString(string:String):Array<CreditsOption>
+	{
+		var options = [];
+
+		for (line in CoolUtil.listFromString(string))
+			options.push(optionFromString(line));
+
+		return options;
+	}
+
+	public static function optionFromString(string:String):CreditsOption
+	{
+		var option = new CreditsOption();
+		var data = string.split("::");
+
+		option.text = data[0] ?? '';
+		option.icon = data[1] ?? '';
+		option.description = data[2] ?? '';
+		option.link = data[3] ?? '';
+
+		if (data.length == 1) {
+			// title
+			option.bold = true;
+			option.centered = true;
+			option.selectable = false;
+		}
+
+		return option;
+	}
 
 	override function create()
 	{
@@ -89,89 +101,33 @@ class CreditsState extends MusicBeatState
 
 		////
 		#if tgt
-		bg = new FlxSprite(Paths.image("tgtmenus/creditsbg"));
-		#else
-		// the cool thing from the options state
-		var color = 0xFFea71fd; 
-		var bgGraphic = Paths.image('menuDesat');
-		var adjustColor = new funkin.objects.shaders.AdjustColor();
-		adjustColor.contrast = 1.0;
-		adjustColor.brightness = -0.125;
+		var bg = new FlxSprite(Paths.image("tgtmenus/creditsbg"));
+		bg.scrollFactor.set();
+		bg.screenCenter();
 
-		bg = new FlxSprite((FlxG.width - bgGraphic.width) * 0.5, (FlxG.height - bgGraphic.height) * 0.5, bgGraphic);
-		bg.shader = adjustColor.shader;
-		bg.blend = INVERT;
-		bg.color = color;
-		bg.alpha = 0.25;
-		bg.setColorTransform(-1, -1, -1, 1, Std.int(255 + bg.color.red / 3), Std.int(255 + bg.color.green / 3), Std.int(255 + bg.color.blue / 3), 0);
+		if (FlxG.height < FlxG.width)
+			bg.scale.x = bg.scale.y = (FlxG.height * 1.05) / bg.frameHeight;
+		else
+			bg.scale.x = bg.scale.y = (FlxG.width * 1.05) / bg.frameWidth;
+		
+		add(bg);
 
-		var bg2 = new FlxSprite(bg.x, bg.y).makeGraphic(bg.frameWidth, bg.frameHeight, 0x00000000, false, 'OptionsState_bg');
-		bg2.blend = MULTIPLY;
-		bg2.stamp(bg);
-
-		bg.destroy();
-		bg = bg2;
-
-		var grid = new openfl.display.BitmapData(2, 2);
-		grid.setPixel32(0, 0, 0xFFC0C0C0);
-		grid.setPixel32(1, 1, 0xFFC0C0C0);
-
-		var grid = flixel.graphics.FlxGraphic.fromBitmapData(grid, false, 'OptionsState_grid');
-
-		backdrop = new flixel.addons.display.FlxBackdrop(grid);
-		backdrop.scale.x = backdrop.scale.y = FlxG.height / 3;
-		backdrop.updateHitbox();
-		backdrop.y -= backdrop.height / 2;
-		backdrop.velocity.set(30, 30);
-		backdrop.antialiasing = true;
-		backdrop.color = color;
-		backdrop.scrollFactor.set(0, 0);
-		backdrop.alpha = 0.5;
-		backdrop.blend = ADD;
-
-		var gradient = flixel.util.FlxGradient.createGradientFlxSprite(FlxG.width, FlxG.height, [0xFFFFFFFF, 0xFF000000]);
-		gradient.scrollFactor.set(0, 0);
-		add(gradient);
+		var backdrop = new flixel.addons.display.FlxBackdrop(Paths.image('grid'));
+		backdrop.velocity.set(30, -30);
+		backdrop.scrollFactor.set();
+		backdrop.blend = MULTIPLY;
+		backdrop.alpha = 0.25;
+		backdrop.x -= 10;
 		add(backdrop);
 
-		bg.setGraphicSize(0, FlxG.height);
-		bg.updateHitbox();
-		bg.screenCenter();
+		#else
+		var bg = new funkin.objects.CoolMenuBG(Paths.image('menuDesat'), 0xFFea71fd);
 		add(bg);
-		#end
-
-		bg.screenCenter().scrollFactor.set();
-
-		if (FlxG.height < FlxG.width){
-			bg.scale.x = bg.scale.y = (FlxG.height * 1.05) / bg.frameHeight;
-		}else{
-			bg.scale.x = bg.scale.y = (FlxG.width * 1.05) / bg.frameWidth;
-		}
-
-		add(bg);
-
-		#if tgt
-		var backdrops = new flixel.addons.display.FlxBackdrop(Paths.image('grid'));
-		backdrops.velocity.set(30, -30);
-		backdrops.scrollFactor.set();
-		backdrops.blend = MULTIPLY;
-		backdrops.alpha = 0.25;
-		backdrops.x -= 10;
-		add(backdrops);
 		#end
 
 		////
-		function loadLine(line:String, ?folder:String)
-			addSong(line.split("::"), folder);
-
-		//// Get credits list
-
-		// TODO: Allow mods to add their own credits
-
-		var creditsPath = Paths.getPath('data/credits.txt');
-
-		for (i in CoolUtil.listFromString(Paths.getContent(creditsPath)))
-			loadLine(i);
+		for (option in dataArray)
+			createOption(option);
 
 		////
 		hintBg = new FlxSprite(0, FlxG.height - 130).makeGraphic(1, 1);
@@ -189,121 +145,121 @@ class CreditsState extends MusicBeatState
 		add(hintText);
 		
 		super.create();
-
-		updateSelection();
 		curSelected = 0;
+		changeSelection(0);
 	}
 
-	var realIndex:Int = 0;
-	var margin = 240;
-	public function addSong(data:Array<String>, ?folder:String)
-	{
-		Paths.currentModDirectory = folder == null ? "" : folder;
+	public function changeSelection(val:Int, isAbs:Bool = false) {
+		curSelected = isAbs ? val : CoolUtil.updateIndex(curSelected, val, dataArray.length);
 
-		var songTitle:Alphabet; 
-		var id = realIndex++;
+		if (!isAbs) {
+			FlxG.sound.play(Paths.sound("scrollMenu"), 0.4);
 
-		if (data.length > 1)
-		{
-			songTitle = new Alphabet(0, margin * id, data[0], false);
-			songTitle.x = 120;
-			songTitle.targetX = 90;
-
-			dataArray[id] = data; 
-
-			var iconPath = "credits/" + data[1];
-			if (Paths.image(iconPath) != null){
-				var songIcon = new AttachedSprite(iconPath);
-
-				songIcon.xAdd = songTitle.width + 15; 
-				songIcon.yAdd = (-songIcon.height / 2) + 15;
-				songIcon.sprTracker = songTitle;
-
-				iconArray[id] = songIcon;
-				add(songIcon);
+			if (dataArray[curSelected].selectable != true) {
+				changeSelection(val < 0 ? -1 : 1);
+				return;
 			}
-		}else if (data[0].trim().length == 0){
-			return;
-		}else{
-			songTitle = new Alphabet(0, margin * id, data[0], true);
-			songTitle.screenCenter(X);
-			songTitle.targetX = songTitle.x;
 		}
-
-		songTitle.ID = id;
-		titleArray[id] = songTitle;
-		add(songTitle);
-	}
-
-	var moveTween:FlxTween;
-	
-	function updateSelection(playSound:Bool = true)
-	{
-		if (playSound)
-			FlxG.sound.play(Paths.sound("scrollMenu"), 0.4 );
-
-		// selectedSong = titleArray[curSelected];
 
 		for (id in 0...titleArray.length)
 		{
+			var difference = Math.abs(curSelected - id);
+			var br = 1 - (difference * 0.15 + (difference > 0 ? 0.05 : 0.0));
+			
 			var title:Alphabet = titleArray[id];
-			var data:Array<String> = dataArray[id];
-			var icon:AttachedSprite = iconArray[id];
-
-			if (data == null){ // for the category titles, whatevrr !!!
+			if (title != null) {
+				var data:CreditsOption = dataArray[title.ID];
 				
-			}else if (id == curSelected){
-				title.alpha = 1;
-				title.targetX = 90;
-				title.color = 0xFFFFFFFF;
-
-				if (icon != null)
-					icon.color = 0xFFFFFFFF;
-
-				var descText = data[2];
-				if (descText == null){
-					hintText.alpha = 0;
-					hintText.text = "";
-				}else{
-					hintText.text = descText;
-
-					hintBg.scale.y = 30 + hintText.height;
-					hintBg.updateHitbox();
-					hintBg.y = FlxG.height - hintBg.height - 10;
-
-					hintText.y = hintBg.y + hintBg.height * 0.5 - hintText.height * 0.5;
-
-					//// FUCK
-					var sby = hintBg.y + 15;
-					var eby = hintBg.y;
-					var sty = hintText.y + 15;
-					var ety = hintText.y;
-					var sba = hintBg.alpha;
-					if (moveTween != null)
-						moveTween.cancel();
-					moveTween = FlxTween.num(0, 1, 0.25, {ease: FlxEase.sineOut}, function(v){
-						hintBg.y = FlxMath.lerp(sby, eby, v);
-						hintText.y = FlxMath.lerp(sty, ety, v);
-						hintBg.alpha = FlxMath.lerp(sba, 0.6, v);
-					});
-				}
-
-				camFollow.y = title.y + title.height * 0.5 + 20;
-			}else{
-				var difference = Math.abs(curSelected - id);
-				
-				title.targetX = 90 + difference * -20;
-				title.alpha = (1 - difference * 0.15);
-				title.color = 0xFF000000;
-				
-				if (icon != null){
-					var br = 1-(difference * 0.15 + 0.05);
-					icon.color = FlxColor.fromRGBFloat(br,br,br);
+				if (!data.centered)
+					title.targetX = 90 + difference * -20;
+				if (data.selectable) {
+					title.alpha = br;
+					title.color = (difference > 0) ? 0xFF000000 : 0xFFFFFFFF;
 				}
 			}
-
-			if (icon != null)
+				
+			var icon:AttachedSprite = iconArray[id];
+			if (icon != null){
+				icon.color = FlxColor.fromRGBFloat(br,br,br);
 				icon.alpha = title.alpha;
+			}
+		}
+
+		var title:Alphabet = titleArray[curSelected];
+		if (title != null)
+			camFollow.y = title.y + title.height * 0.5 + 20;
+		setDescriptionText(dataArray[curSelected].description);
+	}
+
+	var realLength:Int = 0;
+	var margin = 240;
+	public function createOption(data:CreditsOption) {
+		if (data.text.trim().length == 0)
+			return;
+
+		var id = realLength++;
+		var songTitle = new Alphabet(0, margin * id, data.text, data.bold);
+		songTitle.ID = id;
+		titleArray[id] = songTitle;
+		
+		if (data.centered) {
+			songTitle.screenCenter(X);
+			songTitle.targetX = songTitle.x;
+		}
+		else {
+			songTitle.x = 90 + (1 + Math.abs(curSelected - id)) * 30;
+			songTitle.targetX = 90;
+		}
+
+		var iconPath = "credits/" + data.icon;
+		if (Paths.image(iconPath) != null){
+			var songIcon = new AttachedSprite(iconPath);
+
+			songIcon.xAdd = songTitle.width + 15; 
+			songIcon.yAdd = (-songIcon.height / 2) + 15;
+			songIcon.sprTracker = songTitle;
+
+			iconArray[id] = songIcon;
+			add(songIcon);
+		}
+
+		add(songTitle);
+	}
+
+	public function addSong(data:Array<String>, ?folder:String)
+	{
+		Paths.currentModDirectory = folder == null ? "" : folder;
+		createOption(optionFromString(data.join("::")));
+	}
+
+	var moveTween:FlxTween;
+
+	function setDescriptionText(text:Null<String>) {
+		if (text == null || text.length == 0) {
+			hintText.alpha = 0;
+			hintText.text = "";
+		}else{
+			hintText.text = text;
+
+			hintBg.scale.y = 30 + hintText.height;
+			hintBg.updateHitbox();
+			hintBg.y = FlxG.height - hintBg.height - 10;
+
+			hintText.y = hintBg.y + hintBg.height * 0.5 - hintText.height * 0.5;
+
+			//// FUCK
+			var sby = hintBg.y + 15;
+			var eby = hintBg.y;
+			var sty = hintText.y + 15;
+			var ety = hintText.y;
+			var sba = hintBg.alpha;
+			if (moveTween != null)
+				moveTween.cancel();
+			moveTween = FlxTween.num(0, 1, 0.25, {ease: FlxEase.sineOut}, function(v){
+				hintBg.y = FlxMath.lerp(sby, eby, v);
+				hintText.y = FlxMath.lerp(sty, ety, v);
+				hintBg.alpha = FlxMath.lerp(sba, 0.6, v);
+			});
 		}
 	}
 	
@@ -331,15 +287,17 @@ class CreditsState extends MusicBeatState
 		var speed = FlxG.keys.pressed.SHIFT ? 2 : 1;
 
 		var mouseWheel = FlxG.mouse.wheel;
+		var change = 0;
+
 		if (mouseWheel != 0)
-			curSelected -= mouseWheel * speed;
+			change -= mouseWheel * speed;
 
 		if (controls.UI_DOWN_P){
-			curSelected += speed;
+			change += speed;
 			secsHolding = 0;
 		}
 		if (controls.UI_UP_P){
-			curSelected -= speed;
+			change -= speed;
 			secsHolding = 0;
 		}
 
@@ -349,8 +307,11 @@ class CreditsState extends MusicBeatState
 			var checkNewHold:Int = Math.floor((secsHolding - 0.5) * 10);
 
 			if(secsHolding > 0.5 && checkNewHold - checkLastHold > 0)
-				curSelected += (checkNewHold - checkLastHold) * (controls.UI_UP ? -speed : speed);
+				change += (checkNewHold - checkLastHold) * (controls.UI_UP ? -speed : speed);
 		}
+
+		if (change != 0)
+			changeSelection(change);
 
 		if (controls.BACK){
 			controlLock = true;
@@ -359,7 +320,7 @@ class CreditsState extends MusicBeatState
 		}
 
 		if (controls.ACCEPT){
-			var link:Null<String> = dataArray[curSelected][3];
+			var link:Null<String> = dataArray[curSelected].link;
 			if (link != null && link.length > 0)
 				CoolUtil.browserLoad(link);
 		}
