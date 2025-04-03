@@ -311,7 +311,7 @@ class Paths
 			calls.push(func(paths[it]));
 			it++;
 		}
-		calls = calls.filter((a) -> {return a != null;});
+		calls = calls.filter((a) -> {return a != null && a != false;});
 		return calls.length != 0 ? calls[0] : null;
 	}
 	inline static public function getContent(path:String):Null<String> {
@@ -406,11 +406,15 @@ class Paths
 	}
 	inline static public function getSparrowAtlas(key:String, ?library:String):FlxAtlasFrames
 	{
-		var xmlPath = getPath('images/$key.xml');
-		return FlxAtlasFrames.fromSparrow(
-			image(key, library),
-			Paths.exists(xmlPath) ? Paths.getContent(xmlPath) : xmlPath
-		);
+		try {
+			var xmlPath = getPath('images/$key.xml');
+			return FlxAtlasFrames.fromSparrow(
+				image(key, library),
+				Paths.exists(xmlPath) ? Paths.getContent(xmlPath) : xmlPath
+			);
+		} catch (e) {
+			return null;
+		}
 	}
 
 	inline static public function getPackerAtlas(key:String, ?library:String):FlxAtlasFrames

@@ -1,5 +1,8 @@
 package funkin.objects.hud;
 
+import flixel.graphics.frames.FlxFramesCollection;
+import flixel.graphics.frames.FlxImageFrame;
+import sys.FileSystem;
 import flixel.graphics.frames.FlxFrame;
 import flixel.graphics.FlxGraphic;
 import flixel.FlxSprite;
@@ -19,13 +22,12 @@ class HealthIcon extends FlxSprite
 	private var isPlayer:Bool = false;
 	private var char:String = '';
 
-	public var previousPercent:Float = 0; // For transition calculating
-	public var relativePercent(default, set):Float = 0;
+	public var previousPercent:Float = 50; // For transition calculating
+	public var relativePercent(default, set):Float = 50;
 
 	function set_relativePercent(percent:Float){
 		if (autoUpdatesAnims)
 			updateState(percent);
-		previousPercent = relativePercent;
 		return relativePercent = percent;
 	}
 
@@ -38,19 +40,28 @@ class HealthIcon extends FlxSprite
 	
 	public function getWithTransitionables() {
 		// transition
-		if (getAnimation(previousPercent) != getAnimation(relativePercent)) {
+		var f = getAnimation(previousPercent);
+		var n = getAnimation(relativePercent);
+		if (f != n) {
 			isTransitioning = true;
-			return getAnimation(previousPercent) + 'To' + getAnimation(relativePercent);
-		} else {
-			isTransitioning = false;
-			return getAnimation(relativePercent);
+			previousPercent = relativePercent;
+			trace('previous animation is unlike current, playing transition');
+			trace('Animation: ' + f + 'To' + n);
+			if (animation.exists(f + 'To' + n))
+				return f + 'To' + n;
+			else if (animation.exists(n + 'To' + f))
+				return n+'To'+f+'-r';
+			else
+				trace('nvm this anim does not exist nor a reversed variant');
 		}
+		isTransitioning = false;
+		return getAnimation(relativePercent);
 	}
 
-	public function getAnimation(relativePercent:Float){
-		if (relativePercent <= losingPercent)
+	public function getAnimation(perc:Float){
+		if (perc <= losingPercent)
 			return 'losing';
-		else if(relativePercent >= winningPercent)
+		else if(perc >= winningPercent)
 			return 'winning';
 
 		return 'idle';
@@ -60,17 +71,21 @@ class HealthIcon extends FlxSprite
 	// ignore abrupt animation playing during a transition!
 	var isTransitioning = false;
 	public function updateState(relativePercent:Float){
-		if (canTransition && !isTransitioning)
-			animation.play(getWithTransitionables(), true);
-		else
-			animation.play(getAnimation(relativePercent), true);
+		if (canTransition && !isTransitioning) {
+			var anim:String = getWithTransitionables();
+			var reverse = anim.endsWith("-r");
+			anim = anim.split('-')[0];
+			animation.play(anim, false, reverse);
+		}
+		else if (!isTransitioning)
+			animation.play(getAnimation(relativePercent), false);
 	}
 
 	public function onAnimFinished(name:String) {
-		var toSplit = name.split('To');
-		if (isTransitioning) {
-			isTransitioning = false;
-			animation.play(toSplit[1], true);
+		if (name.contains('To')) {
+			if (isTransitioning) {
+				isTransitioning = false;
+			}
 		}
 	}
 
@@ -139,69 +154,48 @@ class HealthIcon extends FlxSprite
 	public static final IDLE_PREFIX = 'N';
 	public static final LOSING_PREFIX = 'L';
 	public static final WINNING_PREFIX = 'W';
-	public static final IDLE_TO_LOSE_PREFIX = 'T';
+	public static final IDLE_TO_LOSE_PREFIX = 'T ';
 	public static final IDLE_TO_WIN_PREFIX = 'TW';
 	public static final LOSE_TO_IDLE_PREFIX = 'TR';
 	public static final WIN_TO_IDLE_PREFIX = 'TWR';
 
 	public function setupSparrow(char:String){
-		var file:Null<FlxGraphic> = Paths.getWithFallbacks(Paths.getSparrowAtlas, ['icons/$char','icons/icon-$char']);
-		animation.addByPrefix("idle", IDLE_PREFIX, 24);
-		animation.addByPrefix("losing", LOSING_PREFIX, 24);
-		addIfExists('winning', WINNING_PREFIX, 24, IDLE_PREFIX);
-		var t:Bool = addIfExists('idleTolosing', IDLE_TO_LOSE_PREFIX, 24);
-		var tw:Bool = addIfExists('idleTowinning', IDLE_TO_WIN_PREFIX, 24);
-		var tr:Bool = addIfExists('losingToidle', LOSE_TO_IDLE_PREFIX, 24);
-		var twr:Bool = addIfExists('winningToIdle', WIN_TO_IDLE_PREFIX, 24);
+		var file:Null<FlxFramesCollection> = Paths.getWithFallbacks(Paths.getSparrowAtlas, ['icons/$char','icons/icon-$char']);
+		trace('Setting Up Sparrow');
+		frames = file;
+		animation.addByPrefix("idle", IDLE_PREFIX, 24, true);
+		animation.addByPrefix("losing", LOSING_PREFIX, 24, true);
+		addIfExists('winning', WINNING_PREFIX, 24, IDLE_PREFIX, true);
+		var t:Bool = addIfExists('idleTolosing', IDLE_TO_LOSE_PREFIX, 24, false);
+		var tw:Bool = addIfExists('idleTowinning', IDLE_TO_WIN_PREFIX, 24, false);
+		var tr:Bool = addIfExists('losingToidle', LOSE_TO_IDLE_PREFIX, 24, false);
+		var twr:Bool = addIfExists('winningToidle', WIN_TO_IDLE_PREFIX, 24, false);
 
-		// This is spaghetti ignore
-		if (t == false && tr == true) {
-			var aFrames = animation.getByName('losingToidle').frames;
-			aFrames.reverse();
-			animation.addByIndices('idleTolosing', IDLE_TO_LOSE_PREFIX, aFrames, '', 24);
-			t = true;
-		} else if (t == true && tr == false) {
-			var aFrames = animation.getByName('idleTolosing').frames;
-			aFrames.reverse();
-			animation.addByIndices('losingToidle', LOSE_TO_IDLE_PREFIX, aFrames, '', 24);
-			tr = true;
-		}
-		if (tw == false && twr == true) {
-			var aFrames = animation.getByName('winningToIdle').frames;
-			aFrames.reverse();
-			animation.addByIndices('idleTowinning', WIN_TO_IDLE_PREFIX, aFrames, '', 24);
-			tw = true;
-		} else if (tw == true && twr == false) {
-			var aFrames = animation.getByName('idleTowinning').frames;
-			aFrames.reverse();
-			animation.addByIndices('winningToIdle', IDLE_TO_WIN_PREFIX, aFrames, '', 24);
-			twr = true;
-		}
-
-		canTransition = (t == tw == tr == twr == true);
+		canTransition = (t == tw == true);
+		trace("Can transition: "+ canTransition);
 	}
 
-	public function addIfExists(name, prefix, framerate, ?fallback) {
+	public function addIfExists(name, prefix, framerate, ?fallback, ?loop) {
 
 		final animFrames:Array<FlxFrame> = new Array<FlxFrame>();
 		@:privateAccess
 		animation.findByPrefix(animFrames, prefix);
 		if (animFrames.length > 0) {
-			animation.addByPrefix(name, prefix, 24);
+			animation.addByPrefix(name, prefix, 24, loop);
 			return true;
 		} else if (fallback != null) {
-			animation.addByPrefix(name, fallback, 24);
+			animation.addByPrefix(name, fallback, 24, loop);
 		}
 		return false;
 	}
 
 	private var iconOffsets:Array<Float> = [0, 0];
 	public function changeIcon(char:String) {
-		if (Paths.getWithFallbacks(Paths.getText, ['images/icons/$char.xml','images/icons/icon-$char.xml']) != null) {
+		var d:Null<Bool> = Paths.getWithFallbacks(Paths.fileExists, ['images/icons/$char.xml','images/icons/icon-$char.xml']);
+		if (d != null) {
 			setupSparrow(char);
 		} else {
 			var file:Null<FlxGraphic> = Paths.getWithFallbacks(Paths.image, ['icons/$char','icons/icon-$char', 'icons/face']);
-			trace(file);
 
 			if (file != null){
 				//// TODO: sparrow atlas icons? would make the implementation of extra behaviour (ex: winning icons) way easier
