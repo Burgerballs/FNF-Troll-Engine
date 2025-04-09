@@ -163,6 +163,7 @@ class HealthIcon extends FlxSprite
 		var file:Null<FlxFramesCollection> = Paths.getWithFallbacks(Paths.getSparrowAtlas, ['icons/$char','icons/icon-$char']);
 		trace('Setting Up Sparrow');
 		frames = file;
+		animation.destroyAnimations();
 		animation.addByPrefix("idle", IDLE_PREFIX, 24, true);
 		animation.addByPrefix("losing", LOSING_PREFIX, 24, true);
 		addIfExists('winning', WINNING_PREFIX, 24, IDLE_PREFIX, true);
@@ -191,6 +192,7 @@ class HealthIcon extends FlxSprite
 
 	private var iconOffsets:Array<Float> = [0, 0];
 	public function changeIcon(char:String) {
+
 		var d:Null<Bool> = Paths.getWithFallbacks(Paths.fileExists, ['images/icons/$char.xml','images/icons/icon-$char.xml']);
 		if (d != null) {
 			setupSparrow(char);

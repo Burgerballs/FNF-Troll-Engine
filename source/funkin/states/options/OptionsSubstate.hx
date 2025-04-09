@@ -711,6 +711,7 @@ class OptionsSubstate extends MusicBeatSubstate
 
 		checkWindows();
 		changeCategory(0, true);
+		FlxG.mouse.visible = true;
 
 		super.create();
 		//trace('OptionState creation took ${Sys.cpuTime() - startTime} seconds.');
@@ -1586,16 +1587,9 @@ class OptionsSubstate extends MusicBeatSubstate
 				}
 			}
 
-			#if (flixel >= "5.9.0")
-			var movedMouse = Math.abs(FlxG.mouse.wheel) + Math.abs(FlxG.mouse.viewX - prevScreenX) + Math.abs(FlxG.mouse.viewY - prevScreenY) != 0;
-			prevScreenX = FlxG.mouse.viewX;
-			prevScreenY = FlxG.mouse.viewY;
-			#else
 			var movedMouse = Math.abs(FlxG.mouse.wheel) + Math.abs(FlxG.mouse.screenX - prevScreenX) + Math.abs(FlxG.mouse.screenY - prevScreenY) != 0;
 			prevScreenX = FlxG.mouse.screenX;
 			prevScreenY = FlxG.mouse.screenY;
-			#end
-			if (movedMouse) FlxG.mouse.visible = true;
 
 			if (pHov == null || doUpdate || movedMouse || FlxG.mouse.justPressed || forceWidgetUpdate)
 			{

@@ -2,6 +2,19 @@ package funkin.states.scripting;
 
 import funkin.scripts.FunkinHScript;
 
+#if SCRIPTABLE_STATES
+
+@:autoBuild(funkin.macros.ScriptingMacro.addScriptingCallbacks([
+	"create",
+	"update",
+	"destroy",
+	"openSubState",
+	"closeSubState",
+	"stepHit",
+	"beatHit",
+	"sectionHit"
+]))
+#end
 class HScriptedSubstate extends MusicBeatSubstate
 {
 	public var scriptPath:String;
@@ -21,8 +34,13 @@ class HScriptedSubstate extends MusicBeatSubstate
 
 		_extensionScript = FunkinHScript.fromFile(scriptPath, scriptPath, vars, false);
 		_extensionScript.call("new", []);
+		_extensionScript.set("add", this.add);
+		_extensionScript.set("remove", this.remove);
+		_extensionScript.set("this", this);
+		_extensionScript.set("insert", this.insert);
+		_extensionScript.set("members", this.members);
 	}
-
+	
 	static public function fromFile(name:String, ?scriptVars:Map<String, Dynamic>)
 	{
 		for (filePath in Paths.getFolders("substates"))
