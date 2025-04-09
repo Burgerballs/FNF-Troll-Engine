@@ -72,6 +72,15 @@ enum abstract CharacterType(Int) from Int to Int {
 	var BF = 0;
 	var DAD = 1;
 	var GF = 2;
+
+	public static function fromString(str:String):CharacterType {
+		return switch (str.toLowerCase().trim()) {
+			case 'bf'	| 'boyfriend'	| '0': BF;
+			case 'dad'	| 'opponent'	| '1': DAD;	
+			case 'gf'	| 'girlfriend'	| '2': GF;
+			default: -1;
+		}
+	}
 }
 
 /*
@@ -160,7 +169,7 @@ class PlayState extends MusicBeatState
 	public var songSpeed(default, set):Float = 1.0;
 	public var songSpeedType:String = "multiplicative";
 	public var noteKillOffset:Float = 350;
-	public var playbackRate:Float = 1.0;
+	public var playbackRate(default, set):Float = 1.0;
 
 	public var disableModcharts:Bool = false;
 	public var practiceMode:Bool = false;
@@ -934,8 +943,39 @@ class PlayState extends MusicBeatState
 		if(hud is TraditionalHUD || hud is KadeHUD || hud is ClassicHUD)
 			@:privateAccess
 			scoreTxt = (cast hud).scoreTxt;
-		
 		#end
+
+		//// Characters
+
+		if (SONG.player1 != null) {
+			changeCharacter(SONG.player1, BF);
+		}
+
+		if (SONG.player2 != null) {
+			changeCharacter(SONG.player2, DAD);
+		}
+
+		if (SONG.gfVersion != null && stageData.hide_girlfriend != true) {
+			changeCharacter(SONG.gfVersion, GF);
+		}
+
+		////
+		stage.buildStage();
+
+		// in case you want to layer characters or objects in a specific way (like in infimario for example)
+		// RICO CAN WE STOP USING SLURS IN THE CODE
+		// we???
+		// fine, can YOU stop using slurs in the code >:(
+		if (Globals.Function_Stop != callOnHScripts("onAddSpriteGroups"))
+		{
+			add(stage);
+
+			add(gfGroup);
+			add(dadGroup);
+			add(boyfriendGroup);
+
+			add(stage.foreground);
+		}
 		
 		//// Generate playfields so you can actually, well, play the game
 		#if ALLOW_DEPRECATION
@@ -1131,11 +1171,6 @@ class PlayState extends MusicBeatState
 
 		Cache.loadWithList(shitToLoad);
 		shitToLoad = [];
-
-		if(gf!=null) gf.callOnScripts("onAdded", [gf, null]); // if you can come up w/ a better name for this callback then change it lol
-		// (this also gets called for the characters changed in changeCharacter)
-		if(boyfriend!=null) boyfriend.callOnScripts("onAdded", [boyfriend, null]);
-		if(dad!=null) dad.callOnScripts("onAdded", [dad, null]); 
 
 		super.create();
 
@@ -1343,11 +1378,6 @@ class PlayState extends MusicBeatState
 	}
 
 	function startCharacterPos(char:Character, ?gfCheck:Bool = false, ?startBopBeat:Float=-5) {
-		if (gfCheck && char.characterId.startsWith('gf')) { //IF DAD IS GIRLFRIEND, HE GOES TO HER POSITION
-			char.setPosition(GF_X, GF_Y);
-			char.scrollFactor.set(0.95, 0.95);
-			char.danceEveryNumBeats = 2;
-		}
 		char.nextDanceBeat = startBopBeat;
 		// center-bottom the character if stage positioning is vslice adjacent.
 		if (stageData?.vslice_positioning ?? false) {
@@ -1696,6 +1726,13 @@ class PlayState extends MusicBeatState
 		}
 
 		return null;
+	}
+
+	@:noCompletion
+	private function set_playbackRate(pitch:Float):Float {		
+		FlxG.timeScale = pitch;
+		Conductor.changePitch(pitch);
+		return playbackRate = pitch;
 	}
 
 	private function generateSong(dataPath:String):Void
@@ -2793,14 +2830,6 @@ class PlayState extends MusicBeatState
 				newChar = dad = dadMap.get(name);
 				varName = 'dadName';
 
-				if (gf != null) {
-					if (oldChar != null && oldChar.characterId.startsWith('gf')) // if the old character was hiding gf, make her visible again.
-						gf.visible = true;
-
-					if (newChar != null && newChar.characterId.startsWith('gf')) // if the new character is a gf character, hide the actual gf as this will take it's position 
-						gf.visible = false; 
-				}
-
 			case GF:
 				if (gf != null && gf.characterId == name) 
 					return;
@@ -2857,14 +2886,8 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	public static function getCharacterTypeFromString(str:String):CharacterType {
-		return switch (str.toLowerCase().trim()) {
-			case 'bf'	| 'boyfriend'	| '0': BF;
-			case 'dad'	| 'opponent'	| '1': DAD;	
-			case 'gf'	| 'girlfriend'	| '2': GF;
-			default: -1;
-		}
-	}
+	public static function getCharacterTypeFromString(str:String):CharacterType
+		return CharacterType.fromString(str);
 
 	public function triggerEventNote(eventName:String = "", value1:String = "", value2:String = "", ?time:Float) {
 		if (time==null)
@@ -2918,16 +2941,10 @@ class PlayState extends MusicBeatState
 				var time:Float = Std.parseFloat(value2);
 				if(Math.isNaN(time) || time <= 0) time = 0.6;
 
-				if (value != 0) {
-					if (dad != null && dad.characterId.startsWith('gf')) { //Tutorial GF is actually Dad! The GF is an imposter!! ding ding ding ding ding ding ding, dindinding, end my suffering
-						dad.playAnim('cheer', true);
-						dad.specialAnim = true;
-						dad.heyTimer = time;
-					} else if (gf != null) {
-						gf.playAnim('cheer', true);
-						gf.specialAnim = true;
-						gf.heyTimer = time;
-					}
+				if (value != 0 && gf != null) {
+					gf.playAnim('cheer', true);
+					gf.specialAnim = true;
+					gf.heyTimer = time;
 				}
 				if (value != 1 && boyfriend != null) {
 					boyfriend.playAnim('hey', true);
@@ -2936,8 +2953,8 @@ class PlayState extends MusicBeatState
 				}
 
 			case 'Set GF Speed':
-				var value:Int = Std.parseInt(value1);
-				if(Math.isNaN(value) || value < 1) value = 1;
+				var value:Null<Int> = Std.parseInt(value1);
+				if (value == null || value < 1) value = 1;
 				gfSpeed = value;
 
 			case 'Add Camera Zoom':
