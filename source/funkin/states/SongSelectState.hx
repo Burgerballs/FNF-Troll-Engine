@@ -77,8 +77,6 @@ class SongSelectState extends MusicBeatState
 
 	override public function create() 
 	{
-		StartupState.load();
-
 		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Menus", null);
 		#end

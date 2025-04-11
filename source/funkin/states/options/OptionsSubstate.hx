@@ -140,6 +140,9 @@ class OptionsSubstate extends MusicBeatSubstate
 				"performance",
 				[
 					"lowQuality",
+					// Sorry gang but in my eyes gpu caching isn't ready yet
+					// and it kills my cool rendering trickery!
+					//"cacheOnGPU",
 					"globalAntialiasing",
 					"multicoreLoading",
 					"optimizeHolds",

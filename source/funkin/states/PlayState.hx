@@ -2562,6 +2562,7 @@ class PlayState extends MusicBeatState
 			}
 
 			var currentCameraPoint = cameraPoints[cameraPoints.length-1];
+			trace(cameraPoints);
 			if (currentCameraPoint != null)
 				camFollow.copyFrom(currentCameraPoint);
 
@@ -2952,6 +2953,7 @@ class PlayState extends MusicBeatState
 				if (isNan1 && isNan2) 
 					cameraPoints.remove(customCamera);
 				else{
+					focusedChar = null;
 					if (!isNan1) customCamera.x = val1;
 					if (!isNan2) customCamera.y = val2;
 					addCameraPoint(customCamera);

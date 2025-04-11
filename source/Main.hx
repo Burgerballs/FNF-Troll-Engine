@@ -44,9 +44,9 @@ final class Version
 class Main extends Sprite
 {
 	public static var instance:Main = null;
-	var gameWidth:Int = 1280; // Width of the game in pixels (might be less / more in actual pixels depending on your zoom).
-	var gameHeight:Int = 720; // Height of the game in pixels (might be less / more in actual pixels depending on your zoom).
-	var adjustGameSize:Bool = true; // If true, the game size is adjusted to fit within the screen resolution
+	static var gameWidth:Int = 1280; // Width of the game in pixels (might be less / more in actual pixels depending on your zoom).
+	static var gameHeight:Int = 720; // Height of the game in pixels (might be less / more in actual pixels depending on your zoom).
+	static var adjustGameSize:Bool = true; // If true, the game size is adjusted to fit within the screen resolution
 	var initialState:Class<FlxState> = StartupState; // The FlxState the game starts with.
 	var nextState:Class<FlxState> = funkin.states.TitleState; 
 	var framerate:Int = 60; // How many frames per second the game should run at.
@@ -184,7 +184,7 @@ class Main extends Sprite
 		);
 	}
 
-	public function resizeGame() {
+	public static function resizeGame() {
 		final screenWidth = Capabilities.screenResolutionX;
 		final screenHeight = Capabilities.screenResolutionY;
 		if (adjustGameSize) {

@@ -1814,7 +1814,6 @@ class ExperimentalChartingState extends MusicBeatState
 	}
 
 	var lastConductorPos:Float = -1;
-	var lastMixTimer:Float = 0;
 	var colorSine:Float = 0;
 	//// sustain note dragging 
 	var startDummyY:Null<Float> = null;
