@@ -41,43 +41,22 @@ NightmareVision only garners popularity because of Hit Single and other popular 
 
 This fork has some features that are different to the original or are completely new.
 
-## Interpolated Scroll Velocities
+* V-Slice Character Support
+* Reskinned Options Menu
+* Interpolated SV Events
+* Startup Loading Screen
+* Cooler Keyhints
+* Aseprite Atlas Support
+* MultiSparrow Support
+* MultiAseprite Support
+* Cooler Freeplay Menu
+* Song Cover Art
+* FPS+ Style Note Indicator Option
+* New Accuracy Calculation Settings
+* Minor changes to the chart editor
+* BPM-Based Scroll Speed Modifier
+* Differing Quant HSVs
 
-![image](https://github.com/user-attachments/assets/ae9a373e-4df3-4000-b72a-975f27c9e983)
-
-https://github.com/user-attachments/assets/e747d50d-54f9-4ce5-a58f-a8bf890a0cd9
-
-Scroll velocities are a big part of Troll Engine, so thats why this modified version adds two extra events for "Interpolated" scroll velocities.
-
-Basically imagine the Scroll Speed Change event in Psych Engine, but for Scroll Velocity instead, with a set duration.
-
-Because of the way that it works, there is an option in the Options Menu, that allows you to change it's smoothness, if it takes a toll on your computer's RAM.
-
-## Themed Options Menu
-
-I've decided to change the appearance of the options menu to make the design more consistant with FNF, instead of the TGT mod specific design the original has.
-
-![image](https://github.com/user-attachments/assets/f0b49edc-c59c-494f-8efb-976d648a7cac)
-
-## V-Slice Character Support
-
-V-Slice's character format is supported.
-
-Along with this are some small optional changes to the Psych Engine character format. Allowing you to use multiple sparrow atlases.
-
-Stages can now also be modified to use V-Slice stage positioning with a small json edit.
-
-# More Atlas Support
-
-Aseprite JSON atlases are supported.
-
-More supported atlas rendering types are as follows:
-
-MultiSparrow (multiple Sparrow atlases on single sprite)
-
-MultiPacker (multiple Packer atlases on single sprite)
-
-MultiAseprite (multiple JSON Packer atlases on single sprite)
 
 # Special Thanks
 
