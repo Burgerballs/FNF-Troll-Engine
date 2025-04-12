@@ -2562,7 +2562,6 @@ class PlayState extends MusicBeatState
 			}
 
 			var currentCameraPoint = cameraPoints[cameraPoints.length-1];
-			trace(cameraPoints);
 			if (currentCameraPoint != null)
 				camFollow.copyFrom(currentCameraPoint);
 
