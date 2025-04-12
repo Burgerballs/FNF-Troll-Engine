@@ -1,5 +1,6 @@
 package;
 
+import flixel.FlxSprite;
 import funkin.objects.IndependentVideoSprite;
 import math.CoolMath;
 import flixel.ui.FlxBar;
@@ -83,6 +84,7 @@ class StartupState extends FlxTransitionableState
 
 	static var loadBar:FlxBar;
 	static var actionTxt:FlxText;
+	static var percentageTxt:FlxText;
 	override function create()
 	{
 		this.transIn = null;
@@ -92,22 +94,14 @@ class StartupState extends FlxTransitionableState
 			function():Void {
 				Paths.init();
 				Paths.getAllStrings();
-			},
-			function():Void {
-				actionTxt.text = 'Initializing Player Settings...';
 				PlayerSettings.init();
-			},
-			function():Void {
-				actionTxt.text = 'Initializing Client Preferences...';
 				ClientPrefs.initialize();
 				ClientPrefs.load();
-			},
-			function():Void {
-				actionTxt.text = 'Loading Player Highscores...';
 				Highscore.load();
+
+				actionTxt.text += ' Done!\nDoing Flixel System Junk...';
 			},
 			function():Void {
-				actionTxt.text = 'Doing Flixel System Junk...';
 
 				Main.resizeGame();
 				FlxG.sound.onVolumeChange.add((vol:Float) -> {
@@ -151,40 +145,59 @@ class StartupState extends FlxTransitionableState
 		
 				FlxTransitionableState.defaultTransIn = FadeTransitionSubstate;
 				FlxTransitionableState.defaultTransOut = FadeTransitionSubstate;
+
+				actionTxt.text += ' Done!\nLoading Video System...';
 			},
 			function() {
 				okay = false;
-				actionTxt.text = 'Loading video system';
 				bullyIntro = new IndependentVideoSprite(0,0,false,false);
 				bullyIntro.bitmap.onFormatSetup.add(function():Void
 				{
 					okay = true;
 				});
-				
 				bullyIntro.load(Paths.video('loading'));
 				bullyIntro.play();
 			},
 			function() {
-				actionTxt.text = 'Loading up the Title Screen...';
+				actionTxt.text += ' Done!';
 				MusicBeatState.switchState(Type.createInstance(nextState, []));
 			}
 		];
 
-		loadMax = loadActions.length - 1;
+		loadMax = loadActions.length;
 
 		var versionShit:FlxText = new FlxText(2, 2, 0, 'Loading...', 18);
 		versionShit.scrollFactor.set();
 		versionShit.setFormat("VCR OSD Mono", 18, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
 
-		actionTxt = new FlxText(2, 22, 0, 'Initializing Paths and Localization Strings...', 18);
+		actionTxt = new FlxText(2, 22, 0, 'Getting Saves and Paths and Stuff...', 18);
 		actionTxt.scrollFactor.set();
 		actionTxt.setFormat("VCR OSD Mono", 18, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(actionTxt);
 
-		loadBar = new FlxBar(versionShit.x + versionShit.width + 32, 2, LEFT_TO_RIGHT, Std.int(FlxG.width - (versionShit.x + versionShit.width + 32) - 32), 16, null, null, 0, 100);
+		loadBar = new FlxBar(versionShit.x + versionShit.width + 32, 2, LEFT_TO_RIGHT, Std.int(FlxG.width - (versionShit.x + versionShit.width) - 34), 16, null, null, 0, 100);
 		loadBar.createFilledBar(0xFF000000, 0xFFFFFFFF);
 		add(loadBar);
+
+		percentageTxt = new FlxText(loadBar.x, 720 - 68, loadBar.width, '100%', 18);
+		percentageTxt.scrollFactor.set();
+		percentageTxt.setFormat("VCR OSD Mono", 64, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(percentageTxt);
+
+		#if BBTE_BURGERBALLS_SIGNATURE
+		var downzi:FlxSprite = new FlxSprite();
+		add(downzi);
+		downzi.frames = Paths.getSparrowAtlas('loading/downzi');
+
+		downzi.animation.addByPrefix('idle', 'walk', 12, true);
+		downzi.animation.play('idle');
+		downzi.scale.set(3,3);
+		downzi.updateHitbox();
+		downzi.setPosition(6, FlxG.height - downzi.height - 6);
+		downzi.antialiasing = false;
+		#end
+
 		super.create();
 	}
 
@@ -206,6 +219,7 @@ class StartupState extends FlxTransitionableState
 			curLoad +=1;
 			loadPercent = (curLoad / loadMax) * 100;
 			loadBar.value = loadPercent;
+			percentageTxt.text = Math.floor(loadPercent) + '%';
 		}
 
 		super.update(elapsed);
