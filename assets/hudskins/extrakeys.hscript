@@ -3,6 +3,9 @@ var gfxLetter:Array<String> = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
 var gfxDir:Array<String> = ['LEFT', 'DOWN', 'UP', 'RIGHT', 'SPACE'];
 
 var gfxIndex:Array<Dynamic> = [
+    [4],
+    [0, 3],
+    [0, 4, 3],
     [0, 1, 2, 3],
     [0, 1, 4, 2, 3],
     [0, 2, 3, 5, 1, 8],
@@ -12,6 +15,9 @@ var gfxIndex:Array<Dynamic> = [
 ];
 
 var gfxHud:Array<Dynamic> = [
+    [4],
+    [0, 3],
+    [0, 4, 3],
     [0, 1, 2, 3],
     [0, 1, 4, 2, 3],
     [0, 2, 3, 0, 1, 3],

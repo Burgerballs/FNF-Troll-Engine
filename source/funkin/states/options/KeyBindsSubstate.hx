@@ -57,6 +57,11 @@ class KeyBindsSubstate extends MusicBeatSubstate  {
 		['Column 8', 'note_8_9k'],
 		['Column 9', 'note_9_9k'],
 
+		['1/3 Keys'],
+		['Column 1', 'note_1_3k'],
+		['Column 2 (1K/3K CENTER)', 'note_2_3k'],
+		['Column 3', 'note_3_3k'],
+
 		[Paths.getString('controls_ui')],
 		[Paths.getString('control_ui_up'), 'ui_up'],
 		[Paths.getString('control_ui_down'), 'ui_down'],

@@ -830,9 +830,15 @@ class ClientPrefs
 	// I think its shitty and can stand a rewrite but w/e
 	// later
 	public static var keyBinds:Map<String, Array<FlxKey>> = [
+
+
+		'note_1_3k' => [A, NONE],
+		'note_2_3k' => [S, NONE],
+		'note_3_3k' => [D, NONE],
+
 		'note_left' => [A, LEFT],
 		'note_down' => [S, DOWN],
-		'note_center' => [SPACE, NONE],
+		'note_center' => [SPACE, H],
 		'note_up' => [W, UP],
 		'note_right' => [D, RIGHT],
 

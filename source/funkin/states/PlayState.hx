@@ -1201,6 +1201,21 @@ class PlayState extends MusicBeatState
 		
 		// for the sake of my dignity never speak of this please?
 		switch (playerField.keyCount) {
+			case 1:
+				keysArray = [
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_2_3k')),
+				];
+			case 2:
+				keysArray = [
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_1_3k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_3_3k'))
+				];
+			case 3:
+				keysArray = [
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_1_3k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_2_3k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_3_3k'))
+				];
 			case 5:
 				keysArray = [
 					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_left')),

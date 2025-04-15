@@ -56,6 +56,7 @@ This fork has some features that are different to the original or are completely
 * Minor changes to the chart editor
 * BPM-Based Scroll Speed Modifier
 * Differing Quant HSVs
+* Expanded Multikey (1 to 9 keys) with changes to the chart and options menus.
 
 
 # Special Thanks
