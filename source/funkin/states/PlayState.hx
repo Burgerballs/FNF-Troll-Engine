@@ -1198,7 +1198,6 @@ class PlayState extends MusicBeatState
 		debugKeysCharacter = ClientPrefs.copyKey(ClientPrefs.keyBinds.get('debug_2'));
 		debugKeysBotplay = ClientPrefs.copyKey(ClientPrefs.keyBinds.get('botplay'));
 
-		
 		// for the sake of my dignity never speak of this please?
 		switch (playerField.keyCount) {
 			case 1:
