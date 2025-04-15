@@ -832,8 +832,29 @@ class ClientPrefs
 	public static var keyBinds:Map<String, Array<FlxKey>> = [
 		'note_left' => [A, LEFT],
 		'note_down' => [S, DOWN],
+		'note_center' => [SPACE, NONE],
 		'note_up' => [W, UP],
 		'note_right' => [D, RIGHT],
+
+		'note_1_7k' => [S, NONE],
+		'note_2_7k' => [D, NONE],
+		'note_3_7k' => [F, NONE],
+		'note_4_7k' => [SPACE, NONE],
+		'note_5_7k' => [J, NONE],
+		'note_6_7k' => [K, NONE],
+		'note_7_7k' => [L, NONE],
+
+		'note_1_9k' => [A, NONE],
+		'note_2_9k' => [S, NONE],
+		'note_3_9k' => [D, NONE],
+		'note_4_9k' => [F, NONE],
+		'note_5_9k' => [SPACE, NONE],
+		'note_6_9k' => [H, NONE],
+		'note_7_9k' => [J, NONE],
+		'note_8_9k' => [K, NONE],
+		'note_9_9k' => [L, NONE],
+
+
 		'dodge' => [SPACE, NONE],
 		'ui_left' => [A, LEFT],
 		'ui_down' => [S, DOWN],

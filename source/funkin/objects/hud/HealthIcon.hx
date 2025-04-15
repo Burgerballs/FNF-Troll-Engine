@@ -1,5 +1,6 @@
 package funkin.objects.hud;
 
+import flixel.animation.FlxAnimationController;
 import flixel.graphics.frames.FlxFramesCollection;
 import flixel.graphics.frames.FlxImageFrame;
 import sys.FileSystem;
@@ -45,14 +46,10 @@ class HealthIcon extends FlxSprite
 		if (f != n) {
 			isTransitioning = true;
 			previousPercent = relativePercent;
-			trace('previous animation is unlike current, playing transition');
-			trace('Animation: ' + f + 'To' + n);
 			if (animation.exists(f + 'To' + n))
 				return f + 'To' + n;
 			else if (animation.exists(n + 'To' + f))
 				return n+'To'+f+'-r';
-			else
-				trace('nvm this anim does not exist nor a reversed variant');
 		}
 		isTransitioning = false;
 		return getAnimation(relativePercent);
@@ -160,10 +157,7 @@ class HealthIcon extends FlxSprite
 	public static final WIN_TO_IDLE_PREFIX = 'TWR';
 
 	public function setupSparrow(char:String){
-		var file:Null<FlxFramesCollection> = Paths.getWithFallbacks(Paths.getSparrowAtlas, ['icons/$char','icons/icon-$char']);
-		trace('Setting Up Sparrow');
-		frames = file;
-		animation.destroyAnimations();
+		frames = Paths.getWithFallbacks(Paths.getSparrowAtlas, ['icons/$char','icons/icon-$char']);
 		animation.addByPrefix("idle", IDLE_PREFIX, 24, true);
 		animation.addByPrefix("losing", LOSING_PREFIX, 24, true);
 		addIfExists('winning', WINNING_PREFIX, 24, IDLE_PREFIX, true);
@@ -171,9 +165,7 @@ class HealthIcon extends FlxSprite
 		var tw:Bool = addIfExists('idleTowinning', IDLE_TO_WIN_PREFIX, 24, false);
 		var tr:Bool = addIfExists('losingToidle', LOSE_TO_IDLE_PREFIX, 24, false);
 		var twr:Bool = addIfExists('winningToidle', WIN_TO_IDLE_PREFIX, 24, false);
-
 		canTransition = (t == tw == true);
-		trace("Can transition: "+ canTransition);
 	}
 
 	public function addIfExists(name, prefix, framerate, ?fallback, ?loop) {

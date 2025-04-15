@@ -556,7 +556,7 @@ class Note extends NoteObject
 		} 
 	
 		if (inEditor)
-			setGraphicSize(ChartingState.GRID_SIZE, ChartingState.GRID_SIZE);
+			setGraphicSize(ChartingState.instance.GRID_SIZE, ChartingState.instance.GRID_SIZE);
 		
 		defScale.copyFrom(scale);
 		updateHitbox();

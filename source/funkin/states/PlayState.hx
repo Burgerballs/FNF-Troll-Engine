@@ -555,7 +555,6 @@ class PlayState extends MusicBeatState
 
 		MusicBeatState.stopMenuMusic();
 
-		updateKeybinds();
 
 		speedChanges.push({
 			position: -6000 * 0.45,
@@ -1189,6 +1188,7 @@ class PlayState extends MusicBeatState
 		noteTypeMap = null;
 		eventPushedMap.clear();
 		eventPushedMap = null;
+		updateKeybinds();
 
 		Paths.clearUnusedMemory();
 	}
@@ -1198,12 +1198,67 @@ class PlayState extends MusicBeatState
 		debugKeysCharacter = ClientPrefs.copyKey(ClientPrefs.keyBinds.get('debug_2'));
 		debugKeysBotplay = ClientPrefs.copyKey(ClientPrefs.keyBinds.get('botplay'));
 
-		keysArray = [
-			ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_left')),
-			ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_down')),
-			ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_up')),
-			ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_right'))
-		];
+		
+		// for the sake of my dignity never speak of this please?
+		switch (playerField.keyCount) {
+			case 5:
+				keysArray = [
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_left')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_down')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_center')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_up')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_right'))
+				];
+			case 6:
+				keysArray = [
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_1_7k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_2_7k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_3_7k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_5_7k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_6_7k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_7_7k'))
+				];
+			case 7:
+				keysArray = [
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_1_7k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_2_7k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_3_7k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_4_7k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_5_7k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_6_7k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_7_7k'))
+				];
+			case 8:
+				keysArray = [
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_1_9k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_2_9k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_3_9k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_4_9k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_6_9k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_7_9k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_8_9k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_9_9k')),
+				];
+			case 9:
+				keysArray = [
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_1_9k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_2_9k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_3_9k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_4_9k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_5_9k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_6_9k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_7_9k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_8_9k')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_9_9k')),
+				];
+			default:
+				keysArray = [
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_left')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_down')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_up')),
+					ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_right'))
+				];
+		}
 
 		buttonsArray = [
 			ClientPrefs.copyKey(ClientPrefs.buttonBinds.get('note_left')),
