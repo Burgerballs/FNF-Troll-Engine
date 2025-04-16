@@ -784,6 +784,11 @@ class ChartingState extends MusicBeatState
 		skinDropdown.selectedLabel = _song.hudSkin;
 		blockPressWhileScrolling.push(skinDropdown);
 
+		var stepperKeys:FlxUINumericStepper = new FlxUINumericStepper(skinDropdown.x, player2DropDown.y, 1, 4, 0, 9);
+		stepperKeys.value = _song.keyCount;
+		stepperKeys.name = 'song_keyCount';
+		blockPressWhileTypingOnStepper.push(stepperKeys);
+
 		var arrowSkin = PlayState.SONG.arrowSkin;
 		if (arrowSkin == null) arrowSkin = '';
 		
@@ -809,6 +814,12 @@ class ChartingState extends MusicBeatState
 		tab_group_song.add(clear_notes);
 		tab_group_song.add(saveButton);
 		tab_group_song.add(saveEvents);
+
+		tab_group_song.add(new FlxText(stepperBPM.x, stepperBPM.y - 15, 0, 'Song BPM:'));
+		tab_group_song.add(stepperKeys);
+
+		tab_group_song.add(new FlxText(skinDropdown.x, stepperKeys.y - 15, 0, 'Key Count:'));
+
 
 		// TODO: per-song metadata 
 /* 		tab_group_song.add(saveMetadata);
@@ -1776,6 +1787,11 @@ class ChartingState extends MusicBeatState
 				_song.bpm = nums.value;
 				Conductor.mapBPMChanges(_song);
 				updateGrid();
+			}
+			else if (wname == 'song_keyCount') {
+				_song.keyCount = Math.floor(nums.value);
+				keyCount = Math.floor(nums.value);
+				reloadGridLayer();
 			}
 			else if (wname == 'note_susLength')
 			{
