@@ -53,6 +53,8 @@ jobs:
           haxelib --always --quiet install hxdiscord_rpc 1.1.1
           haxelib --always --quiet git linc_luajit https://github.com/riconuts/linc_luajit
           haxelib --always --quiet install moonchart 0.4.0
+          haxelib --always --quiet git hxcpp https://github.com/HaxeFoundation/hxcpp
+          haxelib --always --quiet install hxvlc 2.0.1
         shell: cmd
       - name: Create Version Tag
         run: echo "${{github.run_id}}" > VERSION
