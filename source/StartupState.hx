@@ -150,12 +150,12 @@ class StartupState extends FlxTransitionableState
 			},
 			function() {
 				okay = false;
-				bullyIntro = new IndependentVideoSprite(0,0,false,false);
+				bullyIntro = new IndependentVideoSprite(0,0,true,false);
 				bullyIntro.bitmap.onFormatSetup.add(function():Void
 				{
 					okay = true;
 				});
-				bullyIntro.load(Paths.video('loading'));
+				bullyIntro.load(Paths.video('loading'), [':no-audio']);
 				bullyIntro.play();
 			},
 			function() {

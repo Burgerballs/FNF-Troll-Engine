@@ -663,6 +663,22 @@ class ClientPrefs
 				value: true,
 				data: []
 			},
+			"fpsStyle" => {
+				display: "FPS Counter Style",
+				desc: "Allows you to select between various different FPS counter styles from other engines.",
+				type: Dropdown,
+				value: "Troll",
+				data: [
+					"options" => ["Troll", "Psych"]
+				]
+			},
+			"fpsBG" => {
+				display: "FPS Counter Background",
+				desc: "Adds a black underlay to the FPS Counter.",
+				type: Toggle,
+				value: true,
+				data: []
+			},
 			"framerate" => {
 				display:"Max Framerate",
 				desc:"The highest framerate the game can hit.",

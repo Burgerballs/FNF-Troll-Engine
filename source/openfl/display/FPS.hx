@@ -87,10 +87,8 @@ class FPS extends TextField
 		var textFormat = new TextFormat(null, 12, color);
 
 		embedFonts = true;
-		textFormat.font = Paths.font('helvetica.ttf');
+		textFormat.font = '_sans';
 		defaultTextFormat = textFormat;
-		// Condense font to conserve horizontal space.
-		scaleX = 0.95;
 
 
 		currentFPS = 0;
@@ -145,6 +143,8 @@ class FPS extends TextField
 	{
 		currentTime += deltaTime;
 		alpha = ClientPrefs.fpsOpacity;
+		background = ClientPrefs.fpsBG;
+
 		times.push(currentTime);
 
 		while (times[0] < currentTime - 1000)
@@ -160,10 +160,7 @@ class FPS extends TextField
 		{
 			cacheCount = currentCount;
 
-			text = 'FPS: $currentFPS';
-			
-			if (showMemory) // Credit to Rudyrue and Leather128 for this one
-				text += ' • Memory: [APP: ${FlxStringUtil.formatBytes(appMemoryInBytes)} | GC: ${FlxStringUtil.formatBytes(gcMemoryInBytes)}]';
+			generateFpsText();
 
 			#if (debug && false)
 			text += '\nState: $currentState';
@@ -179,6 +176,20 @@ class FPS extends TextField
 			text += "\nstageDC: " + Context3DStats.contextDrawCalls(DrawCallContext.STAGE);
 			text += "\nstage3DDC: " + Context3DStats.contextDrawCalls(DrawCallContext.STAGE3D);
 			#end
+		}
+	}
+
+	private function generateFpsText() {
+		switch (ClientPrefs.fpsStyle) {
+			case 'Funkin' | 'Psych':
+				text = 'FPS: $currentFPS';
+				if (showMemory) // Credit to Rudyrue and Leather128 for this one
+					text += ' \nMemory: [APP: ${FlxStringUtil.formatBytes(appMemoryInBytes)} | GC: ${FlxStringUtil.formatBytes(gcMemoryInBytes)}]';
+			default:
+				text = 'FPS: $currentFPS';
+			
+				if (showMemory) // Credit to Rudyrue and Leather128 for this one
+					text += ' • Memory: [APP: ${FlxStringUtil.formatBytes(appMemoryInBytes)} | GC: ${FlxStringUtil.formatBytes(gcMemoryInBytes)}]';
 		}
 	}
 }

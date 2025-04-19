@@ -46,6 +46,14 @@ class Highscore {
 	];
 
 	public static var grades:Map<String, Array<Array<Dynamic>>> = [
+		"Funkin" => [
+			["P", 1],
+			['E', 0.9],
+			['Silver G', 0.8],
+			['Bronze G', 0.6],
+			['L', 0.0],
+			['ULTRA L', -200] // if you somehow get BELOW -100, this is your prize! (Only applicable to Wife3)
+		],
 		"Psych" => [
 			["Perfect!!", 1],
 			["Sick!", 0.9],

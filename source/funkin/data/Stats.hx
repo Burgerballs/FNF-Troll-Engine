@@ -176,6 +176,7 @@ class Stats {
 	public var wf = Paths.getString("whiteflag"); // White Flag (EFC missed by 1 sick)
 	public var mf = Paths.getString("missflag"); // Miss Flag (Any FC missed by 1 CB)
 
+	public var sdm = 'SDM'; // Single Digit Misses
 	public var sdcb = Paths.getString("sdcb"); // Single Digit Combo Breaks
 	public var fail = Paths.getString("fail");
 	public var clear = Paths.getString("clear");
@@ -188,6 +189,8 @@ class Stats {
 		if (comboBreaks > 0) {
 			if (useFlags && comboBreaks == 1)
 				type = mf; // Miss Flag (Any FC missed by 1 CB)
+			else if (comboBreaks == misses && misses < 10) 
+				type = sdm
 			else if (comboBreaks < 10 && score >= 0)
 				type = sdcb; // Single Digit Combo Break
 			else if (score < 0 || comboBreaks >= 10 && ratingPercent <= 0)

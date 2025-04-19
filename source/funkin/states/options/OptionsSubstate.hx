@@ -134,7 +134,7 @@ class OptionsSubstate extends MusicBeatSubstate
 			]
 		],
 		"video" => [
-			["video", ["shaders", "showFPS", "fpsOpacity"]],
+			["video", ["shaders", "showFPS", "fpsOpacity", "fpsBG", "fpsStyle"]],
 			["display", ["framerate", #if FUNNY_ALLOWED "bread" #end]],
 			[
 				"performance",
@@ -556,7 +556,7 @@ class OptionsSubstate extends MusicBeatSubstate
 
 		////
 		var optionMenu = new FlxSprite(80, 80, CoolUtil.makeOutlinedGraphic(
-			FlxMath.minInt(980, FlxG.width), 
+			FlxMath.minInt(920, FlxG.width), 
 			FlxG.height-140, 
 			color1, 
 			2, 
