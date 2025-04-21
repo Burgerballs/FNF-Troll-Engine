@@ -1451,6 +1451,11 @@ class PlayState extends MusicBeatState
 
 	function startCharacterPos(char:Character, ?gfCheck:Bool = false, ?startBopBeat:Float) {
 		if (startBopBeat != null) char.nextDanceBeat = startBopBeat;
+
+		if (stageData?.vslice_positioning ?? false) {
+			char.x -= Math.floor(char.width / 2);
+			char.y -= char.height;
+		}
 		char.x += char.positionArray[0];
 		char.y += char.positionArray[1];
 	}
