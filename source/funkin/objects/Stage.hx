@@ -155,7 +155,7 @@ class Stage extends FlxTypedGroup<FlxBasic>
 	}
 
 	override function toString(){
-		return 'Stage: "$curStage"';
+		return 'Stage($curStage)';
 	}
 
 	/**

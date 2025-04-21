@@ -1449,14 +1449,8 @@ class PlayState extends MusicBeatState
 		return null;
 	}
 
-	function startCharacterPos(char:Character, ?gfCheck:Bool = false, ?startBopBeat:Float=-5) {
-		char.nextDanceBeat = startBopBeat;
-		// center-bottom the character if stage positioning is vslice adjacent.
-		if (stageData?.vslice_positioning ?? false) {
-			char.x -= Math.floor(char.width / 2);
-			char.y -= char.height;
-		}
-		
+	function startCharacterPos(char:Character, ?gfCheck:Bool = false, ?startBopBeat:Float) {
+		if (startBopBeat != null) char.nextDanceBeat = startBopBeat;
 		char.x += char.positionArray[0];
 		char.y += char.positionArray[1];
 	}
@@ -3957,13 +3951,16 @@ class PlayState extends MusicBeatState
 		
 	}
 
-	inline function getNoteCharacters(note:Note, field:PlayField) {
-		var chars:Array<Character> = note.characters;
+	inline function getNoteCharacters(note:Note, field:PlayField):Array<Character> {
+		var chars:Array<Character> = note.characters.copy();
 
-		if (note.gfNote && gf != null)
-			chars.push(gf);
-		else if (chars.length == 0)
-			chars = field.characters;
+		if (note.gfNote)
+			if (gf != null) chars.push(gf);
+		
+		if (chars.length == 0) {
+			for (c in field.characters)
+				chars.push(c);
+		}
 
 		return chars;
 	}
