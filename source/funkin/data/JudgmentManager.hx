@@ -93,7 +93,7 @@ class JudgmentManager {
 			accuracy: 10,
 			health: 0, // maybe change to 0.375 to match V-Slice?
 			noteSplash: false,
-			level:0.8
+			level:1
 		},
 		TIER2 => {
 			internalName: "bad",
@@ -104,7 +104,7 @@ class JudgmentManager {
 			health: -1.15, // I think we could make this less punishing, just to be closer to V-Slice, but I think shit should stay where it is
 			comboBehaviour: BREAK,
 			noteSplash: false,
-			level:1
+			level:2
 		},
 		TIER1 => {
 			internalName: "shit",
@@ -115,7 +115,7 @@ class JudgmentManager {
 			health: -2.375,
 			comboBehaviour: BREAK,
 			noteSplash: false,
-			level:2
+			level:3
 		},
 		MISS => {
 			internalName: "miss",

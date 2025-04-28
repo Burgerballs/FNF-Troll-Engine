@@ -1,5 +1,6 @@
 package funkin.states.editors;
 
+import flixel.ui.FlxBar;
 import funkin.data.CharacterData;
 import funkin.objects.AttachedFlxText;
 import funkin.objects.hud.HealthIcon;
@@ -161,6 +162,37 @@ class ChartingState extends MusicBeatState
 		return GRID_SIZE * 5;
 	}
 
+
+	var L_NOTES(get,never):Array<Int>;
+
+	public function get_L_NOTES() {
+		return [for (i in 0...Math.ceil(keyCount/2)) i];
+	}
+
+	var R_NOTES(get,never):Array<Int>;
+
+	public function get_R_NOTES() {
+		return [for (i in Math.floor(keyCount/2)...keyCount) i];
+	}
+
+	var noteCount(get,never):Int;
+
+	public function get_noteCount() {
+		return _song.notes[curSec].sectionNotes.length;
+	}
+
+	var noteLCount(get,never):Int;
+
+	public function get_noteLCount() {
+		return _song.notes[curSec].sectionNotes.filter((a) -> {return L_NOTES.contains(a[1]);}).length;
+	}
+
+	var noteRCount(get,never):Int;
+
+	public function get_noteRCount() {
+		return _song.notes[curSec].sectionNotes.filter((a) -> {return R_NOTES.contains(a[1]);}).length;
+	}
+
 	var dummyArrow:FlxSprite;
 
 	var curRenderedSustains:FlxTypedGroup<FlxSprite>;
@@ -194,6 +226,16 @@ class ChartingState extends MusicBeatState
 
 	var leftIcon:HealthIcon;
 	var rightIcon:HealthIcon;
+
+
+	var balanceIndicatorLBG:FlxSprite;
+	var balanceIndicatorRBG:FlxSprite;
+	var balanceIndicatorL:FlxBar;
+	var balanceIndicatorR:FlxBar;
+	var balanceIndicatorLLabel:FlxText;
+	var balanceIndicatorRLabel:FlxText;
+	var balanceIndicatorLValue:FlxText;
+	var balanceIndicatorRValue:FlxText;
 
 	var value1InputText:FlxUIInputText;
 	var value2InputText:FlxUIInputText;
@@ -472,6 +514,45 @@ class ChartingState extends MusicBeatState
 
 		dummyArrow = CoolUtil.blankSprite(GRID_SIZE, GRID_SIZE);
 		add(dummyArrow);
+
+		var balThing = CoolUtil.makeOutlinedGraphic(200, 20, 0xFFFFFFFF, 5, 0xFF000000);
+
+		balanceIndicatorLBG = new FlxSprite(10, 720 - 60, balThing);
+		balanceIndicatorLBG.scrollFactor.set();
+		add(balanceIndicatorLBG);
+
+
+		balanceIndicatorRBG = new FlxSprite(10, 720 - 30, balThing);
+		balanceIndicatorRBG.scrollFactor.set();
+		add(balanceIndicatorRBG);
+
+		balanceIndicatorL = new FlxBar(balanceIndicatorLBG.x + 5, balanceIndicatorLBG.y + 5, LEFT_TO_RIGHT, Std.int(balanceIndicatorLBG.width - 10), Std.int(balanceIndicatorLBG.height - 10), null, '', 0, 1);
+		balanceIndicatorL.createFilledBar(0xFF000000, 0xFFFFFFFF);
+		balanceIndicatorL.numDivisions = 50;
+		balanceIndicatorL.scrollFactor.set();
+		add(balanceIndicatorL);
+
+		balanceIndicatorR = new FlxBar(balanceIndicatorRBG.x + 5, balanceIndicatorRBG.y + 5, LEFT_TO_RIGHT, Std.int(balanceIndicatorLBG.width - 10), Std.int(balanceIndicatorLBG.height - 10), null, '', 0, 1);
+		balanceIndicatorR.createFilledBar(0xFF000000, 0xFFFFFFFF);
+		balanceIndicatorR.numDivisions = 50;
+		balanceIndicatorR.scrollFactor.set();
+		add(balanceIndicatorR);
+
+		balanceIndicatorLLabel = new FlxText(balanceIndicatorL.x + balanceIndicatorL.width + 8, 200, 0, "L" , 16);
+		balanceIndicatorLLabel.setFormat(null, 18, 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFF000000);
+		balanceIndicatorLLabel.borderSize = 2;
+		balanceIndicatorLLabel.scrollFactor.set();
+		add(balanceIndicatorLLabel);
+
+		balanceIndicatorRLabel = new FlxText(balanceIndicatorR.x + balanceIndicatorR.width + 8, 200, 0, "R" , 16);
+		balanceIndicatorRLabel.setFormat(null, 18, 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFF000000);
+		balanceIndicatorRLabel.borderSize = 2;
+		balanceIndicatorRLabel.scrollFactor.set();
+		add(balanceIndicatorRLabel);
+
+		balanceIndicatorLLabel.y = balanceIndicatorLBG.y + ((balanceIndicatorL.height - balanceIndicatorLLabel.height) / 2) + 4;
+		balanceIndicatorRLabel.y = balanceIndicatorRBG.y + ((balanceIndicatorR.height - balanceIndicatorRLabel.height) / 2) + 4;
+
 
 		/*
 		var text =
@@ -2151,6 +2232,9 @@ class ChartingState extends MusicBeatState
 				lastConductorPos = Conductor.songPosition;
 			}
 		}
+
+		balanceIndicatorL.value = (1.0 * noteLCount) / (1.0 * noteCount);
+		balanceIndicatorR.value = (1.0 * noteRCount) / (1.0 * noteCount);
 
 		super.update(elapsed);
 	}
