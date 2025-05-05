@@ -1,5 +1,6 @@
 package funkin.states;
 
+import funkin.objects.hud.SignatureHUD;
 import haxe.Timer;
 import funkin.objects.playfields.PlayField.NoteCallback;
 import funkin.data.CharacterData;
@@ -912,6 +913,7 @@ class PlayState extends MusicBeatState
 				case 'Advanced': hud = new AdvancedHUD(iP1, iP2, SONG.song, stats);
 				case 'Kade': hud = new KadeHUD(iP1, iP2, SONG.song, stats);
 				case 'Classic': hud = new ClassicHUD(iP1, iP2, SONG.song, stats);
+				case 'Signature': hud = new SignatureHUD(iP1,iP2,SONG.song,stats);
 				default: hud = new TraditionalHUD(iP1, iP2, SONG.song, stats);
 			}
 		}

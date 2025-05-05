@@ -193,6 +193,12 @@ class ChartingState extends MusicBeatState
 		return _song.notes[curSec].sectionNotes.filter((a) -> {return R_NOTES.contains(a[1]);}).length;
 	}
 
+	var balancePercentage(get,never):Int;
+
+	public function get_balancePercentage() {
+		return Math.floor((Math.min(noteLCount, noteRCount) * 100) / Math.max(noteLCount, noteRCount));
+	}
+
 	var dummyArrow:FlxSprite;
 
 	var curRenderedSustains:FlxTypedGroup<FlxSprite>;
@@ -234,8 +240,7 @@ class ChartingState extends MusicBeatState
 	var balanceIndicatorR:FlxBar;
 	var balanceIndicatorLLabel:FlxText;
 	var balanceIndicatorRLabel:FlxText;
-	var balanceIndicatorLValue:FlxText;
-	var balanceIndicatorRValue:FlxText;
+	var balanceIndicatorValue:FlxText;
 
 	var value1InputText:FlxUIInputText;
 	var value2InputText:FlxUIInputText;
@@ -552,6 +557,12 @@ class ChartingState extends MusicBeatState
 
 		balanceIndicatorLLabel.y = balanceIndicatorLBG.y + ((balanceIndicatorL.height - balanceIndicatorLLabel.height) / 2) + 4;
 		balanceIndicatorRLabel.y = balanceIndicatorRBG.y + ((balanceIndicatorR.height - balanceIndicatorRLabel.height) / 2) + 4;
+
+		balanceIndicatorValue = new FlxText(balanceIndicatorLBG.x + 4, balanceIndicatorLBG.y - 24, balanceIndicatorLBG.width, "Balance: 100%" , 16);
+		balanceIndicatorValue.setFormat(null, 18, 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFF000000);
+		balanceIndicatorValue.borderSize = 2;
+		balanceIndicatorValue.scrollFactor.set();
+		add(balanceIndicatorValue);
 
 
 		/*
@@ -2235,6 +2246,8 @@ class ChartingState extends MusicBeatState
 
 		balanceIndicatorL.value = (1.0 * noteLCount) / (1.0 * noteCount);
 		balanceIndicatorR.value = (1.0 * noteRCount) / (1.0 * noteCount);
+		balanceIndicatorValue.text = 'Balance: $balancePercentage%';
+		balanceIndicatorValue.color = balancePercentage <= 30 ? 0xFFFF3333 : 0xFFFFFFFF;
 
 		super.update(elapsed);
 	}

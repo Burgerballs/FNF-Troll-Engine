@@ -554,7 +554,7 @@ class ClientPrefs
 					// Default exists so that mods can tell if they're allowed to fuck w/ the HUD or not
 					// In Vanilla Troll use it just defaults to Psych (called Traditional now)
 					// Mods can choose to not honour it but I think they should, generally
-					"options" => ["Default", "Traditional", "Advanced", "Classic", "Kade"]
+					"options" => ["Default", "Traditional", "Advanced", "Classic", "Kade", "Signature"]
 				]
 			},
 
